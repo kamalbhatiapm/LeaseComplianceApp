@@ -8,13 +8,42 @@ IFRS 16 / ASC 842 contract analyzer with AI extraction, risk scoring, and n8n we
 
 ## What's in this repo
 
+### App
+
 | File | Description |
 |------|-------------|
-| `legalgraph-mockups.html` | Full UI mockup — three screens, interactive upload flow, n8n webhook trigger |
-| `sample-lease-agreement.docx` | Realistic 7-year office lease with all IFRS 16 fields embedded for extraction testing |
-| `prd-lease-compliance-2026-03-31.md` | Product requirements document |
-| `build.sh` | Build script — injects env vars into the HTML at deploy time |
-| `netlify.toml` | Netlify build config — command, publish dir, security headers |
+| `legalgraph-mockups.html` | Source of truth — all UI, CSS, and JS in one file (three screens, interactive upload flow, n8n webhook trigger) |
+| `build.sh` | Build script — substitutes `__PLACEHOLDER__` tokens with env vars at deploy time, outputs `dist/index.html` |
+| `netlify.toml` | Netlify build config — build command, publish dir (`dist/`), security headers |
+| `.gitignore` | Excludes `dist/` (build output) so locally-built files with injected secrets are never committed |
+| `CLAUDE.md` | Product context and working norms for AI-assisted development — design system, critical UX rules, backlog priorities |
+
+### Test data
+
+| File | Description |
+|------|-------------|
+| `sample-lease-agreement.docx` | Realistic 7-year commercial office lease engineered to exercise every IFRS 16 extraction field, with discount rate intentionally absent |
+
+### Product docs
+
+| File | Description |
+|------|-------------|
+| `prd-lease-compliance-2026-03-31.md` | Full product requirements — personas, jobs to be done, success metrics, P0/P1/P2 features |
+| `docs/n8n-workflow.jpeg` | Architecture diagram of the n8n orchestrator-subagent pipeline |
+
+### Evals
+
+| File | Description |
+|------|-------------|
+| `evals/run-evals.js` | Automated eval runner — tests webhook payload shape, extraction coverage, and risk score against ground-truth cases |
+| `evals/cases/sample-lease-agreement.json` | Ground-truth test case for the SF office lease |
+| `evals/hhh-rubric.md` | 21-question human eval rubric (Helpful / Honest / Harmless), scored 1–5 per question |
+| `evals/hhh-results-v1.md` | HHH baseline scores — 74/105 (HOLD); per-question breakdown and top gaps |
+| `evals/hhh-results.md` | Live results log — add a row after each eval round |
+| `evals/responsible-ai-eval.md` | 28-question RAI framework across 7 dimensions (Transparency, Fairness, Privacy, Security, Accountability, Safety, Human Oversight) |
+| `evals/responsible-ai-results-v1.md` | RAI baseline — 58/112 (52%, HOLD for regulated clients); dimension-by-dimension evidence |
+| `evals/rai-remediation-plan.md` | Gap-by-gap remediation plan — classifies each gap as UI, pipeline, or process work |
+| `evals/qa-backlog.md` | 21-item bug tracker — all P0/P1 resolved, 9 P2/P3 open |
 
 ---
 
