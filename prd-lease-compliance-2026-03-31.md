@@ -1,5 +1,5 @@
 # PRD: Lease Compliance Reporting
-**LegalGraph | Version 1.0 | Date: 2026-03-31**
+**LegalGraph | Version 1.1 | Date: 2026-03-31 | Updated: 2026-05-04**
 
 ---
 
@@ -40,13 +40,101 @@ In-house legal and finance teams at mid-market companies managing 10–50 active
 
 ## 4. Success Metrics
 
-| Metric | Baseline (today) | Target | Timeframe |
-|--------|-----------------|--------|-----------|
-| Time to generate quarterly compliance report | 4–6 hours/quarter | <45 minutes | 60 days post-launch |
-| Audit query response time (source clause lookup) | 2–4 hours | <5 minutes | 60 days post-launch |
-| Rachel's activation rate on compliance module | 0% (feature doesn't exist) | 80% of eligible customers | 90 days post-launch |
-| AI extraction accuracy on lease terms | 94% (current overall) | ≥94% on lease-specific fields | At launch |
-| Auditor acceptance rate (no restatement requests) | Unknown | ≥95% reports accepted without revision | 6 months post-launch |
+### North Star
+
+**Audit-ready compliance reports generated per active account per quarter.**
+
+When this number rises across the customer base, Rachel has completed the full workflow — extraction, risk resolution, sign-off — and delivered output her auditor accepted. It is also the strongest leading indicator of renewal: accounts generating reports do not churn.
+
+*Baseline:* 0 (pre-launch) · *Year 1 target:* ≥1 report/quarter across ≥80% of active accounts
+
+---
+
+### L1 Metrics — Strategic Health
+
+| # | Metric | Definition | Baseline | Target | Timeframe |
+|---|--------|-----------|----------|--------|-----------|
+| L1-1 | **Activation rate** | % of new accounts completing a first extraction within 14 days of signup | 0% | ≥70% | 30 days post-launch |
+| L1-2 | **Report generation rate** | % of active accounts generating ≥1 IFRS 16 report per quarter | 0% | ≥80% | 90 days post-launch |
+| L1-3 | **AI extraction accuracy** | % of lease fields correctly extracted vs. ground truth across live contracts | 94% (1 contract) | ≥94% sustained across ≥20 contracts | At launch |
+| L1-4 | **Auditor acceptance rate** | % of reports submitted to auditors accepted without a revision request | Unknown | ≥95% | 6 months post-launch |
+
+---
+
+### L2 Metrics — Diagnostic
+
+**Under L1-1 Activation:**
+- Time to first extraction (P50 target: <10 min from first login)
+- File upload success rate (target: >99%)
+- Consent modal completion rate (users completing consent ÷ users reaching upload)
+- Upload-to-analysis drop-off rate
+
+**Under L1-2 Report Generation Rate:**
+- % of leases with all High-severity flags resolved (prerequisite for report gate)
+- Time from first extraction to report export (P50 target: <45 min — Rachel's benchmark)
+- Report PDF export rate
+- "View full report" click-through rate post-analysis
+
+**Under L1-3 Extraction Quality:**
+- Per-field accuracy by field type (discount rate is the known weak field)
+- Missing field rate per contract (tracked via `terms_missing` in webhook payload)
+- AI confidence score distribution (% of extractions with confidence <0.85)
+- False-positive flag rate (flags raised that users manually dismiss)
+
+**Under L1-4 Auditor Acceptance:**
+- Clause citation accuracy (auditor source-clause lookups that resolve correctly)
+- False-negative flag rate (risks surfaced by auditors that LegalGraph missed)
+- Post-filing restatement request rate
+
+---
+
+### L3 Metrics — Operational Health
+
+| Metric | Target |
+|--------|--------|
+| Webhook success rate | ≥99.5% |
+| p95 analysis latency | <8 seconds |
+| HHH eval score | ≥90/105 (gating for regulated pilots) |
+| RAI eval score | ≥96/112 (gating for insurance/banking) |
+| Automated eval pass rate | 11/11 maintained |
+
+---
+
+### Guardrail Metrics
+
+These cap what is allowed while optimising for the North Star. A guardrail breach triggers a stop-and-fix regardless of North Star movement.
+
+| Guardrail | Threshold | Protects against |
+|-----------|-----------|-----------------|
+| "Not legal advice" disclaimer always visible | 100% of results views | Legal liability |
+| Consent modal fires before every analysis | 100% — no bypass | GDPR / data-processing compliance |
+| Report gate enforced (High flags block generation) | 100% | Auditor receiving unresolved material risks |
+| Extraction accuracy hard floor | ≥90% | Trust erosion → churn |
+| HHH Harmless score | ≥25/35 | Regulated-client liability |
+
+---
+
+### Leading Indicators
+
+| Signal | Predicts | Action if declining |
+|--------|---------|---------------------|
+| Upload rate in week 1 post-signup | Activation (L1-1) | Trigger onboarding nudge; audit upload UX |
+| Progress panel 4-step completion rate | Report generation (L1-2) | Investigate webhook failures and drop-off step |
+| "Edit terms" session rate per account | Extraction quality trust (L1-3) | High rate = users don't trust AI output |
+| Days between upload and report export | Time-to-value | >2 days signals friction in flag-resolution flow |
+| "Re-analyze" button click rate | Data trust (L1-4) | High rate = users not confident in first extraction |
+
+---
+
+### Metric collection gaps (must close before metrics are real)
+
+| Gap | Blocks | Priority |
+|-----|--------|----------|
+| No event tracking instrumentation | All L1/L2 measurement | P0 |
+| No persistent storage (BUG-009) | Time-series per account | P0 |
+| Report gate not enforced in UI | L1-4 reliability | P0 |
+| Extraction benchmarked on 1 contract only | L1-3 statistical validity | P1 |
+| No per-field confidence scores | L2 extraction diagnostics | P1 |
 
 ---
 
