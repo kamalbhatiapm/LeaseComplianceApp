@@ -193,6 +193,62 @@ The missing discount rate is deliberate — it matches the mock analysis wired i
 
 ---
 
+## n8n Workflow Architecture
+
+> **Save the screenshot** to `docs/n8n-workflow.png` to render the image below.
+
+![n8n workflow — Webhook → Extract from File → Orchestrator Agent → Respond to Webhook](docs/n8n-workflow.png)
+
+The workflow is named **"claude workflow"** in n8n. It follows an orchestrator-subagent pattern:
+
+```
+Webhook (POST)
+    │
+    ▼
+Extract from File  ──── extracts raw text from uploaded PDF/DOCX
+    │
+    ▼
+Orchestrator Agent  ◄── OpenAI Chat Model + Simple Memory
+    │
+    ├──► key_term_extraction_agent  ◄── Chat Model + Memory + Tool Output Parser
+    │         └── extracts IFRS 16 / ASC 842 fields from contract text
+    │
+    └──► contract_playbook_agent  ◄── Chat Model + Memory
+              └── fetch_playbook (getAll: row)  ← reads playbook rules from DB
+                        └── validates extracted fields against active playbook
+    │
+    ▼
+Respond to Webhook  ──── returns JSON payload to the UI
+```
+
+### Node descriptions
+
+| Node | Type | Role |
+|---|---|---|
+| **Webhook** | Trigger | Receives POST from the UI on "Analyze Contract" click |
+| **Extract from File** | File Processing | Parses the uploaded PDF/DOCX into raw text |
+| **Orchestrator Agent** | AI Agent | Routes work to sub-agents; assembles final response |
+| **OpenAI Chat Model** | LLM | Powers both the orchestrator and sub-agents |
+| **Simple Memory** | Memory | Provides conversation context across agent calls |
+| **key_term_extraction_agent** | AI Sub-agent | Extracts all IFRS 16 fields, flags missing ones, assigns confidence scores |
+| **contract_playbook_agent** | AI Sub-agent | Fetches the active playbook and runs its risk rules against extracted terms |
+| **fetch_playbook** | Tool (DB query) | `getAll: row` — reads playbook rules from the `contract_playbook` table |
+| **Respond to Webhook** | Output | Returns the full extraction JSON to the calling UI |
+
+### Response payload shape
+
+```json
+{
+  "contract_type": "Commercial Office Lease",
+  "terms_found": ["commencement_date", "expiry_date", "annual_payment", "..."],
+  "terms_missing": ["discount_rate"],
+  "risk_score": 62,
+  "analyzed_at": "2026-05-03T22:00:00.000Z"
+}
+```
+
+---
+
 ## Webhook integration notes
 
 ### Why `text/plain` content-type?
