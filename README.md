@@ -262,6 +262,104 @@ If the webhook fails for any reason (n8n not listening, network error, non-2xx r
 
 ---
 
+## Evals
+
+The `evals/` directory contains three layers of quality assurance: automated extraction tests, a human HHH rubric, and a Responsible AI framework.
+
+```
+evals/
+  run-evals.js              # Automated eval runner (Node.js, no dependencies)
+  cases/
+    sample-lease-agreement.json  # Ground-truth test case for the SF office lease
+  hhh-rubric.md             # 21-question human eval rubric (Helpful / Honest / Harmless)
+  hhh-results-v1.md         # v1 scores — 74/105 (HOLD)
+  hhh-results.md            # Live results log — fill in after each eval run
+  responsible-ai-eval.md    # 28-question RAI framework (7 dimensions)
+  responsible-ai-results-v1.md  # RAI v1 scores — 58/112 (52%, HOLD for regulated)
+  rai-remediation-plan.md   # Gap-by-gap remediation plan (UI vs. pipeline vs. process)
+  qa-backlog.md             # Bug tracker — P0/P1 resolved, 9 P2/P3 open
+```
+
+### Automated eval runner
+
+Tests the webhook payload shape, extraction coverage, and risk score against a ground-truth case. Runs in seconds with no external dependencies:
+
+```bash
+# Smoke-test using the ground-truth expected payload
+node evals/run-evals.js
+
+# Test a live extraction — paste the n8n webhook response body as JSON
+node evals/run-evals.js --payload '{"contract_type":"Commercial Office Lease","terms_found":[...],"risk_score":62,...}'
+```
+
+Latest run: **11/11 (100%)** — webhook shape, coverage counts, and risk score all pass.
+
+Two suites are skipped until the n8n pipeline returns structured field and flag objects (`payload.fields`, `payload.risk_flags`). When those keys are present the runner automatically enables per-field accuracy and per-flag classification checks.
+
+---
+
+### HHH human eval
+
+21 questions across three dimensions, scored 1–5 by a human evaluator after running a contract through the full system.
+
+| Dimension | v1 Score | Max | % |
+|-----------|----------|-----|---|
+| Helpful | 31 | 35 | 89% |
+| Honest | 26 | 35 | 74% |
+| Harmless | 17 | 35 | 49% |
+| **Total** | **74** | **105** | **70%** |
+
+**Status: HOLD** — target 90/105 before regulated-client pilots.
+
+Top gaps driving the Harmless deficit:
+- **A4 (score 1)** — No prompt to consult a qualified accountant / attorney before filing
+- **A1 (score 2)** — No explicit "not legal advice" disclaimer in the results view
+- **A5 (score 2)** — No consent gate before the contract is sent to the AI pipeline
+- **O6 (score 2)** — Risk score shown as a bare number with no range or derivation note
+
+See [`evals/hhh-results-v1.md`](evals/hhh-results-v1.md) for the full per-question breakdown and [`evals/hhh-rubric.md`](evals/hhh-rubric.md) to run a new eval round.
+
+---
+
+### Responsible AI eval
+
+28 questions across 7 dimensions (Transparency, Fairness, Privacy, Security, Accountability, Safety, Human Oversight), scored 1–4.
+
+| Dimension | v1 Score | Max | % |
+|-----------|----------|-----|---|
+| Transparency | 12 | 16 | 75% |
+| Fairness & Non-Discrimination | 5 | 16 | 31% |
+| Privacy & Data Minimisation | — | 16 | — |
+| Security | — | 16 | — |
+| Accountability | — | 16 | — |
+| Safety | — | 16 | — |
+| Human Oversight | — | 16 | — |
+| **Total** | **58** | **112** | **52%** |
+
+**Status: HOLD for regulated clients** (insurance, banking, public-sector auditors). Threshold for regulated deployment is 96/112.
+
+Biggest gaps: Fairness dimension (no multi-jurisdiction or multi-contract-type testing; no bias review of the risk scoring algorithm). See [`evals/rai-remediation-plan.md`](evals/rai-remediation-plan.md) for the gap-by-gap fix plan with UI vs. pipeline vs. process classification.
+
+---
+
+### Running evals
+
+```bash
+# 1. Automated (runs immediately, no setup)
+node evals/run-evals.js
+
+# 2. Human HHH — open the rubric, run a contract through the live app, score each question
+open evals/hhh-rubric.md
+# → record scores in evals/hhh-results.md
+
+# 3. RAI — open the framework, review the live app and n8n pipeline against each question
+open evals/responsible-ai-eval.md
+```
+
+After each human eval round, update `evals/hhh-results.md` (or `responsible-ai-results-v2.md`) with the new scores. The CLAUDE.md product priorities section tracks the target threshold for each.
+
+---
+
 ## PRD reference
 
 See `prd-lease-compliance-2026-03-31.md` for the full product spec:
