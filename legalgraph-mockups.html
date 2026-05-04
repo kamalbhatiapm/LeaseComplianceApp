@@ -2478,7 +2478,7 @@
     let responseData = null;
     try {
       const controller = new AbortController();
-      const timeoutId  = setTimeout(() => controller.abort(), 10000);
+      const timeoutId  = setTimeout(() => controller.abort(), 30000); // 30s to handle n8n cold-starts
       const res = await fetch(WEBHOOK_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -2500,10 +2500,12 @@
       setStepDone('step4');
       setProgress('Extraction complete', 100);
     } catch (err) {
+      const reason = err.name === 'AbortError' ? 'Request timed out after 30s' : err.message;
+      console.error('[LegalGraph] Webhook error:', err.name, err.message);
       setStepDone('step4', true);
       setProgress('Webhook unavailable — showing demo results', 100);
       showToast('error', '<i data-lucide="alert-triangle" class="icon-md"></i>', 'Webhook unavailable',
-        'n8n workflow not reachable — demo data shown below');
+        reason + ' — demo data shown below');
     }
 
     document.getElementById('progressStatusPill').textContent = 'Complete';
