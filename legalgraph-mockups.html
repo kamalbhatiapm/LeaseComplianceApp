@@ -18,6 +18,9 @@
       --brand:    #1B4FD8;
       --brand-dk: #1340B0;
       --brand-lt: #EBF0FD;
+      --accent:   #0D9488;
+      --accent-lt: #F0FDFA;
+      --accent-dk: #0F766E;
       --green:    #0E8A5F;
       --green-lt: #E6F5EF;
       --amber:    #B45309;
@@ -189,7 +192,7 @@
        SCREEN 1 — UPLOAD / HOMEPAGE
     ================================================================ */
     .s1-hero {
-      background: linear-gradient(135deg, #0F1923 0%, #1B3A6B 100%);
+      background: linear-gradient(135deg, #0F1923 0%, #0D2B3E 60%, #0A3A3A 100%);
       padding: 56px 64px 48px;
       display: flex;
       gap: 64px;
@@ -201,7 +204,7 @@
       font-weight: 700;
       letter-spacing: .1em;
       text-transform: uppercase;
-      color: #7AADFF;
+      color: #5EEAD4;
       margin-bottom: 14px;
     }
     .s1-headline {
@@ -226,7 +229,7 @@
     .s1-stat-val {
       font-size: 28px;
       font-weight: 800;
-      color: #fff;
+      color: #5EEAD4;
       letter-spacing: -.03em;
     }
     .s1-stat-label {
@@ -255,7 +258,7 @@
     }
     .upload-icon {
       width: 52px; height: 52px;
-      background: rgba(27,79,216,.4);
+      background: rgba(13,148,136,.35);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -563,7 +566,7 @@
       border-radius: 50%;
       margin-right: 4px;
     }
-    .conf-high  { background: var(--green); }
+    .conf-high  { background: var(--accent); }
     .conf-med   { background: var(--amber); }
     .conf-low   { background: var(--red); }
 
@@ -956,10 +959,10 @@
       flex-shrink: 0;
       transition: background .2s;
     }
-    .progress-step.active .step-dot { background: #7AADFF; }
+    .progress-step.active .step-dot { background: #5EEAD4; }
     .progress-step.done   .step-dot { background: #4ADE80; }
     #progressBar { height: 4px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-top: 12px; }
-    #progressFill { height: 100%; background: #7AADFF; border-radius: 99px; width: 0%; transition: width .4s ease; }
+    #progressFill { height: 100%; background: #5EEAD4; border-radius: 99px; width: 0%; transition: width .4s ease; }
     #progressMeta { display: flex; justify-content: space-between; margin-top: 6px; }
     #progressLabel { font-size: 11px; color: rgba(255,255,255,.45); }
     #progressPct   { font-size: 11px; color: rgba(255,255,255,.45); }
