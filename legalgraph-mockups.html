@@ -81,6 +81,9 @@
       flex: 1;
     }
     .nav-link {
+      background: none;
+      border: none;
+      font-family: inherit;
       color: rgba(255,255,255,.55);
       font-size: 13px;
       padding: 6px 12px;
@@ -1196,11 +1199,11 @@
   <nav>
     <div class="nav-logo">LegalGraph<sup>®</sup></div>
     <div class="nav-links">
-      <div class="nav-link active" data-screen="1" onclick="showScreen(1)">Dashboard</div>
-      <div class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</div>
-      <div class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</div>
-      <div class="nav-link disabled" title="Coming soon">Reports</div>
-      <div class="nav-link disabled" title="Coming soon">Audit Trail</div>
+      <button type="button" class="nav-link active" data-screen="1" onclick="showScreen(1)" aria-current="page">Dashboard</button>
+      <button type="button" class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</button>
+      <button type="button" class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</button>
+      <button type="button" class="nav-link disabled" title="Coming soon" aria-disabled="true">Reports</button>
+      <button type="button" class="nav-link disabled" title="Coming soon" aria-disabled="true">Audit Trail</button>
     </div>
     <div class="nav-end">
       <div class="avatar">RC</div>
@@ -1249,10 +1252,11 @@
             Choose file
           </button>
           <div class="upload-progress-label">Max 50 MB per file · Encrypted at rest</div>
+          <div class="upload-progress-label" style="margin-top:6px;color:var(--ink-3);">Best results with standard fixed-rent property leases. Subleases, variable rents, and multi-party structures may require manual review.</div>
         </div>
 
         <!-- Analysis progress panel (shown during analysis) -->
-        <div id="progressPanel" class="hidden">
+        <div id="progressPanel" class="hidden" aria-live="polite" aria-label="Analysis progress">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <span style="font-size:12px;font-weight:600;color:#fff;" id="progressFileName">—</span>
             <span class="pill pill-brand pill-sm" id="progressStatusPill">Queued</span>
@@ -1261,7 +1265,7 @@
           <div class="progress-step" id="step2"><span class="step-dot"></span>Extracting IFRS 16 fields</div>
           <div class="progress-step" id="step3"><span class="step-dot"></span>Scoring risk factors</div>
           <div class="progress-step" id="step4"><span class="step-dot"></span>Triggering downstream workflow</div>
-          <div id="progressBar"><div id="progressFill"></div></div>
+          <div id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Analysis progress"><div id="progressFill"></div></div>
           <div id="progressMeta">
             <span id="progressLabel">Starting…</span>
             <span id="progressPct">0%</span>
@@ -1402,11 +1406,11 @@
   <nav>
     <div class="nav-logo">LegalGraph<sup>®</sup></div>
     <div class="nav-links">
-      <div class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</div>
-      <div class="nav-link active" data-screen="2" onclick="showScreen(2)">Leases</div>
-      <div class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</div>
-      <div class="nav-link disabled" title="Coming soon">Reports</div>
-      <div class="nav-link disabled" title="Coming soon">Audit Trail</div>
+      <button type="button" class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</button>
+      <button type="button" class="nav-link active" data-screen="2" onclick="showScreen(2)" aria-current="page">Leases</button>
+      <button type="button" class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</button>
+      <button type="button" class="nav-link disabled" title="Coming soon" aria-disabled="true">Reports</button>
+      <button type="button" class="nav-link disabled" title="Coming soon" aria-disabled="true">Audit Trail</button>
     </div>
     <div class="nav-end">
       <div class="avatar">RC</div>
@@ -1426,8 +1430,8 @@
         </span>
         <span style="font-size:12px;color:var(--ink-3);" id="s2-analyzed-at">Last analyzed: May 2, 2026 at 3:14 PM</span>
         <button class="btn btn-outline btn-sm">Re-analyze</button>
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" class="icon-sm"></i> Export PDF</button>
-        <button class="btn btn-primary btn-sm" id="generateReportBtn" disabled title="Resolve all high-severity flags and sign off before generating a report" style="opacity:.45;cursor:not-allowed;">Generate IFRS 16 Report</button>
+        <button class="btn btn-outline btn-sm" onclick="track('report_exported', {format:'pdf',type:'extraction'})"><i data-lucide="download" class="icon-sm"></i> Export PDF</button>
+        <button class="btn btn-primary btn-sm" id="generateReportBtn" disabled title="Resolve all high-severity flags and sign off before generating a report" style="opacity:.45;cursor:not-allowed;" onclick="track('report_exported', {format:'pdf',type:'ifrs16_compliance'})">Generate IFRS 16 Report</button>
       </div>
     </div>
 
@@ -1720,11 +1724,11 @@
   <nav>
     <div class="nav-logo">LegalGraph<sup>®</sup></div>
     <div class="nav-links">
-      <div class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</div>
-      <div class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</div>
-      <div class="nav-link active" data-screen="3" onclick="showScreen(3)">Playbooks</div>
-      <div class="nav-link disabled" title="Coming soon">Reports</div>
-      <div class="nav-link disabled" title="Coming soon">Audit Trail</div>
+      <button type="button" class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</button>
+      <button type="button" class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</button>
+      <button type="button" class="nav-link active" data-screen="3" onclick="showScreen(3)" aria-current="page">Playbooks</button>
+      <button type="button" class="nav-link disabled" title="Coming soon" aria-disabled="true">Reports</button>
+      <button type="button" class="nav-link disabled" title="Coming soon" aria-disabled="true">Audit Trail</button>
     </div>
     <div class="nav-end">
       <div class="avatar">RC</div>
@@ -2047,12 +2051,12 @@
   <div style="background:#fff;border-radius:12px;padding:32px;max-width:460px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.2);">
     <div style="font-size:18px;font-weight:700;color:#0F1923;margin-bottom:8px;">Before we analyze your contract</div>
     <div style="font-size:13px;color:var(--ink-2);line-height:1.6;margin-bottom:20px;">
-      To extract lease terms, your document will be sent to an AI processing service and to your configured n8n workflow.
+      To extract lease terms, your document will be sent to the <strong>Anthropic Claude API</strong> for AI processing and to your configured <strong>n8n</strong> workflow for downstream automation.
       <br><br>
       <strong>This tool provides extraction assistance only — not legal advice or accounting opinions.</strong>
       Always have a qualified accountant and attorney review results before making financial or legal decisions.
       <br><br>
-      <span style="font-size:12px;color:var(--ink-3);">Contract data is processed by the AI service and retained for up to 30 days for quality monitoring. n8n workflow data is retained per your configuration. You may request deletion at <a href="mailto:privacy@legalgraph.io" style="color:var(--brand);">privacy@legalgraph.io</a>.</span>
+      <span style="font-size:12px;color:var(--ink-3);">Contract data is processed by Anthropic Claude API and retained for up to 30 days for quality monitoring per Anthropic's data policies. n8n workflow data is retained per your n8n configuration. You may request deletion at <a href="mailto:privacy@legalgraph.io" style="color:var(--brand);">privacy@legalgraph.io</a>.</span>
     </div>
     <div style="display:flex;gap:10px;">
       <button onclick="denyConsent()" style="flex:1;padding:10px;border:1px solid var(--border);background:var(--white);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2);">Cancel</button>
@@ -2062,13 +2066,13 @@
 </div>
 
 <!-- ── Webhook toast ──────────────────────────────────────────────── -->
-<div id="webhookToast">
+<div id="webhookToast" role="alert" aria-live="assertive" aria-atomic="true">
   <div class="toast-icon" id="toastIcon"><i data-lucide="loader" class="icon-md"></i></div>
   <div class="toast-body">
     <div class="toast-title" id="toastTitle">Sending to workflow…</div>
     <div class="toast-sub"  id="toastSub">POST → n8n webhook</div>
   </div>
-  <button class="toast-dismiss" onclick="dismissToast()"><i data-lucide="x" class="icon-sm"></i></button>
+  <button class="toast-dismiss" onclick="dismissToast()" aria-label="Dismiss notification"><i data-lucide="x" class="icon-sm"></i></button>
 </div>
 
 <script>
@@ -2076,12 +2080,22 @@
   const SUPABASE_URL   = '__SUPABASE_URL__';
   const SUPABASE_ANON  = '__SUPABASE_ANON_KEY__';
 
+  /* ── Event tracking stubs ───────────────────────────────────── */
+  function track(event, props = {}) {
+    // Stub: replace with your analytics provider (e.g. Segment, PostHog, Mixpanel)
+    // window.analytics?.track(event, props);
+    console.debug('[track]', event, props);
+  }
+
   /* ── SPA screen routing ─────────────────────────────────────── */
   function showScreen(n) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen' + n).classList.add('active');
     document.querySelectorAll('.nav-link[data-screen]').forEach(link => {
-      link.classList.toggle('active', link.dataset.screen == n);
+      const isCurrent = link.dataset.screen == n;
+      link.classList.toggle('active', isCurrent);
+      if (isCurrent) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
     });
     window.scrollTo(0, 0);
   }
@@ -2382,6 +2396,7 @@
 
     selectedFile = file;
     fileChosen   = true;
+    track('upload_started', { file_name: file.name, file_size_kb: Math.round(file.size / 1024), file_type: ext });
     document.getElementById('uploadIcon').innerHTML = '<i data-lucide="file-check" class="icon-xl"></i>'; lucide.createIcons({nodes:[document.getElementById('uploadIcon')]});
     document.getElementById('uploadTitle').textContent = file.name;
     document.getElementById('uploadSub').textContent   =
@@ -2423,10 +2438,18 @@
   }
 
   /* ── Analysis + webhook flow ────────────────────────────────── */
+  function setNavLocked(locked) {
+    document.querySelectorAll('.nav-link[data-screen]').forEach(el => {
+      el.style.pointerEvents = locked ? 'none' : '';
+      el.style.opacity       = locked ? '.4'   : '';
+    });
+  }
+
   async function runAnalysis() {
     const btn = document.getElementById('analyzeBtn');
     btn.disabled  = true;
     btn.innerHTML = '<span class="spinner"></span> Analyzing…';
+    setNavLocked(true);
 
     document.getElementById('progressFileName').textContent = selectedFile.name;
     document.getElementById('progressPanel').classList.remove('hidden');
@@ -2454,11 +2477,15 @@
     let webhookOk    = false;
     let responseData = null;
     try {
+      const controller = new AbortController();
+      const timeoutId  = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(WEBHOOK_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'text/plain' },
         body:    JSON.stringify(payload),
+        signal:  controller.signal,
       });
+      clearTimeout(timeoutId);
       webhookOk = res.ok;
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -2489,6 +2516,13 @@
     const displayData = responseData ?? MOCK_ANALYSIS;
     renderResults(displayData);
     setDataBadge(webhookOk && responseData);
+    track('analysis_complete', {
+      webhook_ok: webhookOk,
+      fields_extracted: displayData?.terms_found?.length ?? 0,
+      risk_score: displayData?.risk_score ?? null,
+      high_flags: (displayData?.flags ?? []).filter(f => f.severity === 'high').length,
+      used_demo_data: !webhookOk,
+    });
 
     /* Show success toast with actual extracted field counts */
     if (webhookOk) {
@@ -2499,6 +2533,7 @@
     }
 
     if (webhookOk) setTimeout(dismissToast, 7000);
+    setNavLocked(false);
   }
 
   /* ── Progress helpers ───────────────────────────────────────── */
@@ -2518,6 +2553,7 @@
     document.getElementById('progressLabel').textContent = label;
     document.getElementById('progressPct').textContent   = pct + '%';
     document.getElementById('progressFill').style.width  = pct + '%';
+    document.getElementById('progressBar').setAttribute('aria-valuenow', pct);
   }
   async function animateStep(id, label, pct, ms) {
     setStepActive(id);
@@ -2531,6 +2567,8 @@
   function updateReportGate() {
     const boxes = document.querySelectorAll('.high-flag-signoff');
     const allSigned = boxes.length === 0 || [...boxes].every(cb => cb.checked);
+    const checkedCount = [...boxes].filter(cb => cb.checked).length;
+    track('flag_resolved', { flags_signed_off: checkedCount, total_high_flags: boxes.length, all_resolved: allSigned });
     const btn = document.getElementById('generateReportBtn');
     if (!btn) return;
     btn.disabled = !allSigned;
