@@ -2,6 +2,8 @@
 
 IFRS 16 / ASC 842 contract analyzer with AI extraction, risk scoring, and n8n webhook integration.
 
+**Live app → [https://lease-compliance-app.netlify.app](https://lease-compliance-app.netlify.app)**
+
 ---
 
 ## What's in this repo

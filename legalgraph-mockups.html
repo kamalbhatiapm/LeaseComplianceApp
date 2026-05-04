@@ -315,24 +315,34 @@
       color: var(--ink);
       letter-spacing: -.01em;
     }
+    .lease-table-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .lease-table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
     .lease-table {
       width: 100%;
       border-collapse: collapse;
-      background: var(--white);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
     }
     .lease-table th {
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: .06em;
       color: var(--ink-3);
-      padding: 12px 18px;
+      padding: 10px 18px;
       text-align: left;
-      background: var(--surface);
+      background: #F1F3F7;
       border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
     .lease-table td {
       padding: 13px 18px;
@@ -343,6 +353,20 @@
     }
     .lease-table tr:last-child td { border-bottom: none; }
     .lease-table tr:hover td { background: var(--surface); }
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .btn-icon:hover { background: var(--surface); color: var(--ink); }
     .lease-name {
       font-weight: 600;
       color: var(--ink);
@@ -1007,9 +1031,33 @@
 
     /* ── Inline field editing (H1) ──────────────────────────────── */
     .term-val-display { display: inline; }
-    .term-val-edit    { display: none; font-size: 13px; font-weight: 600; border: 1px solid var(--brand); border-radius: 5px; padding: 2px 6px; width: 100%; }
+    .term-val-edit {
+      display: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
+      transition: box-shadow .15s, border-color .15s;
+    }
+    .term-val-edit:focus {
+      border-color: #9BAfd4;
+      box-shadow: 0 0 0 3px rgba(27,79,216,.08);
+    }
+    .term-val-edit::placeholder { color: var(--ink-3); font-weight: 400; }
     .edit-mode .term-val-display { display: none; }
-    .edit-mode .term-val-edit    { display: inline-block; }
+    .edit-mode .term-val-edit    { display: block; }
+    .edit-mode .term-row {
+      background: #F5F8FF;
+      border-bottom-color: #D6E0FA;
+    }
+    .edit-mode .term-row:hover { background: #EEF3FF; }
+    .edit-mode .term-row.term-missing { background: var(--amber-lt); }
     .term-val-edited { color: var(--brand) !important; }
     .manually-verified-badge { font-size: 9px; font-weight: 700; background: var(--brand-lt); color: var(--brand); border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
     #editTermsBtn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
@@ -1026,21 +1074,77 @@
       .term-row { grid-template-columns: 150px 1fr; }
       .term-clause { display: none; }
     }
+
+    /* ── Tablet ─────────────────────────────────────────────────── */
     @media (max-width: 900px) {
-      .s1-stats   { flex-direction: column; gap: 10px; }
-      .metric-grid { grid-template-columns: 1fr 1fr; }
-      .s3-stats   { flex-direction: column; gap: 10px; }
+      /* Body padding */
+      .s1-body    { padding: 24px 28px; }
+      .s3-body    { padding: 20px 24px; }
+
+      /* Hero */
+      .s1-hero    { padding: 40px 28px 36px; gap: 32px; }
+
+      /* Stats row: keep horizontal, tighten gap */
+      .s1-stats   { gap: 20px; flex-wrap: wrap; }
+
+      /* Screen 3 stats: 2-column grid */
+      .s3-stats   { grid-template-columns: 1fr 1fr; }
+
+      /* Table horizontal scroll */
+      .lease-table-card { overflow-x: auto; }
+      .lease-table      { min-width: 680px; }
+
+      /* Playbook table */
       .playbook-table-wrap { overflow-x: auto; }
       .playbook-tbl { min-width: 640px; }
+
+      /* Screen 2 subheader: allow wrapping */
+      .s2-subheader { flex-wrap: wrap; gap: 10px; padding: 12px 20px; }
     }
+
+    /* ── Mobile ─────────────────────────────────────────────────── */
     @media (max-width: 600px) {
+      /* Page chrome */
       .page-nav   { gap: 8px; padding: 0 12px; }
       .screen-wrapper { padding: 16px 12px 0; }
-      .metric-grid { grid-template-columns: 1fr; }
+      nav         { padding: 0 16px; }
+      .nav-links  { display: none; }
+
+      /* Screen 1 — hero: stack copy above upload panel */
+      .s1-hero    { flex-direction: column; padding: 28px 20px 24px; gap: 28px; align-items: stretch; }
+      .s1-upload-panel { width: 100%; }
+      .s1-headline { font-size: 26px; }
+      .s1-sub     { font-size: 14px; margin-bottom: 20px; }
+      .s1-stats   { gap: 20px; }
+
+      /* Screen 1 — body + table */
+      .s1-body    { padding: 16px; }
+      .lease-table-toolbar { flex-wrap: wrap; gap: 8px; }
+      .lease-table-toolbar .section-title { flex: 1 0 100%; }
+
+      /* Screen 2 — subheader */
+      .s2-subheader { flex-direction: column; align-items: flex-start; padding: 12px 16px; gap: 8px; }
+      .s2-subheader-actions { flex-wrap: wrap; gap: 6px; }
+
+      /* Screen 2 — metrics */
+      .metric-grid { grid-template-columns: 1fr 1fr; }
       .score-header { flex-direction: column; gap: 12px; }
-      nav { padding: 0 12px; }
-      .nav-links { display: none; }
-      .s1-upload  { padding: 24px 16px; }
+
+      /* Screen 3 */
+      .s3-body    { padding: 16px; }
+      .s3-stats   { grid-template-columns: 1fr 1fr; }
+      .s3-stat-val { font-size: 22px; }
+    }
+
+    /* ── Small mobile ────────────────────────────────────────────── */
+    @media (max-width: 420px) {
+      .metric-grid { grid-template-columns: 1fr; }
+      .s1-stats    { flex-direction: column; gap: 12px; }
+      .page-nav-link span { display: none; } /* show numbers only */
+
+      /* Screen 3 subheader: stack title group above buttons */
+      .s3-subheader { flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px 16px; }
+      .s3-subheader > div:last-child { width: 100%; justify-content: flex-start; }
     }
 
     /* ── Page nav labels ────────────────────────────────────────── */
@@ -1204,11 +1308,12 @@
 
     <!-- Recent leases -->
     <div class="s1-body">
-      <div class="section-header">
+      <div class="lease-table-card">
+      <div class="lease-table-toolbar">
         <div class="section-title">Recent Contracts</div>
         <div style="display:flex;gap:8px;">
           <button class="btn btn-outline btn-sm">Export all</button>
-          <button class="btn btn-primary btn-sm">+ Add lease</button>
+          <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="icon-sm"></i> Add lease</button>
         </div>
       </div>
 
@@ -1245,7 +1350,7 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-secondary btn-sm">View report</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
@@ -1268,7 +1373,7 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-secondary btn-sm">View report</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
@@ -1291,7 +1396,7 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-danger btn-sm">Resolve flags</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
@@ -1314,12 +1419,13 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-secondary btn-sm">View report</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
+      </div><!-- /.lease-table-card -->
     </div>
   </div>
 </div>
@@ -1352,7 +1458,7 @@
         <span class="breadcrumb-sep">›</span>
         <span class="breadcrumb-current" id="s2-breadcrumb">SF Headquarters — Floor 12</span>
       </div>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+      <div class="s2-subheader-actions" style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <span id="s2-data-badge" class="s2-data-badge s2-data-badge--demo" title="No analysis has been run yet — showing placeholder data">
           <i data-lucide="flask-conical" class="icon-xs"></i> Demo data
         </span>
@@ -1756,7 +1862,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1780,7 +1886,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1804,7 +1910,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1828,7 +1934,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1852,7 +1958,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1876,7 +1982,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-outline btn-sm">View</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -2400,16 +2506,11 @@
 
       setStepDone('step4');
       setProgress('Extraction complete', 100);
-      const fc = responseData?.terms_found?.length
-               ?? Object.keys(responseData?.fields ?? {}).filter(k => responseData.fields[k]?.value).length
-               ?? 8;
-      showToast('success', '<i data-lucide="check-circle" class="icon-md"></i>', 'Extraction complete',
-        `${fc} fields extracted · risk_score=${responseData?.risk_score ?? '—'}`);
     } catch (err) {
       setStepDone('step4', true);
-      setProgress('Webhook failed — showing demo results', 100);
-      showToast('error', '<i data-lucide="alert-triangle" class="icon-md"></i>', 'Webhook delivery failed',
-        `${err.message} — showing demo results`);
+      setProgress('Webhook unavailable — showing demo results', 100);
+      showToast('error', '<i data-lucide="alert-triangle" class="icon-md"></i>', 'Webhook unavailable',
+        'n8n workflow not reachable — demo data shown below');
     }
 
     document.getElementById('progressStatusPill').textContent = 'Complete';
@@ -2419,8 +2520,17 @@
     btn.onclick   = () => document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
 
     /* Render real AI data if available, otherwise fall back to mock */
-    renderResults(responseData ?? MOCK_ANALYSIS);
+    const displayData = responseData ?? MOCK_ANALYSIS;
+    renderResults(displayData);
     setDataBadge(webhookOk && responseData);
+
+    /* Show success toast with actual extracted field counts */
+    if (webhookOk) {
+      const fc        = displayData?.terms_found?.length || MOCK_ANALYSIS.terms_found.length;
+      const riskScore = displayData?.risk_score ?? MOCK_ANALYSIS.risk_score;
+      showToast('success', '<i data-lucide="check-circle" class="icon-md"></i>', 'Extraction complete',
+        `${fc} fields extracted · risk score ${riskScore}`);
+    }
 
     if (webhookOk) setTimeout(dismissToast, 7000);
   }
