@@ -929,6 +929,46 @@
     #progressLabel { font-size: 11px; color: rgba(255,255,255,.45); }
     #progressPct   { font-size: 11px; color: rgba(255,255,255,.45); }
 
+    /* ── Sign-off row (H3) ──────────────────────────────────────── */
+    .sign-off-row {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .sign-off-row label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(255,255,255,.7);
+      cursor: pointer;
+      flex: 1;
+    }
+    .sign-off-row input[type="checkbox"] { accent-color: #4ADE80; width: 14px; height: 14px; cursor: pointer; }
+    .sign-off-row input[type="text"] {
+      font-size: 11px;
+      padding: 4px 8px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 5px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      width: 140px;
+    }
+    .sign-off-row input[type="text"]::placeholder { color: rgba(255,255,255,.35); }
+
+    /* ── Inline field editing (H1) ──────────────────────────────── */
+    .term-val-display { display: inline; }
+    .term-val-edit    { display: none; font-size: 13px; font-weight: 600; border: 1px solid var(--brand); border-radius: 5px; padding: 2px 6px; width: 100%; }
+    .edit-mode .term-val-display { display: none; }
+    .edit-mode .term-val-edit    { display: inline-block; }
+    .term-val-edited { color: var(--brand) !important; }
+    .manually-verified-badge { font-size: 9px; font-weight: 700; background: var(--brand-lt); color: var(--brand); border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
+    #editTermsBtn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
     /* ── Responsive breakpoints ─────────────────────────────────── */
     @media (max-width: 1100px) {
       .s2-body    { flex-direction: column; }
@@ -1341,7 +1381,7 @@
         <!-- Risk Flags -->
         <div class="card-title" style="margin-bottom:12px;margin-top:8px;">Risk Flags</div>
         <div class="risk-list">
-          <div class="risk-item high">
+          <div class="risk-item high" id="flag-discount-rate">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;">
               <div>
                 <div class="risk-title">Discount rate missing</div>
@@ -1352,6 +1392,18 @@
             <div class="risk-meta">
               <button class="btn btn-sm btn-outline">Enter IBR manually</button>
               <span style="font-size:11px;color:var(--ink-3);">Affects: Lease liability, ROU asset calculation</span>
+            </div>
+            <!-- BUG-017: IBR sourcing guidance -->
+            <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5;">
+              To obtain your IBR, contact your treasury team or request a rate from your primary lender for a comparable term and collateral profile.
+            </div>
+            <!-- H3: Human sign-off -->
+            <div class="sign-off-row">
+              <label>
+                <input type="checkbox" id="signoff-discount-rate" onchange="updateReportGate()" />
+                I acknowledge this risk and confirm resolution before report generation
+              </label>
+              <input type="text" placeholder="Reviewer name" id="reviewer-discount-rate" />
             </div>
           </div>
           <div class="risk-item medium">
@@ -1402,10 +1454,10 @@
         <div class="sidebar-section">
           <div class="sidebar-section-title">Actions</div>
           <div class="action-list">
-            <button class="action-btn">📊 Generate IFRS 16 Report</button>
+            <button class="action-btn" id="generateReportBtn" disabled title="Resolve all high-severity flags and sign off before generating a report" style="opacity:.45;cursor:not-allowed;">📊 Generate IFRS 16 Report</button>
             <button class="action-btn">📤 Export to PDF</button>
             <button class="action-btn">📧 Send to auditor</button>
-            <button class="action-btn">✏️ Edit extracted terms</button>
+            <button class="action-btn" id="editTermsBtn" onclick="toggleEditMode()">✏️ Edit extracted terms</button>
             <button class="action-btn">🔁 Re-run extraction</button>
           </div>
         </div>
@@ -1834,6 +1886,8 @@
       <br><br>
       <strong>This tool provides extraction assistance only — not legal advice or accounting opinions.</strong>
       Always have a qualified accountant and attorney review results before making financial or legal decisions.
+      <br><br>
+      <span style="font-size:12px;color:#6B7E8D;">Contract data is processed by the AI service and retained for up to 30 days for quality monitoring. n8n workflow data is retained per your configuration. You may request deletion at <a href="mailto:privacy@legalgraph.io" style="color:var(--brand);">privacy@legalgraph.io</a>.</span>
     </div>
     <div style="display:flex;gap:10px;">
       <button onclick="denyConsent()" style="flex:1;padding:10px;border:1px solid #D8E0E6;background:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#3D4F5C;">Cancel</button>
@@ -1964,8 +2018,7 @@
     btn.disabled   = true;
     btn.innerHTML  = '<span class="spinner"></span> Analyzing…';
 
-    document.getElementById('progressFileName').textContent =
-      selectedFile ? selectedFile.name : 'HQ_Lease_SFOffice_2024.pdf';
+    document.getElementById('progressFileName').textContent = selectedFile.name;
     document.getElementById('progressPanel').classList.remove('hidden');
     document.getElementById('progressStatusPill').textContent = 'Analyzing…';
 
@@ -2051,6 +2104,57 @@
     setStepDone(id);
   }
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  /* ── S2 / H3: Report gate — disabled until all high flags signed off ── */
+  function updateReportGate() {
+    const allSigned = ['signoff-discount-rate'].every(id => {
+      const cb = document.getElementById(id);
+      return cb && cb.checked;
+    });
+    const btn = document.getElementById('generateReportBtn');
+    if (!btn) return;
+    btn.disabled = !allSigned;
+    btn.style.opacity = allSigned ? '1' : '.45';
+    btn.style.cursor  = allSigned ? 'pointer' : 'not-allowed';
+    btn.title = allSigned
+      ? 'Generate IFRS 16 report'
+      : 'Resolve all high-severity flags and sign off before generating a report';
+  }
+
+  /* ── H1: Inline field editing ───────────────────────────────── */
+  let editModeActive = false;
+
+  function toggleEditMode() {
+    editModeActive = !editModeActive;
+    const btn = document.getElementById('editTermsBtn');
+    const termVals = document.querySelectorAll('.term-val');
+
+    if (editModeActive) {
+      btn.textContent = '✅ Save edits';
+      btn.style.background = 'var(--brand)';
+      btn.style.color = '#fff';
+      termVals.forEach(el => {
+        if (!el.dataset.original) el.dataset.original = el.textContent.trim();
+        const cur = el.dataset.edited || el.dataset.original;
+        el.innerHTML =
+          `<input class="term-val-edit" type="text" value="${cur.replace(/"/g, '&quot;')}" />`;
+      });
+    } else {
+      btn.textContent = '✏️ Edit extracted terms';
+      btn.style.background = '';
+      btn.style.color = '';
+      termVals.forEach(el => {
+        const input = el.querySelector('input');
+        if (!input) return;
+        const newVal = input.value.trim();
+        el.dataset.edited = newVal;
+        const changed = newVal !== el.dataset.original;
+        el.innerHTML = changed
+          ? `<span style="color:var(--brand);font-weight:700;">${newVal}</span><span class="manually-verified-badge">Edited</span>`
+          : newVal;
+      });
+    }
+  }
 
   /* ── Toast helpers ──────────────────────────────────────────── */
   function showToast(type, icon, title, sub) {
