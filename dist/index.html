@@ -2464,12 +2464,15 @@
   function toggleEditMode() {
     editModeActive = !editModeActive;
     const btn = document.getElementById('editTermsBtn');
-    const termVals = document.querySelectorAll('.term-val');
+    const grid = document.getElementById('s2-terms-grid');
+    const termVals = grid ? grid.querySelectorAll('.term-val') : [];
 
     if (editModeActive) {
+      if (grid) grid.classList.add('edit-mode');
       btn.innerHTML = '<i data-lucide="check" class="icon-sm"></i> Save edits'; lucide.createIcons({nodes:[btn]});
       btn.style.background = 'var(--brand)';
       btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--brand)';
       termVals.forEach(el => {
         if (!el.dataset.original) el.dataset.original = el.textContent.trim();
         const cur = el.dataset.edited || el.dataset.original;
@@ -2477,9 +2480,11 @@
           `<input class="term-val-edit" type="text" value="${cur.replace(/"/g, '&quot;')}" />`;
       });
     } else {
+      if (grid) grid.classList.remove('edit-mode');
       btn.innerHTML = '<i data-lucide="pencil" class="icon-sm"></i> Edit terms'; lucide.createIcons({nodes:[btn]});
       btn.style.background = '';
       btn.style.color = '';
+      btn.style.borderColor = '';
       termVals.forEach(el => {
         const input = el.querySelector('input');
         if (!input) return;
