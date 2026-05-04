@@ -195,10 +195,6 @@ The missing discount rate is deliberate — it matches the mock analysis wired i
 
 ## n8n Workflow Architecture
 
-> **Save the screenshot** to `docs/n8n-workflow.png` to render the image below.
-
-![n8n workflow — Webhook → Extract from File → Orchestrator Agent → Respond to Webhook](docs/n8n-workflow.png)
-
 The workflow is named **"claude workflow"** in n8n. It follows an orchestrator-subagent pattern:
 
 ```
