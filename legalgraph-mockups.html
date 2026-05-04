@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LegalGraph — UI Mockups</title>
+  <title>LegalGraph</title>
   <style>
     /* ── Reset & tokens ─────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,34 +38,19 @@
     body {
       font-family: var(--font);
       color: var(--ink);
-      background: var(--page-bg);
+      background: var(--white);
       font-size: 14px;
       line-height: 1.5;
     }
 
-    /* ── Screen wrapper ─────────────────────────────────────────── */
-    .screen-label {
-      background: var(--ink);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      padding: 10px 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .screen-label span { opacity: .5; font-weight: 400; }
-    .screen-wrapper {
-      margin: 0 auto;
-      max-width: 1280px;
-      margin-bottom: 48px;
-    }
+    /* ── Screen ────────────────────────────────────────────────── */
     .screen {
+      display: none;
       background: var(--white);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+      min-height: 100vh;
+    }
+    .screen.active {
+      display: block;
     }
 
     /* ── Shared Nav ─────────────────────────────────────────────── */
@@ -1105,8 +1090,6 @@
     /* ── Mobile ─────────────────────────────────────────────────── */
     @media (max-width: 600px) {
       /* Page chrome */
-      .page-nav   { gap: 8px; padding: 0 12px; }
-      .screen-wrapper { padding: 16px 12px 0; }
       nav         { padding: 0 16px; }
       .nav-links  { display: none; }
 
@@ -1140,33 +1123,11 @@
     @media (max-width: 420px) {
       .metric-grid { grid-template-columns: 1fr; }
       .s1-stats    { flex-direction: column; gap: 12px; }
-      .page-nav-link span { display: none; } /* show numbers only */
-
       /* Screen 3 subheader: stack title group above buttons */
       .s3-subheader { flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px 16px; }
       .s3-subheader > div:last-child { width: 100%; justify-content: flex-start; }
     }
 
-    /* ── Page nav labels ────────────────────────────────────────── */
-    .page-nav {
-      background: var(--ink-2);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      padding: 0 24px;
-      display: flex;
-      gap: 0;
-    }
-    .page-nav-link {
-      color: rgba(255,255,255,.6);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 10px 16px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      text-decoration: none;
-    }
-    .page-nav-link:hover { color: #fff; }
 
     /* ── Data source badge ──────────────────────────────────────── */
     .s2-data-badge {
@@ -1216,35 +1177,26 @@
 </head>
 <body>
 
-<!-- ── Sticky page nav ─────────────────────────────────────────── -->
-<div class="page-nav">
-  <a class="page-nav-link" href="#screen1">① Upload</a>
-  <a class="page-nav-link" href="#screen2">② Analysis Results</a>
-  <a class="page-nav-link" href="#screen3">③ Playbook Management</a>
-</div>
-
 <!-- ================================================================
-     SCREEN 1 — UPLOAD / HOMEPAGE
+     SCREEN 1 — DASHBOARD / UPLOAD
 ================================================================ -->
-<div id="screen1" class="screen-wrapper" style="padding-top:24px">
-  <div class="screen-label">Screen 1 — Contract Upload / Homepage <span>[ /dashboard ]</span></div>
-  <div class="screen">
-    <!-- Nav -->
-    <nav>
-      <div class="nav-logo">LegalGraph<sup>®</sup></div>
-      <div class="nav-links">
-        <div class="nav-link active">Dashboard</div>
-        <div class="nav-link">Leases</div>
-        <div class="nav-link">Reports</div>
-        <div class="nav-link">Playbooks</div>
-        <div class="nav-link">Audit Trail</div>
-      </div>
-      <div class="nav-end">
-        <div class="avatar">RC</div>
-      </div>
-    </nav>
+<div id="screen1" class="screen active">
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">LegalGraph<sup>®</sup></div>
+    <div class="nav-links">
+      <div class="nav-link active" data-screen="1" onclick="showScreen(1)">Dashboard</div>
+      <div class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</div>
+      <div class="nav-link">Reports</div>
+      <div class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</div>
+      <div class="nav-link">Audit Trail</div>
+    </div>
+    <div class="nav-end">
+      <div class="avatar">RC</div>
+    </div>
+  </nav>
 
-    <!-- Hero upload section -->
+  <!-- Hero upload section -->
     <div class="s1-hero">
       <div class="s1-hero-copy">
         <div class="s1-kicker">IFRS 16 / ASC 842 Compliance Suite</div>
@@ -1427,29 +1379,26 @@
       </table>
       </div><!-- /.lease-table-card -->
     </div>
-  </div>
 </div>
 
 
 <!-- ================================================================
      SCREEN 2 — ANALYSIS RESULTS
 ================================================================ -->
-<div id="screen2" class="screen-wrapper">
-  <div class="screen-label">Screen 2 — Analysis Results <span>[ /leases/[id]/report ]</span></div>
-  <div class="screen">
-    <nav>
-      <div class="nav-logo">LegalGraph<sup>®</sup></div>
-      <div class="nav-links">
-        <div class="nav-link">Dashboard</div>
-        <div class="nav-link active">Leases</div>
-        <div class="nav-link">Reports</div>
-        <div class="nav-link">Playbooks</div>
-        <div class="nav-link">Audit Trail</div>
-      </div>
-      <div class="nav-end">
-        <div class="avatar">RC</div>
-      </div>
-    </nav>
+<div id="screen2" class="screen">
+  <nav>
+    <div class="nav-logo">LegalGraph<sup>®</sup></div>
+    <div class="nav-links">
+      <div class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</div>
+      <div class="nav-link active" data-screen="2" onclick="showScreen(2)">Leases</div>
+      <div class="nav-link">Reports</div>
+      <div class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</div>
+      <div class="nav-link">Audit Trail</div>
+    </div>
+    <div class="nav-end">
+      <div class="avatar">RC</div>
+    </div>
+  </nav>
 
     <!-- Sub-header breadcrumb -->
     <div class="s2-subheader">
@@ -1748,27 +1697,24 @@
         </div>
       </div>
     </div>
-  </div>
 </div>
 
 
 <!-- ================================================================
      SCREEN 3 — PLAYBOOK MANAGEMENT
 ================================================================ -->
-<div id="screen3" class="screen-wrapper">
-  <div class="screen-label">Screen 3 — Playbook Management <span>[ /playbooks ]</span></div>
-  <div class="screen">
-    <nav>
-      <div class="nav-logo">LegalGraph<sup>®</sup></div>
-      <div class="nav-links">
-        <div class="nav-link">Dashboard</div>
-        <div class="nav-link">Leases</div>
-        <div class="nav-link">Reports</div>
-        <div class="nav-link active">Playbooks</div>
-        <div class="nav-link">Audit Trail</div>
-      </div>
-      <div class="nav-end">
-        <div class="avatar">RC</div>
+<div id="screen3" class="screen">
+  <nav>
+    <div class="nav-logo">LegalGraph<sup>®</sup></div>
+    <div class="nav-links">
+      <div class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</div>
+      <div class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</div>
+      <div class="nav-link">Reports</div>
+      <div class="nav-link active" data-screen="3" onclick="showScreen(3)">Playbooks</div>
+      <div class="nav-link">Audit Trail</div>
+    </div>
+    <div class="nav-end">
+      <div class="avatar">RC</div>
       </div>
     </nav>
 
@@ -2074,7 +2020,6 @@
       </div>
 
     </div>
-  </div>
 </div>
 
 <!-- ── Disclaimer footer ──────────────────────────────────────────── -->
@@ -2103,8 +2048,6 @@
   </div>
 </div>
 
-<div style="height:48px;"></div>
-
 <!-- ── Webhook toast ──────────────────────────────────────────────── -->
 <div id="webhookToast">
   <div class="toast-icon" id="toastIcon"><i data-lucide="loader" class="icon-md"></i></div>
@@ -2119,6 +2062,16 @@
   const WEBHOOK_URL    = '__WEBHOOK_URL__';
   const SUPABASE_URL   = '__SUPABASE_URL__';
   const SUPABASE_ANON  = '__SUPABASE_ANON_KEY__';
+
+  /* ── SPA screen routing ─────────────────────────────────────── */
+  function showScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen' + n).classList.add('active');
+    document.querySelectorAll('.nav-link[data-screen]').forEach(link => {
+      link.classList.toggle('active', link.dataset.screen == n);
+    });
+    window.scrollTo(0, 0);
+  }
 
   // BUG-010: runtime guard — catch builds where placeholder substitution failed
   if (WEBHOOK_URL.startsWith('__')) {
@@ -2517,7 +2470,7 @@
     document.getElementById('progressStatusPill').className   = 'pill pill-green';
     btn.disabled  = false;
     btn.innerHTML = '<i data-lucide="bar-chart-2"></i> View full report'; lucide.createIcons({nodes:[btn]});
-    btn.onclick   = () => document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
+    btn.onclick   = () => showScreen(2);
 
     /* Render real AI data if available, otherwise fall back to mock */
     const displayData = responseData ?? MOCK_ANALYSIS;
