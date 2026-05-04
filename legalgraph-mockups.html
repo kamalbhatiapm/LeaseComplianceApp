@@ -315,24 +315,34 @@
       color: var(--ink);
       letter-spacing: -.01em;
     }
+    .lease-table-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .lease-table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
     .lease-table {
       width: 100%;
       border-collapse: collapse;
-      background: var(--white);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
     }
     .lease-table th {
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: .06em;
       color: var(--ink-3);
-      padding: 12px 18px;
+      padding: 10px 18px;
       text-align: left;
-      background: var(--surface);
+      background: #F1F3F7;
       border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
     .lease-table td {
       padding: 13px 18px;
@@ -343,6 +353,20 @@
     }
     .lease-table tr:last-child td { border-bottom: none; }
     .lease-table tr:hover td { background: var(--surface); }
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .btn-icon:hover { background: var(--surface); color: var(--ink); }
     .lease-name {
       font-weight: 600;
       color: var(--ink);
@@ -1228,11 +1252,12 @@
 
     <!-- Recent leases -->
     <div class="s1-body">
-      <div class="section-header">
+      <div class="lease-table-card">
+      <div class="lease-table-toolbar">
         <div class="section-title">Recent Contracts</div>
         <div style="display:flex;gap:8px;">
           <button class="btn btn-outline btn-sm">Export all</button>
-          <button class="btn btn-primary btn-sm">+ Add lease</button>
+          <button class="btn btn-primary btn-sm"><i data-lucide="plus" class="icon-sm"></i> Add lease</button>
         </div>
       </div>
 
@@ -1269,7 +1294,7 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-secondary btn-sm">View report</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
@@ -1292,7 +1317,7 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-secondary btn-sm">View report</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
@@ -1315,7 +1340,7 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-danger btn-sm">Resolve flags</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
@@ -1338,12 +1363,13 @@
             <td>
               <div style="display:flex;gap:4px;">
                 <button class="btn btn-secondary btn-sm">View report</button>
-                <button class="btn btn-outline btn-sm">⋯</button>
+                <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
+      </div><!-- /.lease-table-card -->
     </div>
   </div>
 </div>
@@ -1780,7 +1806,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1804,7 +1830,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1828,7 +1854,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1852,7 +1878,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1876,7 +1902,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-secondary btn-sm">Edit</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
@@ -1900,7 +1926,7 @@
               <td>
                 <div class="row-actions">
                   <button class="btn btn-outline btn-sm">View</button>
-                  <button class="btn btn-outline btn-sm">⋯</button>
+                  <button class="btn-icon"><i data-lucide="more-horizontal" class="icon-sm"></i></button>
                 </div>
               </td>
             </tr>
