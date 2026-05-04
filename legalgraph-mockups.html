@@ -929,6 +929,30 @@
     #progressLabel { font-size: 11px; color: rgba(255,255,255,.45); }
     #progressPct   { font-size: 11px; color: rgba(255,255,255,.45); }
 
+    /* ── Responsive breakpoints ─────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .s2-body    { flex-direction: column; }
+      .s2-main    { min-width: 0; }
+      .s2-sidebar { width: 100% !important; min-width: 0; }
+      .terms-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .s1-stats   { flex-direction: column; gap: 10px; }
+      .metric-grid { grid-template-columns: 1fr 1fr; }
+      .s3-stats   { flex-direction: column; gap: 10px; }
+      .playbook-table-wrap { overflow-x: auto; }
+      .playbook-tbl { min-width: 640px; }
+    }
+    @media (max-width: 600px) {
+      .page-nav   { gap: 8px; padding: 0 12px; }
+      .screen-wrapper { padding: 16px 12px 0; }
+      .metric-grid { grid-template-columns: 1fr; }
+      .score-header { flex-direction: column; gap: 12px; }
+      nav { padding: 0 12px; }
+      .nav-links { display: none; }
+      .s1-upload  { padding: 24px 16px; }
+    }
+
     /* ── Page nav labels ────────────────────────────────────────── */
     .page-nav {
       background: var(--ink-2);
@@ -1216,14 +1240,14 @@
             <div class="score-pills">
               <span class="pill pill-amber">Medium Risk</span>
               <span class="pill pill-green">8 of 9 fields extracted</span>
-              <span class="pill pill-brand">IFRS 16 compliant</span>
-              <span class="pill pill-gray">2 flags to review</span>
+              <span class="pill pill-brand">IFRS 16 fields extracted</span>
+              <span class="pill pill-gray">3 flags to review</span>
             </div>
           </div>
           <div style="margin-left:auto;text-align:right;">
             <div style="font-size:11px;color:var(--ink-3);margin-bottom:4px;">Overall risk score</div>
             <div style="font-size:42px;font-weight:900;color:var(--amber);letter-spacing:-.04em;line-height:1;">62<span style="font-size:20px;color:var(--ink-3);font-weight:400;">/100</span></div>
-            <div style="font-size:11px;color:var(--ink-3);margin-top:2px;">Lower is better</div>
+            <div style="font-size:11px;color:var(--ink-3);margin-top:2px;">Lower is better · <span title="Estimate based on field coverage (40%) and flag severity (60%). Ranges: 0–49 Low · 50–69 Medium · 70–100 High. Margin: ±8 pts." style="cursor:help;text-decoration:underline dotted;">how is this calculated?</span></div>
           </div>
         </div>
 
@@ -1246,8 +1270,8 @@
           </div>
           <div class="metric-card">
             <div class="metric-label">Remaining Term</div>
-            <div class="metric-val">4.6 yrs</div>
-            <div class="metric-sub">Expires Dec 31, 2030</div>
+            <div class="metric-val">≈2.7 yrs</div>
+            <div class="metric-sub">Expires Dec 31, 2028</div>
           </div>
         </div>
 
@@ -1290,7 +1314,7 @@
           <div class="term-row">
             <div class="term-label"><span class="confidence-dot conf-high"></span>Termination Rights</div>
             <div class="term-val">Landlord only (12-month notice)</div>
-            <div class="term-clause">📎 Clause 14.1 — "Early Termination"</div>
+            <div class="term-clause">📎 §9.1 — "Termination Rights"</div>
           </div>
           <div class="term-row">
             <div class="term-label"><span class="confidence-dot conf-high"></span>Security Deposit</div>
@@ -1310,7 +1334,7 @@
           <div class="term-row">
             <div class="term-label"><span class="confidence-dot conf-high"></span>Governing Law</div>
             <div class="term-val">California, USA</div>
-            <div class="term-clause">📎 Clause 22.4 — "Governing Law"</div>
+            <div class="term-clause">📎 §14.1 — "Governing Law and Dispute Resolution"</div>
           </div>
         </div>
 
@@ -1343,17 +1367,30 @@
               <span style="font-size:11px;color:var(--ink-3);">Clause 3.2</span>
             </div>
           </div>
+          <div class="risk-item medium">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+              <div>
+                <div class="risk-title">Lessee has no unilateral termination right</div>
+                <div class="risk-desc">§9.1 grants termination rights to Landlord only (12-month notice). The lessee cannot exit early. Per IFRS 16.B34, confirm that the non-cancellable period used in the lease liability calculation reflects the full remaining term with no lessee break option.</div>
+              </div>
+              <span class="pill pill-amber" style="flex-shrink:0;margin-left:12px;">Medium</span>
+            </div>
+            <div class="risk-meta">
+              <button class="btn btn-sm btn-outline">Add management note</button>
+              <span style="font-size:11px;color:var(--ink-3);">§9.1 — Termination Rights</span>
+            </div>
+          </div>
           <div class="risk-item low">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;">
               <div>
                 <div class="risk-title">Security deposit classification</div>
-                <div class="risk-desc">The $58,000 security deposit (Clause 6.1) may need to be classified as a lease incentive receivable depending on refund terms. Current extraction did not detect refund conditions.</div>
+                <div class="risk-desc">The $58,000 security deposit (§6.1) may need to be classified as a lease incentive receivable depending on refund terms. Current extraction did not detect refund conditions.</div>
               </div>
               <span class="pill pill-green" style="flex-shrink:0;margin-left:12px;">Low</span>
             </div>
             <div class="risk-meta">
               <button class="btn btn-sm btn-outline">Mark reviewed</button>
-              <span style="font-size:11px;color:var(--ink-3);">Clause 6.1</span>
+              <span style="font-size:11px;color:var(--ink-3);">§6.1 — Security Deposit</span>
             </div>
           </div>
         </div>
@@ -1781,6 +1818,30 @@
   </div>
 </div>
 
+<!-- ── Disclaimer footer ──────────────────────────────────────────── -->
+<div style="background:#F5F7F9;border-top:1px solid #D8E0E6;padding:16px 32px;font-size:12px;color:#6B7E8D;line-height:1.6;text-align:center;">
+  <strong style="color:#3D4F5C;">Not legal or accounting advice.</strong>
+  LegalGraph assists with field extraction and risk flagging only. Always have a qualified accountant and legal counsel review outputs before booking journal entries, recognising ROU assets, or signing financial disclosures.
+  Outputs are estimates and do not constitute an audit opinion or compliance certification.
+</div>
+
+<!-- ── Consent modal ──────────────────────────────────────────────── -->
+<div id="consentModal" style="display:none;position:fixed;inset:0;background:rgba(15,25,35,.7);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:32px;max-width:460px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.2);">
+    <div style="font-size:18px;font-weight:700;color:#0F1923;margin-bottom:8px;">Before we analyze your contract</div>
+    <div style="font-size:13px;color:#3D4F5C;line-height:1.6;margin-bottom:20px;">
+      To extract lease terms, your document will be sent to an AI processing service and to your configured n8n workflow.
+      <br><br>
+      <strong>This tool provides extraction assistance only — not legal advice or accounting opinions.</strong>
+      Always have a qualified accountant and attorney review results before making financial or legal decisions.
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="denyConsent()" style="flex:1;padding:10px;border:1px solid #D8E0E6;background:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#3D4F5C;">Cancel</button>
+      <button onclick="grantConsent()" style="flex:1;padding:10px;background:#1B4FD8;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#fff;">I understand — Analyze</button>
+    </div>
+  </div>
+</div>
+
 <div style="height:48px;"></div>
 
 <!-- ── Webhook toast ──────────────────────────────────────────────── -->
@@ -1797,6 +1858,11 @@
   const WEBHOOK_URL    = '__WEBHOOK_URL__';
   const SUPABASE_URL   = '__SUPABASE_URL__';
   const SUPABASE_ANON  = '__SUPABASE_ANON_KEY__';
+
+  // BUG-010: runtime guard — catch builds where placeholder substitution failed
+  if (WEBHOOK_URL.startsWith('__')) {
+    console.error('Build misconfiguration: WEBHOOK_URL placeholder was not replaced. Check Netlify env vars and build.sh.');
+  }
 
   /* ── Mock extraction results (stand-in for real AI output) ──── */
   const MOCK_ANALYSIS = {
@@ -1835,7 +1901,21 @@
     if (e.dataTransfer.files.length) onFileSelected(e.dataTransfer.files[0]);
   });
 
+  const ALLOWED_TYPES = new Set(['.pdf', '.doc', '.docx', '.txt']);
+  const MAX_BYTES     = 50 * 1024 * 1024; // 50 MB
+
   function onFileSelected(file) {
+    // BUG-007: validate size and type before accepting
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!ALLOWED_TYPES.has(ext)) {
+      alert(`Unsupported file type "${ext}". Please upload a PDF, DOC, DOCX, or TXT file.`);
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum size is 50 MB.`);
+      return;
+    }
+
     selectedFile = file;
     fileChosen   = true;
     document.getElementById('uploadIcon').textContent  = '📋';
@@ -1845,7 +1925,24 @@
     const btn = document.getElementById('analyzeBtn');
     btn.textContent = 'Analyze Contract';
     btn.className   = 'btn btn-primary';
+    btn.onclick     = null; // BUG-019: reset so handleAnalyzeClick takes over again
     btn.id          = 'analyzeBtn';
+  }
+
+  /* ── Consent modal ─────────────────────────────────────────── */
+  let consentGiven = false;
+
+  function showConsentModal() {
+    const m = document.getElementById('consentModal');
+    m.style.display = 'flex';
+  }
+  function grantConsent() {
+    consentGiven = true;
+    document.getElementById('consentModal').style.display = 'none';
+    runAnalysis();
+  }
+  function denyConsent() {
+    document.getElementById('consentModal').style.display = 'none';
   }
 
   /* ── Main entry point ───────────────────────────────────────── */
@@ -1854,7 +1951,11 @@
       fileInput.click();        // first click → open file picker
       return;
     }
-    runAnalysis();              // second click → analyze
+    if (!consentGiven) {
+      showConsentModal();       // BUG-004: require consent before processing
+      return;
+    }
+    runAnalysis();
   }
 
   /* ── Analysis + webhook flow ────────────────────────────────── */
@@ -1921,8 +2022,8 @@
     btn.innerHTML = '📊 View full report';
     btn.onclick   = () => document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
 
-    /* Auto-dismiss toast after 7 s */
-    setTimeout(dismissToast, 7000);
+    /* Auto-dismiss on success; keep open on error so user can read the status */
+    if (webhookOk) setTimeout(dismissToast, 7000);
   }
 
   /* ── Progress helpers ───────────────────────────────────────── */
