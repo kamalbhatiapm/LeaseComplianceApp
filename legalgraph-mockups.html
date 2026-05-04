@@ -1007,9 +1007,33 @@
 
     /* ── Inline field editing (H1) ──────────────────────────────── */
     .term-val-display { display: inline; }
-    .term-val-edit    { display: none; font-size: 13px; font-weight: 600; border: 1px solid var(--brand); border-radius: 5px; padding: 2px 6px; width: 100%; }
+    .term-val-edit {
+      display: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      background: var(--white);
+      border: 1.5px solid var(--brand);
+      border-radius: 6px;
+      padding: 5px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
+      transition: box-shadow .15s, border-color .15s;
+    }
+    .term-val-edit:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(27,79,216,.15);
+    }
+    .term-val-edit::placeholder { color: var(--ink-3); font-weight: 400; }
     .edit-mode .term-val-display { display: none; }
-    .edit-mode .term-val-edit    { display: inline-block; }
+    .edit-mode .term-val-edit    { display: block; }
+    .edit-mode .term-row {
+      background: #F5F8FF;
+      border-bottom-color: #D6E0FA;
+    }
+    .edit-mode .term-row:hover { background: #EEF3FF; }
+    .edit-mode .term-row.term-missing { background: var(--amber-lt); }
     .term-val-edited { color: var(--brand) !important; }
     .manually-verified-badge { font-size: 9px; font-weight: 700; background: var(--brand-lt); color: var(--brand); border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
     #editTermsBtn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
