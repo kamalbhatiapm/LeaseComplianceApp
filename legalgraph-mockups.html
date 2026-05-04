@@ -1053,7 +1053,23 @@
       text-decoration: none;
     }
     .page-nav-link:hover { color: #fff; }
+
+    /* ── Lucide icon defaults ───────────────────────────────────── */
+    [data-lucide] {
+      width: 14px;
+      height: 14px;
+      stroke-width: 1.75;
+      vertical-align: -2px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+    .icon-xs { width: 11px; height: 11px; }
+    .icon-sm { width: 13px; height: 13px; }
+    .icon-md { width: 16px; height: 16px; }
+    .icon-lg { width: 20px; height: 20px; }
+    .icon-xl { width: 32px; height: 32px; stroke-width: 1.5; }
   </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -1112,7 +1128,7 @@
         <div class="upload-zone" id="uploadZone">
           <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt"
                  style="display:none" />
-          <div class="upload-icon" id="uploadIcon">📄</div>
+          <div class="upload-icon" id="uploadIcon"><i data-lucide="file-text" class="icon-xl"></i></div>
           <div class="upload-title" id="uploadTitle">Upload a lease contract</div>
           <div class="upload-sub" id="uploadSub">Drag &amp; drop or click to browse</div>
           <div class="upload-types">
@@ -1300,7 +1316,7 @@
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
         <span style="font-size:12px;color:var(--ink-3);" id="s2-analyzed-at">Last analyzed: May 2, 2026 at 3:14 PM</span>
         <button class="btn btn-outline btn-sm">Re-analyze</button>
-        <button class="btn btn-outline btn-sm">📤 Export PDF</button>
+        <button class="btn btn-outline btn-sm"><i data-lucide="download" class="icon-sm"></i> Export PDF</button>
         <button class="btn btn-primary btn-sm" id="generateReportBtn" disabled title="Resolve all high-severity flags and sign off before generating a report" style="opacity:.45;cursor:not-allowed;">Generate IFRS 16 Report</button>
       </div>
     </div>
@@ -1343,7 +1359,7 @@
               </div>
               <div class="metric-card flagged">
                 <div class="metric-label">Discount Rate</div>
-                <div class="metric-val">⚠ Missing</div>
+                <div class="metric-val"><i data-lucide="alert-circle" class="icon-sm"></i> Missing</div>
                 <div class="metric-sub">Enter manually</div>
               </div>
               <div class="metric-card">
@@ -1357,7 +1373,7 @@
 
         <!-- AI Summary -->
         <div class="card" style="margin-bottom:20px;">
-          <div class="card-title">🤖 AI Summary</div>
+          <div class="card-title"><i data-lucide="sparkles" class="icon-sm"></i> AI Summary</div>
           <div class="summary-text" id="s2-ai-summary">
             This is a <strong>7-year commercial office lease</strong> for floors 12 at 555 Market Street, San Francisco, commencing January 1, 2022 and expiring December 31, 2028. Annual base rent is <strong>$348,000</strong> with 3% annual escalations. The lessee holds <strong>two renewal options of 5 years each</strong>. The lease does not specify a discount rate — the incremental borrowing rate must be supplied manually before the IFRS 16 schedule can be finalized. AI extraction confidence is <strong>96%</strong> across 8 of 9 key fields; the discount rate field is the only gap.
           </div>
@@ -1367,58 +1383,58 @@
         <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px;">
           <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
             <div class="card-title" style="margin:0;">Extracted Lease Terms</div>
-            <button class="btn btn-outline btn-sm" id="editTermsBtn" onclick="toggleEditMode()">✏️ Edit terms</button>
+            <button class="btn btn-outline btn-sm" id="editTermsBtn" onclick="toggleEditMode()"><i data-lucide="pencil" class="icon-sm"></i> Edit terms</button>
           </div>
           <div id="s2-terms-grid">
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Commencement Date</div>
               <div class="term-val">January 1, 2022</div>
-              <div class="term-clause">📎 §2.1 — Lease Commencement</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §2.1 — Lease Commencement</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Expiry Date</div>
               <div class="term-val">December 31, 2028</div>
-              <div class="term-clause">📎 §2.1 — Lease Term</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §2.1 — Lease Term</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Annual Base Rent</div>
               <div class="term-val">$348,000 / year</div>
-              <div class="term-clause">📎 §5.1 — Base Rent</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §5.1 — Base Rent</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Rent Escalation</div>
               <div class="term-val">3% per annum</div>
-              <div class="term-clause">📎 §5.3 — Rent Adjustments</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §5.3 — Rent Adjustments</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Renewal Options</div>
               <div class="term-val">2 × 5-year options</div>
-              <div class="term-clause">📎 §3.2 — Renewal Rights</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §3.2 — Renewal Rights</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Termination Rights</div>
               <div class="term-val">Landlord only (12-month notice)</div>
-              <div class="term-clause">📎 §9.1 — Termination Rights</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §9.1 — Termination Rights</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Security Deposit</div>
               <div class="term-val">$58,000</div>
-              <div class="term-clause">📎 §6.1 — Security Deposit</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §6.1 — Security Deposit</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>ROU Asset Scope</div>
               <div class="term-val">Floor 12 (18,400 sq ft)</div>
-              <div class="term-clause">📎 §1.2 — Premises</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §1.2 — Premises</div>
             </div>
             <div class="term-row term-missing">
               <div class="term-label"><span class="confidence-dot conf-low"></span>Discount Rate</div>
               <div class="term-val" style="color:var(--amber);">Not found in contract</div>
-              <div class="term-clause" style="color:var(--amber);">⚠ Enter IBR manually</div>
+              <div class="term-clause" style="color:var(--amber);"><i data-lucide="alert-triangle" class="icon-xs"></i> Enter IBR manually</div>
             </div>
             <div class="term-row">
               <div class="term-label"><span class="confidence-dot conf-high"></span>Governing Law</div>
               <div class="term-val">California, USA</div>
-              <div class="term-clause">📎 §14.1 — Governing Law</div>
+              <div class="term-clause"><i data-lucide="paperclip" class="icon-xs"></i> §14.1 — Governing Law</div>
             </div>
           </div>
         </div>
@@ -1499,9 +1515,9 @@
         <div class="sidebar-section">
           <div class="sidebar-section-title">Actions</div>
           <div class="action-list">
-            <button class="action-btn">📤 Export to PDF</button>
-            <button class="action-btn">📧 Send to auditor</button>
-            <button class="action-btn">🔁 Re-run extraction</button>
+            <button class="action-btn"><i data-lucide="download" class="icon-sm"></i> Export to PDF</button>
+            <button class="action-btn"><i data-lucide="mail" class="icon-sm"></i> Send to auditor</button>
+            <button class="action-btn"><i data-lucide="refresh-cw" class="icon-sm"></i> Re-run extraction</button>
           </div>
         </div>
 
@@ -1646,7 +1662,7 @@
       <div class="playbook-table-wrap">
         <div class="table-toolbar">
           <div class="table-filters">
-            <input class="search-input" type="text" placeholder="🔍  Search playbooks…" />
+            <input class="search-input" type="text" placeholder="Search playbooks…" />
             <select class="filter-select">
               <option>All standards</option>
               <option>IFRS 16</option>
@@ -1832,7 +1848,7 @@
           <div class="detail-panel-title">IFRS 16 Standard Template — v2.4 · Expanded detail</div>
           <div style="display:flex;gap:8px;align-items:center;">
             <span class="pill pill-green">Active</span>
-            <button class="btn btn-sm" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);">Close ✕</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);"><i data-lucide="x" class="icon-sm"></i> Close</button>
           </div>
         </div>
         <div class="detail-panel-body">
@@ -1840,15 +1856,15 @@
           <div class="detail-col">
             <div class="detail-col-title">Required Extraction Fields (9)</div>
             <div style="display:flex;flex-wrap:wrap;">
-              <span class="clause-chip">📅 Commencement date</span>
-              <span class="clause-chip">📅 Expiry date</span>
-              <span class="clause-chip">💰 Annual payment</span>
-              <span class="clause-chip">📈 Escalation rate</span>
-              <span class="clause-chip">🔄 Renewal options</span>
+              <span class="clause-chip"><i data-lucide="calendar" class="icon-xs"></i> Commencement date</span>
+              <span class="clause-chip"><i data-lucide="calendar" class="icon-xs"></i> Expiry date</span>
+              <span class="clause-chip"><i data-lucide="dollar-sign" class="icon-xs"></i> Annual payment</span>
+              <span class="clause-chip"><i data-lucide="trending-up" class="icon-xs"></i> Escalation rate</span>
+              <span class="clause-chip"><i data-lucide="rotate-cw" class="icon-xs"></i> Renewal options</span>
               <span class="clause-chip">% Discount rate</span>
-              <span class="clause-chip">🏢 ROU asset value</span>
-              <span class="clause-chip">⚖️ Termination rights</span>
-              <span class="clause-chip">🔒 Security deposit</span>
+              <span class="clause-chip"><i data-lucide="building-2" class="icon-xs"></i> ROU asset value</span>
+              <span class="clause-chip"><i data-lucide="scale" class="icon-xs"></i> Termination rights</span>
+              <span class="clause-chip"><i data-lucide="lock" class="icon-xs"></i> Security deposit</span>
             </div>
           </div>
           <!-- Risk rules -->
@@ -1943,12 +1959,12 @@
 
 <!-- ── Webhook toast ──────────────────────────────────────────────── -->
 <div id="webhookToast">
-  <div class="toast-icon" id="toastIcon">⏳</div>
+  <div class="toast-icon" id="toastIcon"><i data-lucide="loader" class="icon-md"></i></div>
   <div class="toast-body">
     <div class="toast-title" id="toastTitle">Sending to workflow…</div>
     <div class="toast-sub"  id="toastSub">POST → n8n webhook</div>
   </div>
-  <button class="toast-dismiss" onclick="dismissToast()">✕</button>
+  <button class="toast-dismiss" onclick="dismissToast()"><i data-lucide="x" class="icon-sm"></i></button>
 </div>
 
 <script>
@@ -2086,6 +2102,9 @@
     renderTermsGrid(fields, termsMissing);
     renderRiskFlags(riskFlags);
 
+    /* Re-initialise Lucide icons in dynamically rendered content */
+    lucide.createIcons({ nodes: [document.getElementById('screen2')] });
+
     /* Re-evaluate report gate for new flags */
     updateReportGate();
 
@@ -2127,7 +2146,7 @@
     document.getElementById('s2-metric-grid').innerHTML = cards.map(c => `
       <div class="metric-card${c.flagged ? ' flagged' : ''}">
         <div class="metric-label">${c.label}</div>
-        <div class="metric-val">${c.flagged && !c.val ? '⚠ Missing' : (c.val ?? 'N/A')}</div>
+        <div class="metric-val">${c.flagged && !c.val ? '<i data-lucide="alert-circle" class="icon-sm"></i> Missing' : (c.val ?? 'N/A')}</div>
         <div class="metric-sub">${c.sub}</div>
       </div>`).join('');
   }
@@ -2145,7 +2164,7 @@
         <div class="term-row${missing ? ' term-missing' : ''}">
           <div class="term-label"><span class="confidence-dot ${confCls}"></span>${label}</div>
           <div class="term-val" ${missing ? 'style="color:var(--amber);"' : ''}>${missing ? 'Not found in contract' : f.value}</div>
-          ${clause ? `<div class="term-clause" ${missing ? 'style="color:var(--amber);"' : ''}>📎 ${clause}</div>` : '<div></div>'}
+          ${clause ? `<div class="term-clause" ${missing ? 'style="color:var(--amber);"' : ''}><i data-lucide="${missing ? 'alert-triangle' : 'paperclip'}" class="icon-xs"></i> ${clause}</div>` : '<div></div>'}
         </div>`;
     });
     const grid = document.getElementById('s2-terms-grid');
@@ -2234,7 +2253,7 @@
 
     selectedFile = file;
     fileChosen   = true;
-    document.getElementById('uploadIcon').textContent  = '📋';
+    document.getElementById('uploadIcon').innerHTML = '<i data-lucide="file-check" class="icon-xl"></i>'; lucide.createIcons({nodes:[document.getElementById('uploadIcon')]});
     document.getElementById('uploadTitle').textContent = file.name;
     document.getElementById('uploadSub').textContent   =
       (file.size / 1024).toFixed(0) + ' KB · Ready to analyze';
@@ -2327,19 +2346,19 @@
       const fc = responseData?.terms_found?.length
                ?? Object.keys(responseData?.fields ?? {}).filter(k => responseData.fields[k]?.value).length
                ?? 8;
-      showToast('success', '✅', 'Extraction complete',
+      showToast('success', '<i data-lucide="check-circle" class="icon-md"></i>', 'Extraction complete',
         `${fc} fields extracted · risk_score=${responseData?.risk_score ?? '—'}`);
     } catch (err) {
       setStepDone('step4', true);
       setProgress('Webhook failed — showing demo results', 100);
-      showToast('error', '⚠️', 'Webhook delivery failed',
+      showToast('error', '<i data-lucide="alert-triangle" class="icon-md"></i>', 'Webhook delivery failed',
         `${err.message} — showing demo results`);
     }
 
     document.getElementById('progressStatusPill').textContent = 'Complete';
     document.getElementById('progressStatusPill').className   = 'pill pill-green';
     btn.disabled  = false;
-    btn.innerHTML = '📊 View full report';
+    btn.innerHTML = '<i data-lucide="bar-chart-2"></i> View full report'; lucide.createIcons({nodes:[btn]});
     btn.onclick   = () => document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
 
     /* Render real AI data if available, otherwise fall back to mock */
@@ -2397,7 +2416,7 @@
     const termVals = document.querySelectorAll('.term-val');
 
     if (editModeActive) {
-      btn.textContent = '✅ Save edits';
+      btn.innerHTML = '<i data-lucide="check" class="icon-sm"></i> Save edits'; lucide.createIcons({nodes:[btn]});
       btn.style.background = 'var(--brand)';
       btn.style.color = '#fff';
       termVals.forEach(el => {
@@ -2407,7 +2426,7 @@
           `<input class="term-val-edit" type="text" value="${cur.replace(/"/g, '&quot;')}" />`;
       });
     } else {
-      btn.textContent = '✏️ Edit extracted terms';
+      btn.innerHTML = '<i data-lucide="pencil" class="icon-sm"></i> Edit terms'; lucide.createIcons({nodes:[btn]});
       btn.style.background = '';
       btn.style.color = '';
       termVals.forEach(el => {
@@ -2427,14 +2446,18 @@
   function showToast(type, icon, title, sub) {
     const t = document.getElementById('webhookToast');
     t.className = `show ${type}`;
-    document.getElementById('toastIcon').textContent  = icon;
+    document.getElementById('toastIcon').innerHTML  = icon;
     document.getElementById('toastTitle').textContent = title;
     document.getElementById('toastSub').textContent   = sub;
+    lucide.createIcons({ nodes: [document.getElementById('toastIcon')] });
   }
   function dismissToast() {
     const t = document.getElementById('webhookToast');
     t.classList.remove('show');
   }
+
+  /* ── Initialise all static Lucide icons ─────────────────────── */
+  lucide.createIcons();
 </script>
 
 </body>
