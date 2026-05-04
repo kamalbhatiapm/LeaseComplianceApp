@@ -184,6 +184,10 @@
     .s1-hero {
       background: linear-gradient(135deg, #0F1923 0%, #0D2B3E 60%, #0A3A3A 100%);
       padding: 36px 56px 32px;
+    }
+    .s1-hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
       display: flex;
       gap: 48px;
       align-items: center;
@@ -1067,7 +1071,8 @@
       .s3-body    { padding: 20px 24px; }
 
       /* Hero */
-      .s1-hero    { padding: 28px 28px 24px; gap: 28px; }
+      .s1-hero    { padding: 28px 28px 24px; }
+      .s1-hero-inner { gap: 28px; }
 
       /* Stats row: keep horizontal, tighten gap */
       .s1-stats   { gap: 20px; flex-wrap: wrap; }
@@ -1094,7 +1099,8 @@
       .nav-links  { display: none; }
 
       /* Screen 1 — hero: stack copy above upload panel */
-      .s1-hero    { flex-direction: column; padding: 28px 20px 24px; gap: 28px; align-items: stretch; }
+      .s1-hero    { padding: 28px 20px 24px; }
+      .s1-hero-inner { flex-direction: column; gap: 28px; align-items: stretch; }
       .s1-upload-panel { width: 100%; }
       .s1-headline { font-size: 26px; }
       .s1-sub     { font-size: 14px; margin-bottom: 20px; }
@@ -1198,6 +1204,7 @@
 
   <!-- Hero upload section -->
     <div class="s1-hero">
+      <div class="s1-hero-inner">
       <div class="s1-hero-copy">
         <div class="s1-kicker">IFRS 16 / ASC 842 Compliance Suite</div>
         <div class="s1-headline">Audit-ready lease<br>reports in minutes,<br>not hours.</div>
@@ -1256,6 +1263,7 @@
           </div>
         </div>
       </div>
+      </div><!-- /.s1-hero-inner -->
     </div>
 
     <!-- Recent leases -->
