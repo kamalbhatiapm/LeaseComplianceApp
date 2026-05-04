@@ -28,7 +28,9 @@ IFRS 16 / ASC 842 contract analyzer with AI extraction, risk scoring, and n8n we
 
 | File | Description |
 |------|-------------|
-| `prd-lease-compliance-2026-03-31.md` | Full product requirements — personas, jobs to be done, success metrics, P0/P1/P2 features |
+| `prd-lease-compliance-2026-03-31.md` | Full product requirements — personas, jobs to be done, North Star + L1/L2 metrics, P0/P1/P2 features (v1.1) |
+| `beta-release-plan.md` | Beta release plan — entry criteria, participant profile, 6-week program structure, graduation gates |
+| `ga-release-plan.md` | GA release plan — staged rollout (4 waves), SLA commitments, GTM, 30-day success metrics, rollback plan |
 | `docs/n8n-workflow.jpeg` | Architecture diagram of the n8n orchestrator-subagent pipeline |
 
 ### Evals
