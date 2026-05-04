@@ -18,15 +18,18 @@
       --brand:    #1B4FD8;
       --brand-dk: #1340B0;
       --brand-lt: #EBF0FD;
-      --accent:   #0D9488;
-      --accent-lt: #F0FDFA;
-      --accent-dk: #0F766E;
+      --accent:        #0D9488;
+      --accent-lt:     #F0FDFA;
+      --accent-dk:     #0F766E;
+      --accent-on-dark:#5EEAD4;
       --green:    #0E8A5F;
       --green-lt: #E6F5EF;
       --amber:    #B45309;
       --amber-lt: #FEF3C7;
       --red:      #C0392B;
       --red-lt:   #FDECEA;
+      --red-on-dark:   #FCA5A5;
+      --page-bg:  #E8EDF2;
       --radius:   8px;
       --shadow:   0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
       --font: 'Helvetica Neue', Arial, sans-serif;
@@ -35,7 +38,7 @@
     body {
       font-family: var(--font);
       color: var(--ink);
-      background: #E8EDF2;
+      background: var(--page-bg);
       font-size: 14px;
       line-height: 1.5;
     }
@@ -204,7 +207,7 @@
       font-weight: 700;
       letter-spacing: .1em;
       text-transform: uppercase;
-      color: #5EEAD4;
+      color: var(--accent-on-dark);
       margin-bottom: 14px;
     }
     .s1-headline {
@@ -229,7 +232,7 @@
     .s1-stat-val {
       font-size: 28px;
       font-weight: 800;
-      color: #5EEAD4;
+      color: var(--accent-on-dark);
       letter-spacing: -.03em;
     }
     .s1-stat-label {
@@ -337,7 +340,7 @@
       vertical-align: middle;
     }
     .lease-table tr:last-child td { border-bottom: none; }
-    .lease-table tr:hover td { background: #FAFBFD; }
+    .lease-table tr:hover td { background: var(--surface); }
     .lease-name {
       font-weight: 600;
       color: var(--ink);
@@ -514,7 +517,7 @@
       color: var(--ink-3);
       margin-top: 1px;
     }
-    .metric-card.flagged { background: #FFFBEB; }
+    .metric-card.flagged { background: var(--amber-lt); }
     .metric-card.flagged .metric-val { color: var(--amber); }
 
     /* Extracted terms — compact table */
@@ -534,9 +537,9 @@
       transition: background .1s;
     }
     .term-row:last-child { border-bottom: none; }
-    .term-row:hover { background: #F8FAFC; }
-    .term-row.term-missing { background: #FFFBEB; }
-    .term-row.term-missing:hover { background: #FEF3C7; }
+    .term-row:hover { background: var(--surface); }
+    .term-row.term-missing { background: var(--amber-lt); }
+    .term-row.term-missing:hover { background: #F3D98C; }
     .term-label {
       font-size: 11px;
       font-weight: 600;
@@ -771,7 +774,7 @@
       vertical-align: middle;
     }
     .playbook-tbl tr:last-child td { border-bottom: none; }
-    .playbook-tbl tr:hover td { background: #FAFBFD; }
+    .playbook-tbl tr:hover td { background: var(--surface); }
     .playbook-name {
       font-weight: 700;
       color: var(--ink);
@@ -791,9 +794,9 @@
       padding: 3px 8px;
       border-radius: 4px;
     }
-    .badge-ifrs { background: #EEF2FF; color: #3730A3; }
-    .badge-asc  { background: #F0FDF4; color: #166534; }
-    .badge-both { background: #FFF7ED; color: #9A3412; }
+    .badge-ifrs { background: var(--brand-lt); color: var(--brand); }
+    .badge-asc  { background: var(--green-lt); color: var(--green); }
+    .badge-both { background: var(--amber-lt); color: var(--amber); }
 
     .coverage-bar-wrap {
       display: flex;
@@ -904,9 +907,9 @@
       transform: translateY(0);
       pointer-events: auto;
     }
-    #webhookToast.success { background: #0F2D1F; border: 1px solid #166534; }
-    #webhookToast.error   { background: #2D0F0F; border: 1px solid #991B1B; }
-    #webhookToast.sending { background: #0F1D2D; border: 1px solid #1E3A5F; }
+    #webhookToast.success { background: #0F2D1F; border: 1px solid var(--green); }
+    #webhookToast.error   { background: #2D0F0F; border: 1px solid var(--red); }
+    #webhookToast.sending { background: #0F1D2D; border: 1px solid var(--brand); }
     .toast-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
     .toast-body { flex: 1; }
     .toast-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
@@ -951,7 +954,7 @@
     }
     .progress-step:last-child { margin-bottom: 0; }
     .progress-step.active  { color: rgba(255,255,255,.85); }
-    .progress-step.done    { color: #4ADE80; }
+    .progress-step.done    { color: var(--accent-on-dark); }
     .step-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
@@ -959,10 +962,10 @@
       flex-shrink: 0;
       transition: background .2s;
     }
-    .progress-step.active .step-dot { background: #5EEAD4; }
-    .progress-step.done   .step-dot { background: #4ADE80; }
+    .progress-step.active .step-dot { background: var(--accent-on-dark); }
+    .progress-step.done   .step-dot { background: var(--accent-on-dark); }
     #progressBar { height: 4px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-top: 12px; }
-    #progressFill { height: 100%; background: #5EEAD4; border-radius: 99px; width: 0%; transition: width .4s ease; }
+    #progressFill { height: 100%; background: var(--accent-on-dark); border-radius: 99px; width: 0%; transition: width .4s ease; }
     #progressMeta { display: flex; justify-content: space-between; margin-top: 6px; }
     #progressLabel { font-size: 11px; color: rgba(255,255,255,.45); }
     #progressPct   { font-size: 11px; color: rgba(255,255,255,.45); }
@@ -1076,14 +1079,14 @@
       border-color: var(--border);
     }
     .s2-data-badge--live {
-      color: #166534;
-      background: #F0FDF4;
-      border-color: #BBF7D0;
+      color: var(--green);
+      background: var(--green-lt);
+      border-color: #9DDFC4;
     }
     .s2-data-badge--fallback {
-      color: #92400E;
-      background: #FFFBEB;
-      border-color: #FDE68A;
+      color: var(--amber);
+      background: var(--amber-lt);
+      border-color: #F3D98C;
     }
 
     /* ── Lucide icon defaults ───────────────────────────────────── */
@@ -1965,8 +1968,8 @@
 </div>
 
 <!-- ── Disclaimer footer ──────────────────────────────────────────── -->
-<div style="background:#F5F7F9;border-top:1px solid #D8E0E6;padding:16px 32px;font-size:12px;color:#6B7E8D;line-height:1.6;text-align:center;">
-  <strong style="color:#3D4F5C;">Not legal or accounting advice.</strong>
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:16px 32px;font-size:12px;color:var(--ink-3);line-height:1.6;text-align:center;">
+  <strong style="color:var(--ink-2);">Not legal or accounting advice.</strong>
   LegalGraph assists with field extraction and risk flagging only. Always have a qualified accountant and legal counsel review outputs before booking journal entries, recognising ROU assets, or signing financial disclosures.
   Outputs are estimates and do not constitute an audit opinion or compliance certification.
 </div>
@@ -1975,16 +1978,16 @@
 <div id="consentModal" style="display:none;position:fixed;inset:0;background:rgba(15,25,35,.7);z-index:10000;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:12px;padding:32px;max-width:460px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.2);">
     <div style="font-size:18px;font-weight:700;color:#0F1923;margin-bottom:8px;">Before we analyze your contract</div>
-    <div style="font-size:13px;color:#3D4F5C;line-height:1.6;margin-bottom:20px;">
+    <div style="font-size:13px;color:var(--ink-2);line-height:1.6;margin-bottom:20px;">
       To extract lease terms, your document will be sent to an AI processing service and to your configured n8n workflow.
       <br><br>
       <strong>This tool provides extraction assistance only — not legal advice or accounting opinions.</strong>
       Always have a qualified accountant and attorney review results before making financial or legal decisions.
       <br><br>
-      <span style="font-size:12px;color:#6B7E8D;">Contract data is processed by the AI service and retained for up to 30 days for quality monitoring. n8n workflow data is retained per your configuration. You may request deletion at <a href="mailto:privacy@legalgraph.io" style="color:var(--brand);">privacy@legalgraph.io</a>.</span>
+      <span style="font-size:12px;color:var(--ink-3);">Contract data is processed by the AI service and retained for up to 30 days for quality monitoring. n8n workflow data is retained per your configuration. You may request deletion at <a href="mailto:privacy@legalgraph.io" style="color:var(--brand);">privacy@legalgraph.io</a>.</span>
     </div>
     <div style="display:flex;gap:10px;">
-      <button onclick="denyConsent()" style="flex:1;padding:10px;border:1px solid #D8E0E6;background:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#3D4F5C;">Cancel</button>
+      <button onclick="denyConsent()" style="flex:1;padding:10px;border:1px solid var(--border);background:var(--white);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2);">Cancel</button>
       <button onclick="grantConsent()" style="flex:1;padding:10px;background:#1B4FD8;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#fff;">I understand — Analyze</button>
     </div>
   </div>
@@ -2427,8 +2430,8 @@
     el.classList.remove('active');
     el.classList.add('done');
     if (isError) {
-      el.querySelector('.step-dot').style.background = '#F87171';
-      el.style.color = '#FCA5A5';
+      el.querySelector('.step-dot').style.background = 'var(--red-on-dark)';
+      el.style.color = 'var(--red-on-dark)';
     }
   }
   function setProgress(label, pct) {
