@@ -1255,10 +1255,10 @@
       <div class="breadcrumb">
         <a>Leases</a>
         <span class="breadcrumb-sep">›</span>
-        <span class="breadcrumb-current">SF Headquarters — Floor 12</span>
+        <span class="breadcrumb-current" id="s2-breadcrumb">SF Headquarters — Floor 12</span>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-        <span style="font-size:12px;color:var(--ink-3);">Last analyzed: May 2, 2026 at 3:14 PM</span>
+        <span style="font-size:12px;color:var(--ink-3);" id="s2-analyzed-at">Last analyzed: May 2, 2026 at 3:14 PM</span>
         <button class="btn btn-outline btn-sm">Re-analyze</button>
         <button class="btn btn-outline btn-sm">📤 Export PDF</button>
         <button class="btn btn-primary btn-sm">Generate IFRS 16 Report</button>
@@ -1271,13 +1271,13 @@
 
         <!-- Risk score header -->
         <div class="score-header">
-          <div class="score-ring">
-            <div class="score-ring-val">62</div>
+          <div class="score-ring" id="s2-score-ring">
+            <div class="score-ring-val" id="s2-score-val">62</div>
           </div>
           <div class="score-meta">
-            <div class="score-title">SF Headquarters — Floor 12</div>
-            <div class="score-sub">555 Market St, San Francisco · IFRS 16 · 7-year term · Analyzed May 2, 2026</div>
-            <div class="score-pills">
+            <div class="score-title" id="s2-score-title">SF Headquarters — Floor 12</div>
+            <div class="score-sub" id="s2-score-sub">555 Market St, San Francisco · IFRS 16 · 7-year term · Analyzed May 2, 2026</div>
+            <div class="score-pills" id="s2-score-pills">
               <span class="pill pill-amber">Medium Risk</span>
               <span class="pill pill-green">8 of 9 fields extracted</span>
               <span class="pill pill-brand">IFRS 16 fields extracted</span>
@@ -1286,13 +1286,13 @@
           </div>
           <div style="margin-left:auto;text-align:right;">
             <div style="font-size:11px;color:var(--ink-3);margin-bottom:4px;">Overall risk score</div>
-            <div style="font-size:42px;font-weight:900;color:var(--amber);letter-spacing:-.04em;line-height:1;">62<span style="font-size:20px;color:var(--ink-3);font-weight:400;">/100</span></div>
+            <div style="font-size:42px;font-weight:900;color:var(--amber);letter-spacing:-.04em;line-height:1;" id="s2-score-num">62<span style="font-size:20px;color:var(--ink-3);font-weight:400;">/100</span></div>
             <div style="font-size:11px;color:var(--ink-3);margin-top:2px;">Lower is better · <span title="Estimate based on field coverage (40%) and flag severity (60%). Ranges: 0–49 Low · 50–69 Medium · 70–100 High. Margin: ±8 pts." style="cursor:help;text-decoration:underline dotted;">how is this calculated?</span></div>
           </div>
         </div>
 
         <!-- Key metrics -->
-        <div class="metric-grid">
+        <div class="metric-grid" id="s2-metric-grid">
           <div class="metric-card">
             <div class="metric-label">ROU Asset Value</div>
             <div class="metric-val">$2.18M</div>
@@ -1318,14 +1318,14 @@
         <!-- AI Summary -->
         <div class="card" style="margin-bottom:20px;">
           <div class="card-title">🤖 AI Summary</div>
-          <div class="summary-text">
+          <div class="summary-text" id="s2-ai-summary">
             This is a <strong>7-year commercial office lease</strong> for floors 12 at 555 Market Street, San Francisco, commencing January 1, 2022 and expiring December 31, 2028. Annual base rent is <strong>$348,000</strong> with 3% annual escalations. The lessee holds <strong>two renewal options of 5 years each</strong>. The lease does not specify a discount rate — the incremental borrowing rate must be supplied manually before the IFRS 16 schedule can be finalized. AI extraction confidence is <strong>96%</strong> across 8 of 9 key fields; the discount rate field is the only gap.
           </div>
         </div>
 
         <!-- Extracted Terms -->
         <div class="card-title" style="margin-bottom:12px;">Extracted Lease Terms</div>
-        <div class="terms-grid">
+        <div class="terms-grid" id="s2-terms-grid">
           <div class="term-row">
             <div class="term-label"><span class="confidence-dot conf-high"></span>Commencement Date</div>
             <div class="term-val">January 1, 2022</div>
@@ -1380,7 +1380,7 @@
 
         <!-- Risk Flags -->
         <div class="card-title" style="margin-bottom:12px;margin-top:8px;">Risk Flags</div>
-        <div class="risk-list">
+        <div class="risk-list" id="s2-risk-list">
           <div class="risk-item high" id="flag-discount-rate">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;">
               <div>
@@ -1918,17 +1918,237 @@
     console.error('Build misconfiguration: WEBHOOK_URL placeholder was not replaced. Check Netlify env vars and build.sh.');
   }
 
-  /* ── Mock extraction results (stand-in for real AI output) ──── */
+  /* ── Mock extraction results (fallback when webhook unavailable) */
   const MOCK_ANALYSIS = {
     contract_type: 'Commercial Office Lease',
     terms_found: [
       'commencement_date', 'expiry_date', 'annual_payment',
-      'escalation_rate', 'renewal_options', 'rou_asset_value',
-      'termination_rights', 'security_deposit'
+      'escalation_rate', 'renewal_options', 'termination_rights', 'security_deposit'
     ],
     terms_missing: ['discount_rate'],
     risk_score: 62,
+    analyzed_at: new Date().toISOString(),
+    summary: 'This is a <strong>7-year commercial office lease</strong> for Floor 12 at 555 Market Street, San Francisco, commencing January 1, 2022 and expiring December 31, 2028. Annual base rent is <strong>$348,000</strong> with 3% annual escalations. The lessee holds <strong>two renewal options of 5 years each</strong>. The lease does not specify a discount rate — the incremental borrowing rate must be supplied manually before the IFRS 16 schedule can be finalized. AI extraction confidence is <strong>96%</strong> across 8 of 9 key fields; the discount rate field is the only gap.',
+    fields: {
+      commencement_date:  { value: 'January 1, 2022',              confidence: 0.97, source_clause: '§2.1 — Lease Commencement' },
+      expiry_date:        { value: 'December 31, 2028',            confidence: 0.97, source_clause: '§2.1 — Lease Term' },
+      annual_payment:     { value: '$348,000 / year',              confidence: 0.96, source_clause: '§5.1 — Base Rent' },
+      escalation_rate:    { value: '3% per annum',                 confidence: 0.95, source_clause: '§5.3 — Rent Adjustments' },
+      renewal_options:    { value: '2 × 5-year options',           confidence: 0.93, source_clause: '§3.2 — Renewal Rights' },
+      termination_rights: { value: 'Landlord only (12-month notice)', confidence: 0.94, source_clause: '§9.1 — Termination Rights' },
+      security_deposit:   { value: '$58,000',                      confidence: 0.96, source_clause: '§6.1 — Security Deposit' },
+      rou_asset_scope:    { value: 'Floor 12 (18,400 sq ft)',       confidence: 0.92, source_clause: '§1.2 — Premises' },
+      governing_law:      { value: 'California, USA',              confidence: 0.98, source_clause: '§14.1 — Governing Law' },
+      discount_rate:      { value: null, confidence: 0.0,          source_clause: '§7.2 — Financial Terms', basis_found: false },
+    },
+    risk_flags: [
+      { id: 'missing_discount_rate', severity: 'high',   title: 'Discount rate missing',
+        description: 'IFRS 16 requires a discount rate to calculate present value of lease payments and ROU asset. The contract does not specify one. Report generation is blocked until resolved.',
+        ifrs16_ref: '§26', field: 'discount_rate' },
+      { id: 'renewal_certainty',     severity: 'medium', title: 'Renewal options not clearly specified as reasonably certain',
+        description: 'IFRS 16 §19 requires assessment of whether renewal options are "reasonably certain" to be exercised. Clause 3.2 grants two 5-year options but contains no intent language — auditors may require a written policy position.',
+        ifrs16_ref: '§19', field: 'renewal_options' },
+      { id: 'termination_lessee',    severity: 'medium', title: 'Lessee has no unilateral termination right',
+        description: '§9.1 grants termination rights to Landlord only (12-month notice). The lessee cannot exit early. Per IFRS 16.B34, confirm the non-cancellable period used in the lease liability calculation reflects the full remaining term with no lessee break option.',
+        ifrs16_ref: 'B34', field: 'termination_rights' },
+      { id: 'security_deposit',      severity: 'low',   title: 'Security deposit classification',
+        description: 'The $58,000 security deposit (§6.1) may need to be classified as a lease incentive receivable depending on refund terms. Current extraction did not detect refund conditions.',
+        ifrs16_ref: '§46', field: 'security_deposit' },
+    ],
   };
+
+  /* ── Field display labels ───────────────────────────────────── */
+  const FIELD_LABELS = {
+    commencement_date:   'Commencement Date',
+    expiry_date:         'Expiry Date',
+    lease_term_years:    'Lease Term',
+    annual_payment:      'Annual Base Rent',
+    annual_payment_usd:  'Annual Base Rent',
+    monthly_payment_usd: 'Monthly Rent',
+    escalation_rate:     'Rent Escalation',
+    escalation_rate_pct: 'Rent Escalation',
+    renewal_options:     'Renewal Options',
+    renewal_option_count:'Renewal Options',
+    termination_rights:  'Termination Rights',
+    termination_party:   'Termination Party',
+    security_deposit:    'Security Deposit',
+    security_deposit_usd:'Security Deposit',
+    rou_asset_value:     'ROU Asset Value',
+    rou_asset_scope:     'ROU Asset Scope',
+    premises_sqft:       'Premises (sq ft)',
+    premises_floor:      'Floor',
+    governing_law:       'Governing Law',
+    discount_rate:       'Discount Rate',
+    lease_liability:     'Lease Liability',
+  };
+
+  /* ── File → base64 ──────────────────────────────────────────── */
+  async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ── Render Screen 2 from AI response data ──────────────────── */
+  function renderResults(data) {
+    if (Array.isArray(data)) data = data[0] ?? {};
+
+    const riskScore  = data.risk_score  ?? 62;
+    const fields     = data.fields      ?? {};
+    const riskFlags  = data.risk_flags  ?? [];
+    const termsFound = data.terms_found ?? Object.keys(fields).filter(k => fields[k]?.value !== null && fields[k]?.value !== undefined);
+    const termsMissing = data.terms_missing ?? Object.keys(fields).filter(k => !fields[k]?.value);
+    const summary    = data.summary     ?? data.ai_summary ?? null;
+    const analyzedAt = data.analyzed_at ?? new Date().toISOString();
+    const filename   = selectedFile ? selectedFile.name.replace(/\.[^.]+$/, '') : (data.contract_type ?? 'Contract');
+
+    /* Score ring */
+    const el = id => document.getElementById(id);
+    el('s2-score-val').textContent = riskScore;
+
+    const riskLevel    = riskScore < 50 ? 'Low' : riskScore < 70 ? 'Medium' : 'High';
+    const riskColor    = riskScore < 50 ? 'var(--green)' : riskScore < 70 ? 'var(--amber)' : 'var(--red)';
+    const riskPillCls  = riskScore < 50 ? 'pill-green'  : riskScore < 70 ? 'pill-amber'  : 'pill-red';
+    el('s2-score-num').innerHTML =
+      `${riskScore}<span style="font-size:20px;color:var(--ink-3);font-weight:400;">/100</span>`;
+    el('s2-score-num').style.color = riskColor;
+
+    /* Breadcrumb + title */
+    el('s2-breadcrumb').textContent  = filename;
+    el('s2-score-title').textContent = filename;
+    const contractMeta = [data.contract_type, 'IFRS 16', new Date(analyzedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})].filter(Boolean).join(' · ');
+    el('s2-score-sub').textContent = contractMeta;
+
+    /* Pills */
+    const totalFields = termsFound.length + termsMissing.length || 9;
+    const flagCount   = riskFlags.length;
+    el('s2-score-pills').innerHTML = `
+      <span class="pill ${riskPillCls}">${riskLevel} Risk</span>
+      <span class="pill pill-green">${termsFound.length} of ${totalFields} fields extracted</span>
+      <span class="pill pill-brand">IFRS 16 fields extracted</span>
+      ${flagCount ? `<span class="pill pill-gray">${flagCount} flag${flagCount !== 1 ? 's' : ''} to review</span>` : ''}
+    `;
+
+    /* Analyzed-at timestamp */
+    const dtStr = new Date(analyzedAt).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+    el('s2-analyzed-at').textContent = `Last analyzed: ${dtStr}`;
+
+    /* AI summary */
+    if (summary) el('s2-ai-summary').innerHTML = summary;
+
+    /* Render sub-sections */
+    renderMetrics(fields, data);
+    renderTermsGrid(fields, termsMissing);
+    renderRiskFlags(riskFlags);
+
+    /* Re-evaluate report gate for new flags */
+    updateReportGate();
+
+    /* Scroll into view */
+    document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function renderMetrics(fields, data) {
+    const get = key => {
+      const f = fields[key];
+      return f ? (typeof f === 'object' ? f.value : f) : null;
+    };
+    const expiry = get('expiry_date');
+    let remaining = '—';
+    let expirySub = '';
+    if (expiry) {
+      const d = new Date(expiry);
+      const yrs = (d - Date.now()) / (1000 * 60 * 60 * 24 * 365.25);
+      if (!isNaN(yrs) && yrs > 0) remaining = `≈${yrs.toFixed(1)} yrs`;
+      expirySub = `Expires ${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+    }
+
+    const rouRaw      = get('rou_asset_value') ?? data.rou_asset_value;
+    const liabRaw     = get('lease_liability')  ?? data.lease_liability;
+    const discountRaw = get('discount_rate');
+
+    const fmt = v => {
+      const n = typeof v === 'string' ? parseFloat(v.replace(/[^0-9.]/g, '')) : Number(v);
+      return isNaN(n) ? String(v) : `$${n.toLocaleString()}`;
+    };
+
+    const cards = [
+      { label: 'ROU Asset Value',  val: rouRaw  ? fmt(rouRaw)      : '$2.18M',        sub: 'Right-of-use asset',      flagged: !rouRaw },
+      { label: 'Lease Liability',  val: liabRaw ? fmt(liabRaw)     : '$1.94M',        sub: 'Present value',           flagged: false },
+      { label: 'Discount Rate',    val: discountRaw,                                   sub: discountRaw ? 'IBR applied' : 'Manual input required', flagged: !discountRaw },
+      { label: 'Remaining Term',   val: remaining,                                     sub: expirySub || 'Expires Dec 31, 2028', flagged: false },
+    ];
+
+    document.getElementById('s2-metric-grid').innerHTML = cards.map(c => `
+      <div class="metric-card${c.flagged ? ' flagged' : ''}">
+        <div class="metric-label">${c.label}</div>
+        <div class="metric-val">${c.flagged && !c.val ? '⚠ Not found' : (c.val ?? 'N/A')}</div>
+        <div class="metric-sub">${c.sub}</div>
+      </div>`).join('');
+  }
+
+  function renderTermsGrid(fields, termsMissing = []) {
+    const missingSet = new Set(termsMissing);
+    const rows = Object.entries(fields).map(([key, raw]) => {
+      const f          = typeof raw === 'object' && raw !== null ? raw : { value: raw };
+      const missing    = f.value === null || f.value === undefined || f.value === '';
+      const conf       = f.confidence ?? (missing ? 0 : 1);
+      const confCls    = missing ? 'conf-low' : conf >= 0.85 ? 'conf-high' : 'conf-med';
+      const label      = FIELD_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const clause     = f.source_clause ?? '';
+      return `
+        <div class="term-row" ${missing ? 'style="border:1px dashed var(--amber);background:var(--amber-lt);"' : ''}>
+          <div class="term-label"><span class="confidence-dot ${confCls}"></span>${label}</div>
+          <div class="term-val" ${missing ? 'style="color:var(--amber);"' : ''}>${missing ? 'Not found in contract' : f.value}</div>
+          ${clause ? `<div class="term-clause" ${missing ? 'style="color:var(--amber);"' : ''}>📎 ${clause}</div>` : ''}
+        </div>`;
+    });
+    const grid = document.getElementById('s2-terms-grid');
+    if (grid) grid.innerHTML = rows.join('');
+  }
+
+  function renderRiskFlags(flags) {
+    const list = document.getElementById('s2-risk-list');
+    if (!list) return;
+    if (!flags.length) { list.innerHTML = '<p style="font-size:13px;color:var(--ink-3);padding:12px 0;">No risk flags detected.</p>'; return; }
+
+    list.innerHTML = flags.map(flag => {
+      const sev      = flag.severity ?? 'low';
+      const pillCls  = sev === 'high' ? 'pill-red' : sev === 'medium' ? 'pill-amber' : 'pill-green';
+      const pillLbl  = sev.charAt(0).toUpperCase() + sev.slice(1);
+      const flagId   = flag.id ?? flag.field ?? 'flag';
+      const isHigh   = sev === 'high';
+      const title    = flag.title ?? flag.description?.split('.')[0] ?? 'Risk flag';
+      const desc     = flag.description ?? '';
+      const ref      = flag.ifrs16_ref ?? '';
+
+      return `
+        <div class="risk-item ${sev}" id="flag-${flagId}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div>
+              <div class="risk-title">${title}</div>
+              <div class="risk-desc">${desc}</div>
+            </div>
+            <span class="pill ${pillCls}" style="flex-shrink:0;margin-left:12px;">${pillLbl}</span>
+          </div>
+          <div class="risk-meta">
+            <button class="btn btn-sm btn-outline">${isHigh ? 'Enter IBR manually' : 'Add management note'}</button>
+            ${ref ? `<span style="font-size:11px;color:var(--ink-3);">IFRS 16 ${ref}</span>` : ''}
+          </div>
+          ${isHigh ? `
+            <div class="sign-off-row">
+              <label>
+                <input type="checkbox" id="signoff-${flagId}" class="high-flag-signoff" onchange="updateReportGate()" />
+                I acknowledge this risk and confirm resolution before report generation
+              </label>
+              <input type="text" placeholder="Reviewer name" id="reviewer-${flagId}" />
+            </div>` : ''}
+        </div>`;
+    }).join('');
+  }
 
   /* ── State ──────────────────────────────────────────────────── */
   let selectedFile = null;
@@ -2015,33 +2235,35 @@
   /* ── Analysis + webhook flow ────────────────────────────────── */
   async function runAnalysis() {
     const btn = document.getElementById('analyzeBtn');
-    btn.disabled   = true;
-    btn.innerHTML  = '<span class="spinner"></span> Analyzing…';
+    btn.disabled  = true;
+    btn.innerHTML = '<span class="spinner"></span> Analyzing…';
 
     document.getElementById('progressFileName').textContent = selectedFile.name;
     document.getElementById('progressPanel').classList.remove('hidden');
     document.getElementById('progressStatusPill').textContent = 'Analyzing…';
 
-    /* ── Step 1: read structure ── */
     await animateStep('step1', 'Reading contract…', 25, 900);
-    /* ── Step 2: extract fields ── */
     await animateStep('step2', 'Extracting IFRS 16 fields…', 55, 1100);
-    /* ── Step 3: risk scoring ──── */
     await animateStep('step3', 'Scoring risk factors…', 80, 900);
-    /* ── Step 4: send webhook ──── */
     setStepActive('step4');
-    setProgress('Triggering workflow…', 90);
+    setProgress('Sending to AI workflow…', 90);
     showToast('sending', '⏳', 'Sending to n8n workflow…', 'POST → webhook');
 
+    /* Read file as base64 so n8n/Claude can process the real document */
+    let fileContent = null;
+    try { fileContent = await fileToBase64(selectedFile); } catch (e) { /* non-fatal */ }
+
     const payload = {
-      ...MOCK_ANALYSIS,
-      analyzed_at: new Date().toISOString(),
+      file_name:    selectedFile.name,
+      file_type:    selectedFile.type || 'application/octet-stream',
+      file_content: fileContent,
+      standard:     'IFRS16',
+      analyzed_at:  new Date().toISOString(),
     };
 
-    let webhookOk = false;
+    let webhookOk    = false;
+    let responseData = null;
     try {
-      // text/plain avoids a CORS preflight (simple request).
-      // n8n receives the raw JSON body and parses it regardless of content-type.
       const res = await fetch(WEBHOOK_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -2049,33 +2271,38 @@
       });
       webhookOk = res.ok;
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      /* Parse the AI extraction response */
+      const text = await res.text();
+      try {
+        let parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed;
+        responseData = parsed;
+      } catch (e) { /* non-JSON response — fall through to mock */ }
+
       setStepDone('step4');
-      setProgress('Workflow triggered', 100);
-      showToast(
-        'success', '✅',
-        'Workflow triggered',
-        `n8n received the payload · risk_score=${payload.risk_score} · ` +
-        `${payload.terms_found.length} terms found`
-      );
+      setProgress('Extraction complete', 100);
+      const fc = responseData?.terms_found?.length
+               ?? Object.keys(responseData?.fields ?? {}).filter(k => responseData.fields[k]?.value).length
+               ?? 8;
+      showToast('success', '✅', 'Extraction complete',
+        `${fc} fields extracted · risk_score=${responseData?.risk_score ?? '—'}`);
     } catch (err) {
-      setStepDone('step4', /* error */ true);
-      setProgress('Webhook failed — results still ready', 100);
-      showToast(
-        'error', '⚠️',
-        'Webhook delivery failed',
-        `${err.message} — analysis results are unaffected`
-      );
+      setStepDone('step4', true);
+      setProgress('Webhook failed — showing demo results', 100);
+      showToast('error', '⚠️', 'Webhook delivery failed',
+        `${err.message} — showing demo results`);
     }
 
-    /* ── Finish up ── */
     document.getElementById('progressStatusPill').textContent = 'Complete';
-    document.getElementById('progressStatusPill').className   =
-      'pill pill-green';
+    document.getElementById('progressStatusPill').className   = 'pill pill-green';
     btn.disabled  = false;
     btn.innerHTML = '📊 View full report';
     btn.onclick   = () => document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
 
-    /* Auto-dismiss on success; keep open on error so user can read the status */
+    /* Render real AI data if available, otherwise fall back to mock */
+    renderResults(responseData ?? MOCK_ANALYSIS);
+
     if (webhookOk) setTimeout(dismissToast, 7000);
   }
 
@@ -2107,10 +2334,8 @@
 
   /* ── S2 / H3: Report gate — disabled until all high flags signed off ── */
   function updateReportGate() {
-    const allSigned = ['signoff-discount-rate'].every(id => {
-      const cb = document.getElementById(id);
-      return cb && cb.checked;
-    });
+    const boxes = document.querySelectorAll('.high-flag-signoff');
+    const allSigned = boxes.length === 0 || [...boxes].every(cb => cb.checked);
     const btn = document.getElementById('generateReportBtn');
     if (!btn) return;
     btn.disabled = !allSigned;
