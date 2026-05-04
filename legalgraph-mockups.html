@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LegalGraph — UI Mockups</title>
+  <style>
+    /* ── Reset & tokens ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #0F1923;
+      --ink-2:    #3D4F5C;
+      --ink-3:    #6B7E8D;
+      --border:   #D8E0E6;
+      --surface:  #F5F7F9;
+      --white:    #FFFFFF;
+      --brand:    #1B4FD8;
+      --brand-dk: #1340B0;
+      --brand-lt: #EBF0FD;
+      --green:    #0E8A5F;
+      --green-lt: #E6F5EF;
+      --amber:    #B45309;
+      --amber-lt: #FEF3C7;
+      --red:      #C0392B;
+      --red-lt:   #FDECEA;
+      --radius:   8px;
+      --shadow:   0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+      --font: 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: #E8EDF2;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Screen wrapper ─────────────────────────────────────────── */
+    .screen-label {
+      background: var(--ink);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .screen-label span { opacity: .5; font-weight: 400; }
+    .screen-wrapper {
+      margin: 0 auto;
+      max-width: 1280px;
+      margin-bottom: 48px;
+    }
+    .screen {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* ── Shared Nav ─────────────────────────────────────────────── */
+    nav {
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      height: 56px;
+      gap: 32px;
+    }
+    .nav-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+    }
+    .nav-logo sup {
+      font-size: 9px;
+      font-weight: 400;
+      opacity: .6;
+      letter-spacing: .04em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+    .nav-link {
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+    .nav-link.active { color: #fff; }
+    .nav-end {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Buttons ────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .88; }
+    .btn-primary   { background: var(--brand); color: #fff; }
+    .btn-secondary { background: var(--brand-lt); color: var(--brand); }
+    .btn-outline   { background: transparent; color: var(--ink-2); border: 1px solid var(--border); }
+    .btn-sm        { padding: 5px 10px; font-size: 12px; }
+    .btn-danger    { background: var(--red); color: #fff; }
+
+    /* ── Pills / Tags ───────────────────────────────────────────── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+    .pill-green  { background: var(--green-lt);  color: var(--green); }
+    .pill-amber  { background: var(--amber-lt);  color: var(--amber); }
+    .pill-red    { background: var(--red-lt);    color: var(--red); }
+    .pill-brand  { background: var(--brand-lt);  color: var(--brand); }
+    .pill-gray   { background: var(--surface);   color: var(--ink-2); border: 1px solid var(--border); }
+
+    /* ── Cards ──────────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 14px;
+      letter-spacing: -.01em;
+    }
+
+    /* ── Section dividers ───────────────────────────────────────── */
+    .section-gap { height: 40px; }
+    .divider { height: 1px; background: var(--border); margin: 0; }
+
+    /* ── Icons (inline SVG stand-ins using Unicode + CSS) ───────── */
+    .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px; height: 16px;
+      font-style: normal;
+    }
+
+    /* ================================================================
+       SCREEN 1 — UPLOAD / HOMEPAGE
+    ================================================================ */
+    .s1-hero {
+      background: linear-gradient(135deg, #0F1923 0%, #1B3A6B 100%);
+      padding: 56px 64px 48px;
+      display: flex;
+      gap: 64px;
+      align-items: flex-start;
+    }
+    .s1-hero-copy { flex: 1; }
+    .s1-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #7AADFF;
+      margin-bottom: 14px;
+    }
+    .s1-headline {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -.03em;
+      margin-bottom: 16px;
+    }
+    .s1-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,.65);
+      line-height: 1.6;
+      max-width: 480px;
+      margin-bottom: 28px;
+    }
+    .s1-stats {
+      display: flex;
+      gap: 32px;
+    }
+    .s1-stat-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.03em;
+    }
+    .s1-stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,.5);
+      margin-top: 2px;
+    }
+
+    /* Upload zone */
+    .s1-upload-panel {
+      width: 360px;
+      flex-shrink: 0;
+    }
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,.25);
+      border-radius: 12px;
+      padding: 40px 28px;
+      text-align: center;
+      background: rgba(255,255,255,.06);
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .upload-zone:hover {
+      border-color: rgba(255,255,255,.5);
+      background: rgba(255,255,255,.10);
+    }
+    .upload-icon {
+      width: 52px; height: 52px;
+      background: rgba(27,79,216,.4);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 24px;
+    }
+    .upload-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .upload-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,.5);
+      margin-bottom: 20px;
+    }
+    .upload-types {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .upload-type-tag {
+      background: rgba(255,255,255,.1);
+      color: rgba(255,255,255,.6);
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 3px 8px;
+    }
+    .upload-progress-label {
+      font-size: 11px;
+      color: rgba(255,255,255,.5);
+      margin-top: 14px;
+    }
+
+    /* Recent uploads */
+    .s1-body { padding: 32px 64px; background: var(--surface); }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+    .lease-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .lease-table th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--ink-3);
+      padding: 12px 18px;
+      text-align: left;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .lease-table td {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--ink-2);
+      vertical-align: middle;
+    }
+    .lease-table tr:last-child td { border-bottom: none; }
+    .lease-table tr:hover td { background: #FAFBFD; }
+    .lease-name {
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .lease-sub {
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-top: 2px;
+    }
+    .progress-bar-wrap {
+      width: 80px;
+      height: 5px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      display: inline-block;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--brand);
+    }
+
+    /* ================================================================
+       SCREEN 2 — ANALYSIS RESULTS
+    ================================================================ */
+    .s2-subheader {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+    .breadcrumb a { color: var(--brand); cursor: pointer; }
+    .breadcrumb-sep { color: var(--border); }
+    .breadcrumb-current { color: var(--ink); font-weight: 600; }
+
+    .s2-layout {
+      display: flex;
+      gap: 0;
+      min-height: 640px;
+    }
+    .s2-main {
+      flex: 1;
+      padding: 28px;
+      background: var(--surface);
+      overflow-y: auto;
+    }
+    .s2-sidebar {
+      width: 300px;
+      border-left: 1px solid var(--border);
+      background: var(--white);
+      padding: 24px 20px;
+      flex-shrink: 0;
+    }
+
+    /* Score ring */
+    .score-header {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 20px;
+    }
+    .score-ring {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: conic-gradient(var(--amber) 0% 62%, var(--border) 62% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .score-ring::before {
+      content: '';
+      width: 68px; height: 68px;
+      background: var(--white);
+      border-radius: 50%;
+      position: absolute;
+    }
+    .score-ring-val {
+      position: relative;
+      z-index: 1;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--amber);
+    }
+    .score-meta { flex: 1; }
+    .score-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.02em;
+      margin-bottom: 4px;
+    }
+    .score-sub {
+      font-size: 12px;
+      color: var(--ink-3);
+      margin-bottom: 12px;
+    }
+    .score-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* Metric grid */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .metric-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+    .metric-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-3);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+    }
+    .metric-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.02em;
+    }
+    .metric-sub {
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-top: 2px;
+    }
+    .metric-card.flagged { border-color: #FBBF24; background: #FFFBEB; }
+    .metric-card.flagged .metric-val { color: var(--amber); }
+
+    /* Extracted terms table */
+    .terms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .term-row {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .term-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-3);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .term-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .term-clause {
+      font-size: 11px;
+      color: var(--brand);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-top: 2px;
+    }
+    .term-clause:hover { text-decoration: underline; }
+    .confidence-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    .conf-high  { background: var(--green); }
+    .conf-med   { background: var(--amber); }
+    .conf-low   { background: var(--red); }
+
+    /* Risk items */
+    .risk-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .risk-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+    }
+    .risk-item.high   { border-left-color: var(--red); }
+    .risk-item.medium { border-left-color: var(--amber); }
+    .risk-item.low    { border-left-color: var(--green); }
+    .risk-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+    .risk-desc {
+      font-size: 12px;
+      color: var(--ink-3);
+      line-height: 1.5;
+    }
+    .risk-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    /* Summary box */
+    .summary-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .summary-text {
+      font-size: 13px;
+      color: var(--ink-2);
+      line-height: 1.7;
+    }
+
+    /* Sidebar */
+    .sidebar-section { margin-bottom: 24px; }
+    .sidebar-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .action-list { display: flex; flex-direction: column; gap: 6px; }
+    .action-btn {
+      width: 100%;
+      text-align: left;
+      padding: 9px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--white);
+      font-size: 13px;
+      color: var(--ink-2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .action-btn:hover { background: var(--surface); color: var(--ink); }
+    .audit-trail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .audit-trail-item:last-child { border-bottom: none; }
+    .audit-clause {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--brand);
+      cursor: pointer;
+    }
+    .audit-field {
+      font-size: 11px;
+      color: var(--ink-3);
+    }
+
+    /* ================================================================
+       SCREEN 3 — PLAYBOOK MANAGEMENT
+    ================================================================ */
+    .s3-subheader {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .s3-title-group { display: flex; flex-direction: column; gap: 2px; }
+    .s3-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.02em;
+    }
+    .s3-subtitle {
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+    .s3-body { padding: 28px; background: var(--surface); }
+
+    /* Stats row */
+    .s3-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .s3-stat {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+    }
+    .s3-stat-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.03em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .s3-stat-label {
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+
+    /* Playbook table */
+    .playbook-table-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-filters { display: flex; align-items: center; gap: 8px; }
+    .filter-select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--ink-2);
+      background: var(--white);
+      cursor: pointer;
+    }
+    .search-input {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--ink);
+      width: 220px;
+    }
+    .playbook-tbl {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .playbook-tbl th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--ink-3);
+      padding: 11px 18px;
+      text-align: left;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .playbook-tbl th.sortable { cursor: pointer; }
+    .playbook-tbl th.sortable:hover { color: var(--brand); }
+    .sort-arrow { margin-left: 4px; opacity: .5; }
+    .playbook-tbl td {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--ink-2);
+      vertical-align: middle;
+    }
+    .playbook-tbl tr:last-child td { border-bottom: none; }
+    .playbook-tbl tr:hover td { background: #FAFBFD; }
+    .playbook-name {
+      font-weight: 700;
+      color: var(--ink);
+      display: block;
+    }
+    .playbook-id {
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+      color: var(--ink-3);
+    }
+    .standard-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .badge-ifrs { background: #EEF2FF; color: #3730A3; }
+    .badge-asc  { background: #F0FDF4; color: #166534; }
+    .badge-both { background: #FFF7ED; color: #9A3412; }
+
+    .coverage-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .coverage-bar {
+      height: 6px;
+      flex: 1;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .coverage-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--green);
+    }
+    .coverage-fill.partial { background: var(--amber); }
+    .coverage-pct {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-2);
+      width: 28px;
+      text-align: right;
+    }
+
+    .row-actions { display: flex; gap: 4px; }
+
+    /* Slide-out detail panel (visual only) */
+    .detail-panel {
+      position: relative;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    .detail-panel-header {
+      background: var(--ink);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .detail-panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .detail-panel-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+    }
+    .detail-col {
+      padding: 20px;
+      border-right: 1px solid var(--border);
+    }
+    .detail-col:last-child { border-right: none; }
+    .detail-col-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--ink-3);
+      margin-bottom: 12px;
+    }
+    .clause-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: var(--ink-2);
+      margin: 3px;
+      cursor: pointer;
+    }
+    .clause-chip:hover { border-color: var(--brand); color: var(--brand); }
+    .field-pair { margin-bottom: 10px; }
+    .field-pair-label { font-size: 11px; color: var(--ink-3); margin-bottom: 2px; }
+    .field-pair-val { font-size: 13px; font-weight: 600; color: var(--ink); }
+
+    /* ── Webhook toast ──────────────────────────────────────────── */
+    #webhookToast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      min-width: 320px;
+      max-width: 420px;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+    }
+    #webhookToast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    #webhookToast.success { background: #0F2D1F; border: 1px solid #166534; }
+    #webhookToast.error   { background: #2D0F0F; border: 1px solid #991B1B; }
+    #webhookToast.sending { background: #0F1D2D; border: 1px solid #1E3A5F; }
+    .toast-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .toast-body { flex: 1; }
+    .toast-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .toast-sub   { font-size: 12px; color: rgba(255,255,255,.6); line-height: 1.4; }
+    .toast-dismiss {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,.4);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .toast-dismiss:hover { color: rgba(255,255,255,.9); }
+
+    /* ── Analyze button states ───────────────────────────────────── */
+    #analyzeBtn { width: 100%; justify-content: center; }
+    #analyzeBtn:disabled { opacity: .55; cursor: not-allowed; }
+    .spinner {
+      display: inline-block;
+      width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Analysis progress steps ─────────────────────────────────── */
+    #progressPanel { margin-top: 14px; background: rgba(255,255,255,.08); border-radius: 10px; padding: 14px 16px; }
+    #progressPanel.hidden { display: none; }
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,.45);
+      margin-bottom: 5px;
+      transition: color .2s;
+    }
+    .progress-step:last-child { margin-bottom: 0; }
+    .progress-step.active  { color: rgba(255,255,255,.85); }
+    .progress-step.done    { color: #4ADE80; }
+    .step-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      flex-shrink: 0;
+      transition: background .2s;
+    }
+    .progress-step.active .step-dot { background: #7AADFF; }
+    .progress-step.done   .step-dot { background: #4ADE80; }
+    #progressBar { height: 4px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-top: 12px; }
+    #progressFill { height: 100%; background: #7AADFF; border-radius: 99px; width: 0%; transition: width .4s ease; }
+    #progressMeta { display: flex; justify-content: space-between; margin-top: 6px; }
+    #progressLabel { font-size: 11px; color: rgba(255,255,255,.45); }
+    #progressPct   { font-size: 11px; color: rgba(255,255,255,.45); }
+
+    /* ── Page nav labels ────────────────────────────────────────── */
+    .page-nav {
+      background: var(--ink-2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0 24px;
+      display: flex;
+      gap: 0;
+    }
+    .page-nav-link {
+      color: rgba(255,255,255,.6);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      text-decoration: none;
+    }
+    .page-nav-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- ── Sticky page nav ─────────────────────────────────────────── -->
+<div class="page-nav">
+  <a class="page-nav-link" href="#screen1">① Upload</a>
+  <a class="page-nav-link" href="#screen2">② Analysis Results</a>
+  <a class="page-nav-link" href="#screen3">③ Playbook Management</a>
+</div>
+
+<!-- ================================================================
+     SCREEN 1 — UPLOAD / HOMEPAGE
+================================================================ -->
+<div id="screen1" class="screen-wrapper" style="padding-top:24px">
+  <div class="screen-label">Screen 1 — Contract Upload / Homepage <span>[ /dashboard ]</span></div>
+  <div class="screen">
+    <!-- Nav -->
+    <nav>
+      <div class="nav-logo">LegalGraph<sup>®</sup></div>
+      <div class="nav-links">
+        <div class="nav-link active">Dashboard</div>
+        <div class="nav-link">Leases</div>
+        <div class="nav-link">Reports</div>
+        <div class="nav-link">Playbooks</div>
+        <div class="nav-link">Audit Trail</div>
+      </div>
+      <div class="nav-end">
+        <div class="avatar">RC</div>
+      </div>
+    </nav>
+
+    <!-- Hero upload section -->
+    <div class="s1-hero">
+      <div class="s1-hero-copy">
+        <div class="s1-kicker">IFRS 16 / ASC 842 Compliance Suite</div>
+        <div class="s1-headline">Audit-ready lease<br>reports in minutes,<br>not hours.</div>
+        <div class="s1-sub">Upload a contract and LegalGraph extracts every IFRS 16 field automatically — commencement dates, payment schedules, discount rates, renewal options — with a clause-level audit trail auditors can verify on the spot.</div>
+        <div class="s1-stats">
+          <div>
+            <div class="s1-stat-val">94%</div>
+            <div class="s1-stat-label">Extraction accuracy</div>
+          </div>
+          <div>
+            <div class="s1-stat-val">&lt;45m</div>
+            <div class="s1-stat-label">Time to compliance report</div>
+          </div>
+          <div>
+            <div class="s1-stat-val">12</div>
+            <div class="s1-stat-label">Active leases tracked</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload zone -->
+      <div class="s1-upload-panel">
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt"
+                 style="display:none" />
+          <div class="upload-icon" id="uploadIcon">📄</div>
+          <div class="upload-title" id="uploadTitle">Upload a lease contract</div>
+          <div class="upload-sub" id="uploadSub">Drag &amp; drop or click to browse</div>
+          <div class="upload-types">
+            <span class="upload-type-tag">PDF</span>
+            <span class="upload-type-tag">DOCX</span>
+            <span class="upload-type-tag">DOC</span>
+            <span class="upload-type-tag">TXT</span>
+          </div>
+          <button class="btn btn-primary" id="analyzeBtn"
+                  onclick="handleAnalyzeClick()">
+            Choose file
+          </button>
+          <div class="upload-progress-label">Max 50 MB per file · Encrypted at rest</div>
+        </div>
+
+        <!-- Analysis progress panel (shown during analysis) -->
+        <div id="progressPanel" class="hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:12px;font-weight:600;color:#fff;" id="progressFileName">—</span>
+            <span class="pill pill-brand" style="font-size:10px;" id="progressStatusPill">Queued</span>
+          </div>
+          <div class="progress-step" id="step1"><span class="step-dot"></span>Reading contract structure</div>
+          <div class="progress-step" id="step2"><span class="step-dot"></span>Extracting IFRS 16 fields</div>
+          <div class="progress-step" id="step3"><span class="step-dot"></span>Scoring risk factors</div>
+          <div class="progress-step" id="step4"><span class="step-dot"></span>Triggering downstream workflow</div>
+          <div id="progressBar"><div id="progressFill"></div></div>
+          <div id="progressMeta">
+            <span id="progressLabel">Starting…</span>
+            <span id="progressPct">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent leases -->
+    <div class="s1-body">
+      <div class="section-header">
+        <div class="section-title">Recent Contracts</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm">Export all</button>
+          <button class="btn btn-primary btn-sm">+ Add lease</button>
+        </div>
+      </div>
+
+      <table class="lease-table">
+        <thead>
+          <tr>
+            <th>Contract</th>
+            <th>Standard</th>
+            <th>Commencement</th>
+            <th>Term</th>
+            <th>Annual Payment</th>
+            <th>Status</th>
+            <th>Extraction</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="lease-name">SF Headquarters — Floor 12</div>
+              <div class="lease-sub">555 Market St, San Francisco, CA</div>
+            </td>
+            <td><span class="standard-badge badge-ifrs">IFRS 16</span></td>
+            <td>Jan 1, 2022</td>
+            <td>7 years</td>
+            <td>$348,000</td>
+            <td><span class="pill pill-green">Current</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:96%"></div></div>
+                <span style="font-size:11px;color:var(--ink-3);">96%</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px;">
+                <button class="btn btn-secondary btn-sm">View report</button>
+                <button class="btn btn-outline btn-sm">⋯</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="lease-name">NYC Office — Midtown</div>
+              <div class="lease-sub">1221 Avenue of the Americas, New York</div>
+            </td>
+            <td><span class="standard-badge badge-asc">ASC 842</span></td>
+            <td>Mar 15, 2021</td>
+            <td>5 years</td>
+            <td>$524,400</td>
+            <td><span class="pill pill-amber">Expiring soon</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:88%"></div></div>
+                <span style="font-size:11px;color:var(--ink-3);">88%</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px;">
+                <button class="btn btn-secondary btn-sm">View report</button>
+                <button class="btn btn-outline btn-sm">⋯</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="lease-name">Austin Co-working Space</div>
+              <div class="lease-sub">701 Brazos St, Austin, TX</div>
+            </td>
+            <td><span class="standard-badge badge-asc">ASC 842</span></td>
+            <td>Sep 1, 2023</td>
+            <td>2 years</td>
+            <td>$96,000</td>
+            <td><span class="pill pill-red">Flagged</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:71%"></div></div>
+                <span style="font-size:11px;color:var(--amber);">71%</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px;">
+                <button class="btn btn-danger btn-sm">Resolve flags</button>
+                <button class="btn btn-outline btn-sm">⋯</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="lease-name">London EMEA HQ</div>
+              <div class="lease-sub">30 St Mary Axe, London, EC3A 8EP</div>
+            </td>
+            <td><span class="standard-badge badge-ifrs">IFRS 16</span></td>
+            <td>Jul 1, 2020</td>
+            <td>10 years</td>
+            <td>£612,000</td>
+            <td><span class="pill pill-green">Current</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:98%"></div></div>
+                <span style="font-size:11px;color:var(--ink-3);">98%</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px;">
+                <button class="btn btn-secondary btn-sm">View report</button>
+                <button class="btn btn-outline btn-sm">⋯</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     SCREEN 2 — ANALYSIS RESULTS
+================================================================ -->
+<div id="screen2" class="screen-wrapper">
+  <div class="screen-label">Screen 2 — Analysis Results <span>[ /leases/[id]/report ]</span></div>
+  <div class="screen">
+    <nav>
+      <div class="nav-logo">LegalGraph<sup>®</sup></div>
+      <div class="nav-links">
+        <div class="nav-link">Dashboard</div>
+        <div class="nav-link active">Leases</div>
+        <div class="nav-link">Reports</div>
+        <div class="nav-link">Playbooks</div>
+        <div class="nav-link">Audit Trail</div>
+      </div>
+      <div class="nav-end">
+        <div class="avatar">RC</div>
+      </div>
+    </nav>
+
+    <!-- Sub-header breadcrumb -->
+    <div class="s2-subheader">
+      <div class="breadcrumb">
+        <a>Leases</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">SF Headquarters — Floor 12</span>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <span style="font-size:12px;color:var(--ink-3);">Last analyzed: May 2, 2026 at 3:14 PM</span>
+        <button class="btn btn-outline btn-sm">Re-analyze</button>
+        <button class="btn btn-outline btn-sm">📤 Export PDF</button>
+        <button class="btn btn-primary btn-sm">Generate IFRS 16 Report</button>
+      </div>
+    </div>
+
+    <div class="s2-layout">
+      <!-- Main content -->
+      <div class="s2-main">
+
+        <!-- Risk score header -->
+        <div class="score-header">
+          <div class="score-ring">
+            <div class="score-ring-val">62</div>
+          </div>
+          <div class="score-meta">
+            <div class="score-title">SF Headquarters — Floor 12</div>
+            <div class="score-sub">555 Market St, San Francisco · IFRS 16 · 7-year term · Analyzed May 2, 2026</div>
+            <div class="score-pills">
+              <span class="pill pill-amber">Medium Risk</span>
+              <span class="pill pill-green">8 of 9 fields extracted</span>
+              <span class="pill pill-brand">IFRS 16 compliant</span>
+              <span class="pill pill-gray">2 flags to review</span>
+            </div>
+          </div>
+          <div style="margin-left:auto;text-align:right;">
+            <div style="font-size:11px;color:var(--ink-3);margin-bottom:4px;">Overall risk score</div>
+            <div style="font-size:42px;font-weight:900;color:var(--amber);letter-spacing:-.04em;line-height:1;">62<span style="font-size:20px;color:var(--ink-3);font-weight:400;">/100</span></div>
+            <div style="font-size:11px;color:var(--ink-3);margin-top:2px;">Lower is better</div>
+          </div>
+        </div>
+
+        <!-- Key metrics -->
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="metric-label">ROU Asset Value</div>
+            <div class="metric-val">$2.18M</div>
+            <div class="metric-sub">Right-of-use asset</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Lease Liability</div>
+            <div class="metric-val">$1.94M</div>
+            <div class="metric-sub">Present value</div>
+          </div>
+          <div class="metric-card flagged">
+            <div class="metric-label">Discount Rate</div>
+            <div class="metric-val">⚠ Not found</div>
+            <div class="metric-sub">Manual input required</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Remaining Term</div>
+            <div class="metric-val">4.6 yrs</div>
+            <div class="metric-sub">Expires Dec 31, 2030</div>
+          </div>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">🤖 AI Summary</div>
+          <div class="summary-text">
+            This is a <strong>7-year commercial office lease</strong> for floors 12 at 555 Market Street, San Francisco, commencing January 1, 2022 and expiring December 31, 2028. Annual base rent is <strong>$348,000</strong> with 3% annual escalations. The lessee holds <strong>two renewal options of 5 years each</strong>. The lease does not specify a discount rate — the incremental borrowing rate must be supplied manually before the IFRS 16 schedule can be finalized. AI extraction confidence is <strong>96%</strong> across 8 of 9 key fields; the discount rate field is the only gap.
+          </div>
+        </div>
+
+        <!-- Extracted Terms -->
+        <div class="card-title" style="margin-bottom:12px;">Extracted Lease Terms</div>
+        <div class="terms-grid">
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Commencement Date</div>
+            <div class="term-val">January 1, 2022</div>
+            <div class="term-clause">📎 Clause 2.1 — "Lease Commencement"</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Expiry Date</div>
+            <div class="term-val">December 31, 2028</div>
+            <div class="term-clause">📎 Clause 2.1 — "Lease Term"</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Annual Base Rent</div>
+            <div class="term-val">$348,000 / year</div>
+            <div class="term-clause">📎 Clause 5.1 — "Base Rent"</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Rent Escalation</div>
+            <div class="term-val">3% per annum</div>
+            <div class="term-clause">📎 Clause 5.3 — "Rent Adjustments"</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Renewal Options</div>
+            <div class="term-val">2 × 5-year options</div>
+            <div class="term-clause">📎 Clause 3.2 — "Renewal Rights"</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Termination Rights</div>
+            <div class="term-val">Landlord only (12-month notice)</div>
+            <div class="term-clause">📎 Clause 14.1 — "Early Termination"</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Security Deposit</div>
+            <div class="term-val">$58,000</div>
+            <div class="term-clause">📎 Clause 6.1 — "Security Deposit"</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>ROU Asset Scope</div>
+            <div class="term-val">Floors 12 (18,400 sq ft)</div>
+            <div class="term-clause">📎 Clause 1.2 — "Premises"</div>
+          </div>
+          <div class="term-row" style="border:1px dashed var(--amber);background:var(--amber-lt);">
+            <div class="term-label"><span class="confidence-dot conf-low"></span>Discount Rate</div>
+            <div class="term-val" style="color:var(--amber);">Not found in contract</div>
+            <div class="term-clause" style="color:var(--amber);">⚠ Enter incremental borrowing rate manually</div>
+          </div>
+          <div class="term-row">
+            <div class="term-label"><span class="confidence-dot conf-high"></span>Governing Law</div>
+            <div class="term-val">California, USA</div>
+            <div class="term-clause">📎 Clause 22.4 — "Governing Law"</div>
+          </div>
+        </div>
+
+        <!-- Risk Flags -->
+        <div class="card-title" style="margin-bottom:12px;margin-top:8px;">Risk Flags</div>
+        <div class="risk-list">
+          <div class="risk-item high">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+              <div>
+                <div class="risk-title">Discount rate missing</div>
+                <div class="risk-desc">IFRS 16 requires a discount rate to calculate present value of lease payments and ROU asset. The contract does not specify one. Report generation is blocked until resolved.</div>
+              </div>
+              <span class="pill pill-red" style="flex-shrink:0;margin-left:12px;">High</span>
+            </div>
+            <div class="risk-meta">
+              <button class="btn btn-sm btn-outline">Enter IBR manually</button>
+              <span style="font-size:11px;color:var(--ink-3);">Affects: Lease liability, ROU asset calculation</span>
+            </div>
+          </div>
+          <div class="risk-item medium">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+              <div>
+                <div class="risk-title">Renewal options not clearly specified as reasonably certain</div>
+                <div class="risk-desc">IFRS 16 §19 requires assessment of whether renewal options are "reasonably certain" to be exercised. Clause 3.2 grants two 5-year options but contains no intent language — auditors may require a written policy position.</div>
+              </div>
+              <span class="pill pill-amber" style="flex-shrink:0;margin-left:12px;">Medium</span>
+            </div>
+            <div class="risk-meta">
+              <button class="btn btn-sm btn-outline">Add management note</button>
+              <span style="font-size:11px;color:var(--ink-3);">Clause 3.2</span>
+            </div>
+          </div>
+          <div class="risk-item low">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+              <div>
+                <div class="risk-title">Security deposit classification</div>
+                <div class="risk-desc">The $58,000 security deposit (Clause 6.1) may need to be classified as a lease incentive receivable depending on refund terms. Current extraction did not detect refund conditions.</div>
+              </div>
+              <span class="pill pill-green" style="flex-shrink:0;margin-left:12px;">Low</span>
+            </div>
+            <div class="risk-meta">
+              <button class="btn btn-sm btn-outline">Mark reviewed</button>
+              <span style="font-size:11px;color:var(--ink-3);">Clause 6.1</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <div class="s2-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Actions</div>
+          <div class="action-list">
+            <button class="action-btn">📊 Generate IFRS 16 Report</button>
+            <button class="action-btn">📤 Export to PDF</button>
+            <button class="action-btn">📧 Send to auditor</button>
+            <button class="action-btn">✏️ Edit extracted terms</button>
+            <button class="action-btn">🔁 Re-run extraction</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Clause Audit Trail</div>
+          <div class="audit-trail-item">
+            <div class="audit-clause">§ 2.1 — Lease Commencement</div>
+            <div class="audit-field">→ Commencement date · Lease term</div>
+          </div>
+          <div class="audit-trail-item">
+            <div class="audit-clause">§ 3.2 — Renewal Rights</div>
+            <div class="audit-field">→ Renewal options</div>
+          </div>
+          <div class="audit-trail-item">
+            <div class="audit-clause">§ 5.1 — Base Rent</div>
+            <div class="audit-field">→ Annual payment</div>
+          </div>
+          <div class="audit-trail-item">
+            <div class="audit-clause">§ 5.3 — Rent Adjustments</div>
+            <div class="audit-field">→ Escalation rate</div>
+          </div>
+          <div class="audit-trail-item">
+            <div class="audit-clause">§ 6.1 — Security Deposit</div>
+            <div class="audit-field">→ Security deposit amount</div>
+          </div>
+          <div class="audit-trail-item">
+            <div class="audit-clause">§ 14.1 — Early Termination</div>
+            <div class="audit-field">→ Termination rights</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">IFRS 16 Field Coverage</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                <span style="font-size:12px;color:var(--ink-2);">Lease term</span>
+                <span class="pill pill-green" style="font-size:10px;">✓</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                <span style="font-size:12px;color:var(--ink-2);">Payment schedule</span>
+                <span class="pill pill-green" style="font-size:10px;">✓</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                <span style="font-size:12px;color:var(--ink-2);">Renewal options</span>
+                <span class="pill pill-green" style="font-size:10px;">✓</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                <span style="font-size:12px;color:var(--ink-2);">Discount rate</span>
+                <span class="pill pill-red" style="font-size:10px;">Missing</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                <span style="font-size:12px;color:var(--ink-2);">ROU asset value</span>
+                <span class="pill pill-green" style="font-size:10px;">✓</span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+                <span style="font-size:12px;color:var(--ink-2);">Commencement date</span>
+                <span class="pill pill-green" style="font-size:10px;">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Applied Playbook</div>
+          <div style="background:var(--brand-lt);border:1px solid rgba(27,79,216,.2);border-radius:8px;padding:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--brand);margin-bottom:4px;">IFRS 16 Standard Template</div>
+            <div style="font-size:11px;color:var(--ink-3);">Version 2.4 · 9 required fields · 14 risk rules</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     SCREEN 3 — PLAYBOOK MANAGEMENT
+================================================================ -->
+<div id="screen3" class="screen-wrapper">
+  <div class="screen-label">Screen 3 — Playbook Management <span>[ /playbooks ]</span></div>
+  <div class="screen">
+    <nav>
+      <div class="nav-logo">LegalGraph<sup>®</sup></div>
+      <div class="nav-links">
+        <div class="nav-link">Dashboard</div>
+        <div class="nav-link">Leases</div>
+        <div class="nav-link">Reports</div>
+        <div class="nav-link active">Playbooks</div>
+        <div class="nav-link">Audit Trail</div>
+      </div>
+      <div class="nav-end">
+        <div class="avatar">RC</div>
+      </div>
+    </nav>
+
+    <!-- Sub-header -->
+    <div class="s3-subheader">
+      <div class="s3-title-group">
+        <div class="s3-title">Playbooks</div>
+        <div class="s3-subtitle">Configure extraction rules and risk criteria applied to incoming contracts</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm">Import playbook</button>
+        <button class="btn btn-primary btn-sm">+ New playbook</button>
+      </div>
+    </div>
+
+    <div class="s3-body">
+
+      <!-- Stats -->
+      <div class="s3-stats">
+        <div class="s3-stat">
+          <div class="s3-stat-val">6</div>
+          <div class="s3-stat-label">Total playbooks</div>
+        </div>
+        <div class="s3-stat">
+          <div class="s3-stat-val">3</div>
+          <div class="s3-stat-label">Active &amp; applied</div>
+        </div>
+        <div class="s3-stat">
+          <div class="s3-stat-val">47</div>
+          <div class="s3-stat-label">Total extraction rules</div>
+        </div>
+        <div class="s3-stat">
+          <div class="s3-stat-val">12</div>
+          <div class="s3-stat-label">Leases using a playbook</div>
+        </div>
+      </div>
+
+      <!-- Playbook table (contract_playbook data) -->
+      <div class="playbook-table-wrap">
+        <div class="table-toolbar">
+          <div class="table-filters">
+            <input class="search-input" type="text" placeholder="🔍  Search playbooks…" />
+            <select class="filter-select">
+              <option>All standards</option>
+              <option>IFRS 16</option>
+              <option>ASC 842</option>
+              <option>Both</option>
+            </select>
+            <select class="filter-select">
+              <option>All statuses</option>
+              <option>Active</option>
+              <option>Draft</option>
+              <option>Archived</option>
+            </select>
+          </div>
+          <div style="font-size:12px;color:var(--ink-3);">6 playbooks</div>
+        </div>
+
+        <table class="playbook-tbl">
+          <thead>
+            <tr>
+              <th class="sortable">Playbook name <span class="sort-arrow">↕</span></th>
+              <th>Standard</th>
+              <th class="sortable">Required fields <span class="sort-arrow">↕</span></th>
+              <th>Field coverage</th>
+              <th class="sortable">Risk rules <span class="sort-arrow">↕</span></th>
+              <th>Status</th>
+              <th class="sortable">Last updated <span class="sort-arrow">↕</span></th>
+              <th>Leases</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="playbook-name">IFRS 16 Standard Template</span>
+                <span class="playbook-id">pb_ifrs16_std_v24</span>
+              </td>
+              <td><span class="standard-badge badge-ifrs">IFRS 16</span></td>
+              <td>9</td>
+              <td>
+                <div class="coverage-bar-wrap">
+                  <div class="coverage-bar"><div class="coverage-fill" style="width:100%"></div></div>
+                  <span class="coverage-pct">100%</span>
+                </div>
+              </td>
+              <td>14</td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td style="color:var(--ink-3);">Apr 28, 2026</td>
+              <td>8</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary btn-sm">Edit</button>
+                  <button class="btn btn-outline btn-sm">⋯</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="playbook-name">ASC 842 Standard Template</span>
+                <span class="playbook-id">pb_asc842_std_v18</span>
+              </td>
+              <td><span class="standard-badge badge-asc">ASC 842</span></td>
+              <td>11</td>
+              <td>
+                <div class="coverage-bar-wrap">
+                  <div class="coverage-bar"><div class="coverage-fill" style="width:91%"></div></div>
+                  <span class="coverage-pct">91%</span>
+                </div>
+              </td>
+              <td>11</td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td style="color:var(--ink-3);">Apr 15, 2026</td>
+              <td>4</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary btn-sm">Edit</button>
+                  <button class="btn btn-outline btn-sm">⋯</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="playbook-name">Dual-Standard (IFRS + ASC)</span>
+                <span class="playbook-id">pb_dual_v09</span>
+              </td>
+              <td><span class="standard-badge badge-both">Both</span></td>
+              <td>15</td>
+              <td>
+                <div class="coverage-bar-wrap">
+                  <div class="coverage-bar"><div class="coverage-fill partial" style="width:73%"></div></div>
+                  <span class="coverage-pct" style="color:var(--amber);">73%</span>
+                </div>
+              </td>
+              <td>19</td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td style="color:var(--ink-3);">Mar 02, 2026</td>
+              <td>0</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary btn-sm">Edit</button>
+                  <button class="btn btn-outline btn-sm">⋯</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="playbook-name">Property Lease — UK / EMEA</span>
+                <span class="playbook-id">pb_uk_emea_v04</span>
+              </td>
+              <td><span class="standard-badge badge-ifrs">IFRS 16</span></td>
+              <td>9</td>
+              <td>
+                <div class="coverage-bar-wrap">
+                  <div class="coverage-bar"><div class="coverage-fill" style="width:100%"></div></div>
+                  <span class="coverage-pct">100%</span>
+                </div>
+              </td>
+              <td>9</td>
+              <td><span class="pill pill-gray">Draft</span></td>
+              <td style="color:var(--ink-3);">Feb 18, 2026</td>
+              <td>0</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary btn-sm">Edit</button>
+                  <button class="btn btn-outline btn-sm">⋯</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="playbook-name">Short-term Lease Exemption</span>
+                <span class="playbook-id">pb_short_exempt_v02</span>
+              </td>
+              <td><span class="standard-badge badge-ifrs">IFRS 16</span></td>
+              <td>4</td>
+              <td>
+                <div class="coverage-bar-wrap">
+                  <div class="coverage-bar"><div class="coverage-fill" style="width:100%"></div></div>
+                  <span class="coverage-pct">100%</span>
+                </div>
+              </td>
+              <td>3</td>
+              <td><span class="pill pill-gray">Draft</span></td>
+              <td style="color:var(--ink-3);">Jan 30, 2026</td>
+              <td>0</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary btn-sm">Edit</button>
+                  <button class="btn btn-outline btn-sm">⋯</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="playbook-name">Legacy ASC 840 (read-only)</span>
+                <span class="playbook-id">pb_asc840_archived</span>
+              </td>
+              <td><span class="standard-badge badge-asc">ASC 840</span></td>
+              <td>8</td>
+              <td>
+                <div class="coverage-bar-wrap">
+                  <div class="coverage-bar"><div class="coverage-fill" style="width:100%"></div></div>
+                  <span class="coverage-pct">100%</span>
+                </div>
+              </td>
+              <td>6</td>
+              <td><span class="pill pill-gray" style="opacity:.6;">Archived</span></td>
+              <td style="color:var(--ink-3);">Nov 12, 2024</td>
+              <td>0</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-outline btn-sm">View</button>
+                  <button class="btn btn-outline btn-sm">⋯</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Playbook detail panel (expanded row mockup) -->
+      <div class="detail-panel">
+        <div class="detail-panel-header">
+          <div class="detail-panel-title">IFRS 16 Standard Template — v2.4 · Expanded detail</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="pill pill-green">Active</span>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);">Close ✕</button>
+          </div>
+        </div>
+        <div class="detail-panel-body">
+          <!-- Required fields -->
+          <div class="detail-col">
+            <div class="detail-col-title">Required Extraction Fields (9)</div>
+            <div style="display:flex;flex-wrap:wrap;">
+              <span class="clause-chip">📅 Commencement date</span>
+              <span class="clause-chip">📅 Expiry date</span>
+              <span class="clause-chip">💰 Annual payment</span>
+              <span class="clause-chip">📈 Escalation rate</span>
+              <span class="clause-chip">🔄 Renewal options</span>
+              <span class="clause-chip">% Discount rate</span>
+              <span class="clause-chip">🏢 ROU asset value</span>
+              <span class="clause-chip">⚖️ Termination rights</span>
+              <span class="clause-chip">🔒 Security deposit</span>
+            </div>
+          </div>
+          <!-- Risk rules -->
+          <div class="detail-col">
+            <div class="detail-col-title">Risk Rules (14 active)</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span class="pill pill-red" style="font-size:10px;">High</span>
+                <span style="color:var(--ink-2);">Discount rate missing</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span class="pill pill-red" style="font-size:10px;">High</span>
+                <span style="color:var(--ink-2);">Lease term &gt; 20 years</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span class="pill pill-amber" style="font-size:10px;">Med</span>
+                <span style="color:var(--ink-2);">Renewal options not quantified</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span class="pill pill-amber" style="font-size:10px;">Med</span>
+                <span style="color:var(--ink-2);">Escalation rate &gt; 5%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                <span class="pill pill-green" style="font-size:10px;">Low</span>
+                <span style="color:var(--ink-2);">Security deposit classification</span>
+              </div>
+              <div style="font-size:11px;color:var(--brand);cursor:pointer;margin-top:2px;">+ 9 more rules →</div>
+            </div>
+          </div>
+          <!-- Settings -->
+          <div class="detail-col">
+            <div class="detail-col-title">Settings</div>
+            <div class="field-pair">
+              <div class="field-pair-label">Confidence threshold</div>
+              <div class="field-pair-val">85% — flag below</div>
+            </div>
+            <div class="field-pair">
+              <div class="field-pair-label">Low-confidence behavior</div>
+              <div class="field-pair-val">Flag + warn (don't block)</div>
+            </div>
+            <div class="field-pair">
+              <div class="field-pair-label">Default discount rate</div>
+              <div class="field-pair-val">Manual input required</div>
+            </div>
+            <div class="field-pair">
+              <div class="field-pair-label">Report format</div>
+              <div class="field-pair-val">IFRS 16 (IAS)</div>
+            </div>
+            <div class="field-pair">
+              <div class="field-pair-label">Export formats</div>
+              <div class="field-pair-val">PDF, XLSX</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:12px;">
+              <button class="btn btn-primary btn-sm">Edit playbook</button>
+              <button class="btn btn-outline btn-sm">Duplicate</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div style="height:48px;"></div>
+
+<!-- ── Webhook toast ──────────────────────────────────────────────── -->
+<div id="webhookToast">
+  <div class="toast-icon" id="toastIcon">⏳</div>
+  <div class="toast-body">
+    <div class="toast-title" id="toastTitle">Sending to workflow…</div>
+    <div class="toast-sub"  id="toastSub">POST → n8n webhook</div>
+  </div>
+  <button class="toast-dismiss" onclick="dismissToast()">✕</button>
+</div>
+
+<script>
+  const WEBHOOK_URL    = '__WEBHOOK_URL__';
+  const SUPABASE_URL   = '__SUPABASE_URL__';
+  const SUPABASE_ANON  = '__SUPABASE_ANON_KEY__';
+
+  /* ── Mock extraction results (stand-in for real AI output) ──── */
+  const MOCK_ANALYSIS = {
+    contract_type: 'Commercial Office Lease',
+    terms_found: [
+      'commencement_date', 'expiry_date', 'annual_payment',
+      'escalation_rate', 'renewal_options', 'rou_asset_value',
+      'termination_rights', 'security_deposit'
+    ],
+    terms_missing: ['discount_rate'],
+    risk_score: 62,
+  };
+
+  /* ── State ──────────────────────────────────────────────────── */
+  let selectedFile = null;
+  let fileChosen   = false;
+
+  /* ── File input wiring ──────────────────────────────────────── */
+  const fileInput = document.getElementById('fileInput');
+  const uploadZone = document.getElementById('uploadZone');
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) onFileSelected(fileInput.files[0]);
+  });
+
+  uploadZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'rgba(255,255,255,.7)';
+  });
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.style.borderColor = '';
+  });
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.style.borderColor = '';
+    if (e.dataTransfer.files.length) onFileSelected(e.dataTransfer.files[0]);
+  });
+
+  function onFileSelected(file) {
+    selectedFile = file;
+    fileChosen   = true;
+    document.getElementById('uploadIcon').textContent  = '📋';
+    document.getElementById('uploadTitle').textContent = file.name;
+    document.getElementById('uploadSub').textContent   =
+      (file.size / 1024).toFixed(0) + ' KB · Ready to analyze';
+    const btn = document.getElementById('analyzeBtn');
+    btn.textContent = 'Analyze Contract';
+    btn.className   = 'btn btn-primary';
+    btn.id          = 'analyzeBtn';
+  }
+
+  /* ── Main entry point ───────────────────────────────────────── */
+  function handleAnalyzeClick() {
+    if (!fileChosen) {
+      fileInput.click();        // first click → open file picker
+      return;
+    }
+    runAnalysis();              // second click → analyze
+  }
+
+  /* ── Analysis + webhook flow ────────────────────────────────── */
+  async function runAnalysis() {
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled   = true;
+    btn.innerHTML  = '<span class="spinner"></span> Analyzing…';
+
+    document.getElementById('progressFileName').textContent =
+      selectedFile ? selectedFile.name : 'HQ_Lease_SFOffice_2024.pdf';
+    document.getElementById('progressPanel').classList.remove('hidden');
+    document.getElementById('progressStatusPill').textContent = 'Analyzing…';
+
+    /* ── Step 1: read structure ── */
+    await animateStep('step1', 'Reading contract…', 25, 900);
+    /* ── Step 2: extract fields ── */
+    await animateStep('step2', 'Extracting IFRS 16 fields…', 55, 1100);
+    /* ── Step 3: risk scoring ──── */
+    await animateStep('step3', 'Scoring risk factors…', 80, 900);
+    /* ── Step 4: send webhook ──── */
+    setStepActive('step4');
+    setProgress('Triggering workflow…', 90);
+    showToast('sending', '⏳', 'Sending to n8n workflow…', 'POST → webhook');
+
+    const payload = {
+      ...MOCK_ANALYSIS,
+      analyzed_at: new Date().toISOString(),
+    };
+
+    let webhookOk = false;
+    try {
+      // text/plain avoids a CORS preflight (simple request).
+      // n8n receives the raw JSON body and parses it regardless of content-type.
+      const res = await fetch(WEBHOOK_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body:    JSON.stringify(payload),
+      });
+      webhookOk = res.ok;
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setStepDone('step4');
+      setProgress('Workflow triggered', 100);
+      showToast(
+        'success', '✅',
+        'Workflow triggered',
+        `n8n received the payload · risk_score=${payload.risk_score} · ` +
+        `${payload.terms_found.length} terms found`
+      );
+    } catch (err) {
+      setStepDone('step4', /* error */ true);
+      setProgress('Webhook failed — results still ready', 100);
+      showToast(
+        'error', '⚠️',
+        'Webhook delivery failed',
+        `${err.message} — analysis results are unaffected`
+      );
+    }
+
+    /* ── Finish up ── */
+    document.getElementById('progressStatusPill').textContent = 'Complete';
+    document.getElementById('progressStatusPill').className   =
+      'pill pill-green';
+    btn.disabled  = false;
+    btn.innerHTML = '📊 View full report';
+    btn.onclick   = () => document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
+
+    /* Auto-dismiss toast after 7 s */
+    setTimeout(dismissToast, 7000);
+  }
+
+  /* ── Progress helpers ───────────────────────────────────────── */
+  function setStepActive(id) {
+    document.getElementById(id).classList.add('active');
+  }
+  function setStepDone(id, isError = false) {
+    const el = document.getElementById(id);
+    el.classList.remove('active');
+    el.classList.add('done');
+    if (isError) {
+      el.querySelector('.step-dot').style.background = '#F87171';
+      el.style.color = '#FCA5A5';
+    }
+  }
+  function setProgress(label, pct) {
+    document.getElementById('progressLabel').textContent = label;
+    document.getElementById('progressPct').textContent   = pct + '%';
+    document.getElementById('progressFill').style.width  = pct + '%';
+  }
+  async function animateStep(id, label, pct, ms) {
+    setStepActive(id);
+    setProgress(label, pct);
+    await sleep(ms);
+    setStepDone(id);
+  }
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  /* ── Toast helpers ──────────────────────────────────────────── */
+  function showToast(type, icon, title, sub) {
+    const t = document.getElementById('webhookToast');
+    t.className = `show ${type}`;
+    document.getElementById('toastIcon').textContent  = icon;
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastSub').textContent   = sub;
+  }
+  function dismissToast() {
+    const t = document.getElementById('webhookToast');
+    t.classList.remove('show');
+  }
+</script>
+
+</body>
+</html>
