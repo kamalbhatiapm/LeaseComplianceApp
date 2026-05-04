@@ -2,8 +2,6 @@
 
 IFRS 16 / ASC 842 contract analyzer with AI extraction, risk scoring, and n8n webhook integration.
 
-**Live app → [https://lease-compliance-app.netlify.app](https://lease-compliance-app.netlify.app)**
-
 ---
 
 ## What's in this repo
@@ -47,7 +45,7 @@ Manage the `contract_playbook` table — extraction rule sets applied to incomin
 The source file uses `__PLACEHOLDER__` tokens instead of hardcoded values. Run `build.sh` to substitute them before opening in a browser:
 
 ```bash
-WEBHOOK_URL="https://cfalcon.app.n8n.cloud/webhook-test/7d90ba9a-649b-468e-95b5-0984450b83d8" \
+WEBHOOK_URL="https://your-n8n-instance/webhook-test/your-workflow-id" \
 SUPABASE_URL="https://your-project.supabase.co" \
 SUPABASE_ANON_KEY="your-anon-key" \
 bash build.sh
@@ -68,13 +66,13 @@ python3 -m http.server --directory dist 8080
 
 The app POSTs to an n8n webhook on analysis completion. The URL is a **test webhook** (`/webhook-test/`) which only listens when the workflow is actively open.
 
-1. Log in to [n8n](https://cfalcon.app.n8n.cloud)
-2. Open the workflow with ID `7d90ba9a-649b-468e-95b5-0984450b83d8`
+1. Log in to your n8n instance
+2. Open the lease compliance workflow
 3. Click **"Listen for test event"** in the Webhook trigger node — you'll see the node waiting
 
 ### Step 2 — Upload the sample contract
 
-1. Open the [live app](https://lease-compliance-app.netlify.app) (or `dist/index.html` locally)
+1. Open the app (your Netlify URL or `dist/index.html` locally)
 2. On Screen 1 (Upload), click **Choose file**
 3. Select `sample-lease-agreement.docx` from this repo
 
@@ -93,7 +91,7 @@ Click **Analyze Contract**. Watch the four progress steps animate:
 
 ### Step 4 — Verify the webhook
 
-When analysis completes, the app fires a POST to the `WEBHOOK_URL` set in Netlify. The exact payload:
+When analysis completes, the app fires a POST to the `WEBHOOK_URL` you configured. The exact payload:
 
 ```json
 {
@@ -128,8 +126,6 @@ Click **View full report** (or use the sticky nav). Screen 2 shows the complete 
 
 ## Deployment (Netlify)
 
-The app is deployed at **[https://lease-compliance-app.netlify.app](https://lease-compliance-app.netlify.app)**.
-
 ### How the build works
 
 `build.sh` runs on every Netlify deploy. It uses `sed` to substitute three `__PLACEHOLDER__` tokens in `legalgraph-mockups.html` with live env var values, then writes the output to `dist/index.html`. No secrets are stored in the repo.
@@ -144,11 +140,11 @@ legalgraph-mockups.html  (placeholders)
 
 ### Environment variables
 
-Set in **Netlify → lease-compliance-app → Site configuration → Environment variables**:
+Set in **Netlify → your site → Site configuration → Environment variables**:
 
 | Variable | Description | Secret |
 |---|---|---|
-| `WEBHOOK_URL` | n8n webhook endpoint — swap `/webhook-test/` for `/webhook/` in production | No |
+| `WEBHOOK_URL` | n8n webhook endpoint — your n8n instance URL + workflow path. Swap `/webhook-test/` for `/webhook/` in production | No |
 | `SUPABASE_URL` | Your Supabase project URL | No |
 | `SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
 
@@ -158,14 +154,14 @@ To update any value: change it in the Netlify dashboard and trigger a redeploy �
 
 ```bash
 # Netlify CLI (if installed)
-netlify deploy --prod --site lease-compliance-app
+netlify deploy --prod --site <your-site-name>
 
 # Or push any commit — connect the GitHub repo in Netlify for auto-deploy on push
 ```
 
 ### Moving to production
 
-1. Change `WEBHOOK_URL` from `/webhook-test/…` to `/webhook/…` — the always-on endpoint that doesn't require the n8n workflow to be open
+1. Change `WEBHOOK_URL` from `/webhook-test/…` to `/webhook/…` in your Netlify env vars — the always-on endpoint that doesn't require the n8n workflow to be open
 2. Replace the Supabase placeholder values with your real project credentials
 3. Connect the GitHub repo to Netlify (Settings → Build & deploy → Link repository) for automatic deploys on every push to `main`
 4. Move the webhook POST server-side (e.g. a Netlify Function or Next.js API route) to keep the n8n URL out of the client bundle entirely
@@ -197,7 +193,7 @@ The missing discount rate is deliberate — it matches the mock analysis wired i
 
 ![n8n workflow — Webhook → Orchestrator Agent → sub-agents → Respond to Webhook](docs/n8n-workflow.jpeg)
 
-The workflow is named **"claude workflow"** in n8n. It follows an orchestrator-subagent pattern:
+The workflow follows an orchestrator-subagent pattern:
 
 ```
 Webhook (POST)
