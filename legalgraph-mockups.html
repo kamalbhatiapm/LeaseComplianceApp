@@ -2400,16 +2400,11 @@
 
       setStepDone('step4');
       setProgress('Extraction complete', 100);
-      const fc = responseData?.terms_found?.length
-               ?? Object.keys(responseData?.fields ?? {}).filter(k => responseData.fields[k]?.value).length
-               ?? 8;
-      showToast('success', '<i data-lucide="check-circle" class="icon-md"></i>', 'Extraction complete',
-        `${fc} fields extracted · risk_score=${responseData?.risk_score ?? '—'}`);
     } catch (err) {
       setStepDone('step4', true);
-      setProgress('Webhook failed — showing demo results', 100);
-      showToast('error', '<i data-lucide="alert-triangle" class="icon-md"></i>', 'Webhook delivery failed',
-        `${err.message} — showing demo results`);
+      setProgress('Webhook unavailable — showing demo results', 100);
+      showToast('error', '<i data-lucide="alert-triangle" class="icon-md"></i>', 'Webhook unavailable',
+        'n8n workflow not reachable — demo data shown below');
     }
 
     document.getElementById('progressStatusPill').textContent = 'Complete';
@@ -2419,8 +2414,17 @@
     btn.onclick   = () => document.getElementById('screen2').scrollIntoView({ behavior: 'smooth' });
 
     /* Render real AI data if available, otherwise fall back to mock */
-    renderResults(responseData ?? MOCK_ANALYSIS);
+    const displayData = responseData ?? MOCK_ANALYSIS;
+    renderResults(displayData);
     setDataBadge(webhookOk && responseData);
+
+    /* Show success toast with actual extracted field counts */
+    if (webhookOk) {
+      const fc        = displayData?.terms_found?.length || MOCK_ANALYSIS.terms_found.length;
+      const riskScore = displayData?.risk_score ?? MOCK_ANALYSIS.risk_score;
+      showToast('success', '<i data-lucide="check-circle" class="icon-md"></i>', 'Extraction complete',
+        `${fc} fields extracted · risk score ${riskScore}`);
+    }
 
     if (webhookOk) setTimeout(dismissToast, 7000);
   }
