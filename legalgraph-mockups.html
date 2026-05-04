@@ -93,6 +93,11 @@
       color: #fff;
     }
     .nav-link.active { color: #fff; }
+    .nav-link.disabled {
+      opacity: .35;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
     .nav-end {
       display: flex;
       align-items: center;
@@ -1193,9 +1198,9 @@
     <div class="nav-links">
       <div class="nav-link active" data-screen="1" onclick="showScreen(1)">Dashboard</div>
       <div class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</div>
-      <div class="nav-link">Reports</div>
       <div class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</div>
-      <div class="nav-link">Audit Trail</div>
+      <div class="nav-link disabled" title="Coming soon">Reports</div>
+      <div class="nav-link disabled" title="Coming soon">Audit Trail</div>
     </div>
     <div class="nav-end">
       <div class="avatar">RC</div>
@@ -1399,9 +1404,9 @@
     <div class="nav-links">
       <div class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</div>
       <div class="nav-link active" data-screen="2" onclick="showScreen(2)">Leases</div>
-      <div class="nav-link">Reports</div>
       <div class="nav-link" data-screen="3" onclick="showScreen(3)">Playbooks</div>
-      <div class="nav-link">Audit Trail</div>
+      <div class="nav-link disabled" title="Coming soon">Reports</div>
+      <div class="nav-link disabled" title="Coming soon">Audit Trail</div>
     </div>
     <div class="nav-end">
       <div class="avatar">RC</div>
@@ -1717,9 +1722,9 @@
     <div class="nav-links">
       <div class="nav-link" data-screen="1" onclick="showScreen(1)">Dashboard</div>
       <div class="nav-link" data-screen="2" onclick="showScreen(2)">Leases</div>
-      <div class="nav-link">Reports</div>
       <div class="nav-link active" data-screen="3" onclick="showScreen(3)">Playbooks</div>
-      <div class="nav-link">Audit Trail</div>
+      <div class="nav-link disabled" title="Coming soon">Reports</div>
+      <div class="nav-link disabled" title="Coming soon">Audit Trail</div>
     </div>
     <div class="nav-end">
       <div class="avatar">RC</div>
