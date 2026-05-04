@@ -1054,6 +1054,35 @@
     }
     .page-nav-link:hover { color: #fff; }
 
+    /* ── Data source badge ──────────────────────────────────────── */
+    .s2-data-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 99px;
+      border: 1px solid;
+      white-space: nowrap;
+      cursor: default;
+    }
+    .s2-data-badge--demo {
+      color: var(--ink-3);
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .s2-data-badge--live {
+      color: #166534;
+      background: #F0FDF4;
+      border-color: #BBF7D0;
+    }
+    .s2-data-badge--fallback {
+      color: #92400E;
+      background: #FFFBEB;
+      border-color: #FDE68A;
+    }
+
     /* ── Lucide icon defaults ───────────────────────────────────── */
     [data-lucide] {
       width: 14px;
@@ -1314,6 +1343,9 @@
         <span class="breadcrumb-current" id="s2-breadcrumb">SF Headquarters — Floor 12</span>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <span id="s2-data-badge" class="s2-data-badge s2-data-badge--demo" title="No analysis has been run yet — showing placeholder data">
+          <i data-lucide="flask-conical" class="icon-xs"></i> Demo data
+        </span>
         <span style="font-size:12px;color:var(--ink-3);" id="s2-analyzed-at">Last analyzed: May 2, 2026 at 3:14 PM</span>
         <button class="btn btn-outline btn-sm">Re-analyze</button>
         <button class="btn btn-outline btn-sm"><i data-lucide="download" class="icon-sm"></i> Export PDF</button>
@@ -2052,6 +2084,21 @@
   }
 
   /* ── Render Screen 2 from AI response data ──────────────────── */
+  function setDataBadge(isLive) {
+    const badge = document.getElementById('s2-data-badge');
+    if (!badge) return;
+    if (isLive) {
+      badge.className = 's2-data-badge s2-data-badge--live';
+      badge.title = 'Results extracted live from your uploaded document by AI';
+      badge.innerHTML = '<i data-lucide="circle-check" class="icon-xs"></i> Live extraction';
+    } else {
+      badge.className = 's2-data-badge s2-data-badge--fallback';
+      badge.title = 'Webhook unavailable — showing demo placeholder data';
+      badge.innerHTML = '<i data-lucide="circle-alert" class="icon-xs"></i> Demo fallback';
+    }
+    lucide.createIcons({ nodes: [badge] });
+  }
+
   function renderResults(data) {
     if (Array.isArray(data)) data = data[0] ?? {};
 
@@ -2363,6 +2410,7 @@
 
     /* Render real AI data if available, otherwise fall back to mock */
     renderResults(responseData ?? MOCK_ANALYSIS);
+    setDataBadge(webhookOk && responseData);
 
     if (webhookOk) setTimeout(dismissToast, 7000);
   }
