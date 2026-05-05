@@ -6,6 +6,24 @@ IFRS 16 / ASC 842 contract analyzer with AI extraction, risk scoring, and n8n we
 
 ---
 
+## Problem Statement
+
+In-house legal and finance teams at mid-market companies managing 10–50 active leases have no reliable way to generate audit-ready IFRS 16 / ASC 842 compliance reports from their contracts.
+
+Today, **Rachel** (Compliance Lead) spends **4–6 hours per quarter** manually extracting lease terms from PDFs, reconciling them in Excel, and formatting outputs for auditors — a process prone to error, version conflicts, and missed deadlines. When an auditor asks for the source clause behind a specific line item, she has to hunt through PDFs manually, adding hours of back-and-forth before a report can be signed off.
+
+With IFRS 16 audit scrutiny increasing and external auditors requiring traceable, clause-level evidence, the manual workflow is no longer sustainable.
+
+**LegalGraph solves this in three steps:**
+
+1. **Upload** — drop a lease contract (PDF, DOCX, or TXT) into the app
+2. **Extract** — AI pulls all IFRS 16 / ASC 842 fields directly from the contract text, flags missing data and risks, and links every finding back to the source clause
+3. **Report** — generate a structured, auditor-ready compliance report in one click — with a full clause-level audit trail
+
+The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **under 45 minutes**, and auditors get the clause citations they need without any manual follow-up.
+
+---
+
 ## What's in this repo
 
 ### App
