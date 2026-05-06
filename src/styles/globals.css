@@ -1120,6 +1120,16 @@ nav {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+[data-theme="light"] .btn-danger {
+  background: #fde8e6;
+  color: #b91c1c;
+  border: 1px solid rgba(185,28,28,.18);
+}
+[data-theme="light"] .btn-danger:hover {
+  background: #fbd5d2;
+  color: #991b1b;
+  opacity: 1;
+}
 [data-theme="light"] .al-step.error { color: var(--red); }
 [data-theme="light"] .al-quip { color: var(--ink-2); }
 [data-theme="light"] .al-progress-track { background: rgba(0,0,0,.1); }
