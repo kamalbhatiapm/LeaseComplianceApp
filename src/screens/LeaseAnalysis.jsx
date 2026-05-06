@@ -20,6 +20,10 @@ const QUIPS = [
   "Negotiating with sub-agents… one is asking for a raise.",
   "Consulting 3 agents and 1 overconfident opinion.",
   "Loading… the AI insists it's almost done.",
+  "I'm like Linux. First I confuse you, then you can't live without me.",
+  "Lease term: 5 years. Time spent reading it: also 5 years.",
+  "The landlord's lawyer used 'forthwith' 11 times. We counted.",
+  "Extracting the important bits so you don't have to fake-read 47 pages.",
 ]
 
 const LOADING_STEPS = [
