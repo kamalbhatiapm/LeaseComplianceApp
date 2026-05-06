@@ -118,7 +118,7 @@ export default function App() {
         setIsLiveData(false)
         setIsAnalyzing(false)
         setNavLocked(false)
-      }, 28000)
+      }, 63000)
 
       let fileContent = null
       try { fileContent = await fileToBase64(selectedFile) } catch {}
@@ -134,7 +134,7 @@ export default function App() {
 
       try {
         const controller = new AbortController()
-        const tid = setTimeout(() => controller.abort(), 25000)
+        const tid = setTimeout(() => controller.abort(), 60000)
         const res = await fetch(WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
