@@ -1,0 +1,50 @@
+flowchart TD
+    classDef client fill:#1B4FD8,stroke:#1340B0,color:#fff
+    classDef n8n fill:#0D9488,stroke:#0F766E,color:#fff
+    classDef new fill:#0E8A5F,stroke:#065A3E,color:#fff
+    classDef claude fill:#B45309,stroke:#92400E,color:#fff
+    classDef storage fill:#5B4BD8,stroke:#3D2FB0,color:#fff
+
+    subgraph Browser["🌐 Browser"]
+        UPLOAD["User uploads file"]:::client
+        EXTRACT["PDF.js / mammoth.js\nextracts document_text ✨"]:::new
+        POST["POST to webhook\n\nsession_id ✨\naccount_id ✨\nstandard ✨\nfilename + filesize + filetype\ntimestamp\ndocument_text ✨"]:::new
+        FALLBACK["Demo fallback\n(kept as safety net)"]:::client
+    end
+
+    subgraph N8N["⚙️ n8n Cloud — Beta Workflow"]
+        TRIGGER["Webhook trigger"]:::n8n
+        ENRICH["Phase 1 — Schema enrichment\nAdd confidence + clause_ref\n+ terms_missing + status"]:::new
+        PARSE["Phase 2 — Parse document_text"]:::new
+        CLAUDE_CALL["Call Anthropic API\nclaude-sonnet-4-6\nExtract IFRS 16 fields\nScore confidence per field\nIdentify clause references"]:::claude
+        SCORE["Build real response\nterms_found with confidence\nterms_missing list\nreal risk_score + flags"]:::new
+        ERR["Error envelope ✨\nstatus: error\nerror_code + error_message\nretryable flag"]:::n8n
+
+        TRIGGER --> ENRICH --> PARSE --> CLAUDE_CALL --> SCORE
+        SCORE -.->|"on failure"| ERR
+    end
+
+    subgraph RESP["📦 Response — Beta"]
+        R1["status: ok / partial / error\nsession_id\nrisk_score\nterms_found:\n  field, value\n  confidence ✨\n  clause_ref ✨\nterms_missing ✨\nflags with clause_ref ✨\nmetadata ✨"]:::new
+    end
+
+    subgraph Anthropic["🤖 Anthropic Claude API"]
+        MODEL["claude-sonnet-4-6\nLease field extraction\nIFRS 16 and ASC 842\nClause identification"]:::claude
+    end
+
+    subgraph Storage["💾 Supabase ✨"]
+        AUTH["Auth — JWT + account_id"]:::storage
+        DB["Database\nextractions + flags\nper session + account"]:::storage
+        FILES["File Storage\noriginal PDFs\nfor clause viewer"]:::storage
+    end
+
+    UPLOAD --> EXTRACT --> POST
+    AUTH -->|"account_id + JWT"| POST
+    UPLOAD -->|"store original file"| FILES
+    POST --> TRIGGER
+    CLAUDE_CALL <-->|"real API call"| MODEL
+    SCORE --> R1
+    R1 -->|"200 OK"| Browser
+    ERR -->|"200 OK"| Browser
+    POST -.->|"on timeout"| FALLBACK
+    R1 -->|"persist results"| DB

@@ -1,0 +1,28 @@
+flowchart LR
+    classDef client fill:#1B4FD8,stroke:#1340B0,color:#fff
+    classDef n8n fill:#0D9488,stroke:#0F766E,color:#fff
+    classDef gap fill:#C0392B,stroke:#922B21,color:#fff
+    classDef storage fill:#6B7E8D,stroke:#3D4F5C,color:#fff
+
+    subgraph Browser["🌐 Browser"]
+        UPLOAD["User uploads file\n(PDF / DOCX / TXT)"]:::client
+        POST["POST to webhook\n\nfilename\nfilesize\nfiletype\ntimestamp\n\n⚠️ No document text\n⚠️ No session ID\n⚠️ No account ID"]:::gap
+        FALLBACK["Demo fallback JSON\nhardcoded in HTML"]:::gap
+    end
+
+    subgraph N8N["⚙️ n8n Cloud"]
+        TRIGGER["Webhook trigger"]:::n8n
+        MOCK["Return mock JSON\n\n⚠️ No Claude call\n⚠️ No real extraction\n⚠️ Same data every time"]:::gap
+    end
+
+    subgraph Response["📦 Response (mock only)"]
+        RESP["risk_score: 72\nflags: [ ... ]\nterms_found: [ ... ]\n\n⚠️ No confidence scores\n⚠️ No clause_ref\n⚠️ No terms_missing\n⚠️ No error envelope\n⚠️ No status field"]:::gap
+    end
+
+    subgraph Storage["💾 Storage"]
+        SUPA["Supabase\ncredentials injected\nbut NEVER written to ⚠️"]:::gap
+    end
+
+    UPLOAD --> POST --> TRIGGER --> MOCK --> RESP
+    POST -.->|"on timeout / error"| FALLBACK
+    RESP -->|"200 OK"| Browser
