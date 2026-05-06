@@ -24,7 +24,7 @@
   --red-lt:        #fff2f0;
   --red-on-dark:   #ff6961;
   /* Theme tokens — dark is default */
-  --page-bg:       #000000;
+  --page-bg:       #0d1117;
   --t1:            #ffffff;
   --t2:            rgba(255,255,255,.75);
   --t3:            rgba(255,255,255,.65);
@@ -471,15 +471,15 @@ nav {
 .breadcrumb-current { color: #fff; font-weight: 600; letter-spacing: -.01em; }
 
 .s2-layout { display: flex; min-height: 640px; }
-.s2-main   { flex: 1; padding: 32px 36px; background: #000; overflow-y: auto; }
+.s2-main   { flex: 1; padding: 32px 36px; background: #0d1117; overflow-y: auto; }
 .s2-sidebar {
   width: 280px; border-left: 1px solid rgba(255,255,255,.07);
-  background: #000; padding: 28px 22px; flex-shrink: 0;
+  background: #0d1117; padding: 28px 22px; flex-shrink: 0;
 }
 
 .score-header {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.09);
   border-radius: 20px;
   display: grid; grid-template-columns: 140px 1px 1fr;
   margin-bottom: 20px; overflow: hidden;
@@ -501,7 +501,7 @@ nav {
 }
 .score-ring::before {
   content: ''; width: 62px; height: 62px;
-  background: #111; border-radius: 50%; position: absolute;
+  background: #0d1117; border-radius: 50%; position: absolute;
 }
 .score-ring-val {
   position: relative; z-index: 1;
@@ -531,8 +531,8 @@ nav {
 
 /* Card (dark) */
 .card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.09);
   border-radius: var(--radius);
   padding: 24px 28px;
 }
@@ -653,7 +653,7 @@ nav {
 .s3-title-group p { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 3px; }
 .s3-btn-outline { color: rgba(255,255,255,.8) !important; border-color: rgba(255,255,255,.2) !important; }
 .s3-btn-outline:hover { background: rgba(255,255,255,.1) !important; color: #fff !important; }
-.s3-body { padding: 36px 32px; background: #000; min-height: calc(100vh - 52px - 72px); }
+.s3-body { padding: 36px 32px; background: #0d1117; min-height: calc(100vh - 52px - 72px); }
 .s3-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 20px; }
 .playbook-card {
   background: rgba(255,255,255,.06);
@@ -713,7 +713,7 @@ nav {
   justify-content: center;
   min-height: calc(100vh - 52px);
   padding: 40px 20px;
-  background: #000;
+  background: #0d1117;
 }
 .analysis-loading-card {
   background: rgba(255,255,255,.07);
