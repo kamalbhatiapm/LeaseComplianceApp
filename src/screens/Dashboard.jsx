@@ -26,18 +26,18 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
     if (isAnalyzing) navigate('/leases')
   }, [isAnalyzing])
 
+  const onDragEnter = e => { e.preventDefault(); setDragging(true) }
+  const onDragOver  = e => { e.preventDefault(); setDragging(true) }
+
+  const onDragLeave = e => {
+    // Only clear when leaving the zone entirely, not when moving between children
+    if (!zoneRef.current?.contains(e.relatedTarget)) setDragging(false)
+  }
+
   const onDrop = e => {
     e.preventDefault()
     setDragging(false)
     if (e.dataTransfer.files.length) handleFileDrop(e.dataTransfer.files[0])
-  }
-
-  const onDragLeave = e => {
-    // Only clear dragging state when leaving the zone entirely, not when
-    // moving between child elements (icon, text, tags, etc.)
-    if (zoneRef.current && !zoneRef.current.contains(e.relatedTarget)) {
-      setDragging(false)
-    }
   }
 
   const onAnalyze = () => {
@@ -77,7 +77,8 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
                 ref={zoneRef}
                 className={`upload-zone${dragging ? ' drag-over' : ''}`}
                 onClick={() => !selectedFile && fileRef.current?.click()}
-                onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                onDragEnter={onDragEnter}
+                onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
                 onDrop={onDrop}
               >
@@ -89,25 +90,37 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
                   onChange={e => { if (e.target.files.length) handleFileSelected(e.target.files[0]) }}
                 />
                 <div className="upload-drop-area">
-                  <div className="upload-icon">
-                    {selectedFile
-                      ? <FileCheck size={24} color="var(--accent-on-dark)" />
-                      : <FileText  size={24} color="var(--accent-on-dark)" />}
-                  </div>
-                  <div className="upload-title">
-                    {selectedFile ? selectedFile.name : 'Upload a lease contract'}
-                  </div>
-                  <div className="upload-sub">
-                    {selectedFile
-                      ? `${(selectedFile.size / 1024).toFixed(0)} KB · Ready to analyze`
-                      : 'Drag & drop or click to browse'}
-                  </div>
-                  {!selectedFile && (
-                    <div className="upload-types">
-                      {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
-                        <span key={t} className="upload-type-tag">{t}</span>
-                      ))}
-                    </div>
+                  {dragging ? (
+                    <>
+                      <div className="upload-icon upload-icon-drop">
+                        <FileText size={24} color="var(--accent-on-dark)" />
+                      </div>
+                      <div className="upload-title">Drop to analyze</div>
+                      <div className="upload-sub">Release to start extraction</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="upload-icon">
+                        {selectedFile
+                          ? <FileCheck size={24} color="var(--accent-on-dark)" />
+                          : <FileText  size={24} color="var(--accent-on-dark)" />}
+                      </div>
+                      <div className="upload-title">
+                        {selectedFile ? selectedFile.name : 'Upload a lease contract'}
+                      </div>
+                      <div className="upload-sub">
+                        {selectedFile
+                          ? `${(selectedFile.size / 1024).toFixed(0)} KB · Ready to analyze`
+                          : 'Drag & drop or click to browse'}
+                      </div>
+                      {!selectedFile && (
+                        <div className="upload-types">
+                          {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
+                            <span key={t} className="upload-type-tag">{t}</span>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 

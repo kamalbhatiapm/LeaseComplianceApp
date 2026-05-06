@@ -369,13 +369,20 @@ nav {
   border-radius: 18px;
   padding: 20px 6px 24px;
   margin-bottom: 20px;
-  transition: border-color .22s;
+  transition: border-color .18s, background .18s;
 }
-.upload-zone:hover .upload-drop-area,
+.upload-zone:hover .upload-drop-area {
+  border-color: rgba(255,255,255,.32);
+}
 .upload-zone.drag-over .upload-drop-area {
-  border-color: rgba(255,255,255,.35);
+  border-color: rgba(90,200,250,.8);
+  background: rgba(90,200,250,.07);
+  animation: dash-march .5s linear infinite;
 }
-.upload-zone:hover, .upload-zone.drag-over {
+@keyframes dash-march {
+  to { border-dash-offset: -12px; }
+}
+.upload-zone:hover {
   border-color: rgba(255,255,255,.38);
   background: rgba(255,255,255,.13);
   box-shadow:
@@ -383,6 +390,19 @@ nav {
     inset 0 -1px 0 rgba(255,255,255,.08),
     0 40px 72px rgba(0,0,0,.5),
     0 8px 24px rgba(0,0,0,.28);
+}
+.upload-zone.drag-over {
+  border-color: rgba(90,200,250,.6);
+  background: rgba(90,200,250,.1);
+  box-shadow:
+    0 0 0 3px rgba(90,200,250,.25),
+    inset 0 1.5px 0 rgba(255,255,255,.35),
+    0 40px 72px rgba(0,0,0,.5);
+}
+.upload-icon-drop {
+  background: rgba(90,200,250,.3) !important;
+  border-color: rgba(90,200,250,.5) !important;
+  box-shadow: 0 0 20px rgba(90,200,250,.3) !important;
 }
 .upload-icon {
   width: 60px; height: 60px;
