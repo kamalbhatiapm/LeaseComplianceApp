@@ -109,6 +109,7 @@ export default function App() {
         file_type:    selectedFile.type || 'application/octet-stream',
         file_content: fileContent,
         standard:     'IFRS16',
+        intent:       'key_term_extraction',
         analyzed_at:  new Date().toISOString(),
       }
 
