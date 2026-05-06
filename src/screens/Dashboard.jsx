@@ -143,7 +143,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                     </span>
                   </td>
                   <td>{l.start}</td>
-                  <td>{l.term}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}>{l.term}</td>
                   <td>{l.rent}</td>
                   <td><span className={`pill pill-${l.status}`}>{l.statusLabel}</span></td>
                   <td>
