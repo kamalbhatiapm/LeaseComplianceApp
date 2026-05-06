@@ -1,0 +1,159 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useCallback } from 'react'
+import Dashboard from './screens/Dashboard.jsx'
+import LeaseAnalysis from './screens/LeaseAnalysis.jsx'
+import Playbooks from './screens/Playbooks.jsx'
+import Toast from './components/Toast.jsx'
+import ConsentModal from './components/ConsentModal.jsx'
+import { MOCK_ANALYSIS } from './utils/constants.js'
+import { fileToBase64 } from './utils/fileToBase64.js'
+import { track } from './utils/track.js'
+
+const WEBHOOK_URL   = import.meta.env.VITE_WEBHOOK_URL   ?? ''
+const SUPABASE_URL  = import.meta.env.VITE_SUPABASE_URL  ?? ''
+const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+
+if (WEBHOOK_URL.startsWith('__') || !WEBHOOK_URL) {
+  console.error('Build misconfiguration: VITE_WEBHOOK_URL not set. Check .env file.')
+}
+
+export default function App() {
+  const [selectedFile, setSelectedFile]   = useState(null)
+  const [consentGiven, setConsentGiven]   = useState(false)
+  const [showConsent, setShowConsent]     = useState(false)
+  const [isAnalyzing, setIsAnalyzing]     = useState(false)
+  const [analysisData, setAnalysisData]   = useState(null)
+  const [isLiveData, setIsLiveData]       = useState(false)
+  const [toast, setToast]                 = useState(null)
+  const [progress, setProgress]           = useState({ step: 0, label: '', pct: 0 })
+  const [navLocked, setNavLocked]         = useState(false)
+
+  const showToast = useCallback((type, title, sub) => {
+    setToast({ type, title, sub })
+  }, [])
+
+  const dismissToast = useCallback(() => setToast(null), [])
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+  const handleFileSelected = useCallback((file) => {
+    const ALLOWED = new Set(['.pdf', '.doc', '.docx', '.txt'])
+    const MAX_BYTES = 50 * 1024 * 1024
+    const ext = '.' + file.name.split('.').pop().toLowerCase()
+    if (!ALLOWED.has(ext)) {
+      alert(`Unsupported file type "${ext}". Please upload a PDF, DOC, DOCX, or TXT file.`)
+      return
+    }
+    if (file.size > MAX_BYTES) {
+      alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is 50 MB.`)
+      return
+    }
+    setSelectedFile(file)
+    track('upload_started', { file_name: file.name, file_size_kb: Math.round(file.size / 1024) })
+  }, [])
+
+  const handleAnalyzeClick = useCallback(() => {
+    if (!selectedFile) return
+    if (!consentGiven) { setShowConsent(true); return }
+    runAnalysis()
+  }, [selectedFile, consentGiven])
+
+  const grantConsent = useCallback(() => {
+    setConsentGiven(true)
+    setShowConsent(false)
+    runAnalysis()
+  }, [])
+
+  async function runAnalysis() {
+    setIsAnalyzing(true)
+    setNavLocked(true)
+    showToast('sending', 'Sending to workflow…', 'POST → n8n webhook')
+
+    const step = async (n, label, pct, ms) => {
+      setProgress({ step: n, label, pct })
+      await sleep(ms)
+    }
+
+    await step(1, 'Reading contract…', 25, 900)
+    await step(2, 'Extracting IFRS 16 fields…', 55, 1100)
+    await step(3, 'Scoring risk factors…', 80, 900)
+    setProgress({ step: 4, label: 'Sending to AI workflow…', pct: 90 })
+
+    let fileContent = null
+    try { fileContent = await fileToBase64(selectedFile) } catch {}
+
+    const payload = {
+      file_name:    selectedFile.name,
+      file_type:    selectedFile.type || 'application/octet-stream',
+      file_content: fileContent,
+      standard:     'IFRS16',
+      analyzed_at:  new Date().toISOString(),
+    }
+
+    let webhookOk    = false
+    let responseData = null
+    try {
+      const controller = new AbortController()
+      const tid = setTimeout(() => controller.abort(), 30000)
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      })
+      clearTimeout(tid)
+      webhookOk = res.ok
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const text = await res.text()
+      try {
+        let parsed = JSON.parse(text)
+        if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed
+        responseData = parsed
+      } catch {}
+      setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
+    } catch (err) {
+      const reason = err.name === 'AbortError' ? 'Request timed out after 30s' : err.message
+      console.error('[LegalGraph] Webhook error:', err.name, err.message)
+      setProgress({ step: 4, label: 'Webhook unavailable — showing demo results', pct: 100, error: true })
+      showToast('error', 'Webhook unavailable', reason + ' — demo data shown below')
+    }
+
+    const displayData = responseData ?? MOCK_ANALYSIS
+    setAnalysisData(displayData)
+    setIsLiveData(webhookOk && !!responseData)
+
+    track('analysis_complete', {
+      webhook_ok: webhookOk,
+      risk_score: displayData?.risk_score ?? null,
+      used_demo_data: !webhookOk,
+    })
+
+    if (webhookOk) {
+      const fc = displayData?.terms_found?.length || MOCK_ANALYSIS.terms_found.length
+      showToast('success', 'Extraction complete', `${fc} fields extracted · risk score ${displayData?.risk_score ?? '—'}`)
+      setTimeout(dismissToast, 7000)
+    }
+
+    setIsAnalyzing(false)
+    setNavLocked(false)
+  }
+
+  const sharedProps = {
+    selectedFile, handleFileSelected, handleAnalyzeClick,
+    isAnalyzing, analysisData, isLiveData, progress, navLocked,
+    showToast, dismissToast,
+  }
+
+  return (
+    <BrowserRouter>
+      {toast && <Toast toast={toast} onDismiss={dismissToast} />}
+      {showConsent && <ConsentModal onGrant={grantConsent} onDeny={() => setShowConsent(false)} />}
+      <Routes>
+        <Route path="/"          element={<Dashboard      {...sharedProps} />} />
+        <Route path="/leases"    element={<LeaseAnalysis  {...sharedProps} />} />
+        <Route path="/playbooks" element={<Playbooks      navLocked={navLocked} />} />
+        <Route path="*"          element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}

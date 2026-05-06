@@ -8,7 +8,7 @@
 
 A single-file HTML/CSS/JS SPA served from Netlify. No framework, no bundler. UI state lives in the DOM and is lost on page refresh. The file is read as base64 before being sent to n8n — but n8n expects a binary attachment, causing a format mismatch.
 
-![Frontend — Current State](diagrams/frontend-current.png)
+<img src="https://raw.githubusercontent.com/kamalbhatiapm/LeaseComplianceApp/main/architecture/diagrams/frontend-current.png" width="100%" alt="Frontend — Current State" />
 
 ### Current State — Key Gaps
 
@@ -31,7 +31,7 @@ A single-file HTML/CSS/JS SPA served from Netlify. No framework, no bundler. UI 
 
 Fixes the binary mismatch by extracting document text client-side and sending as plain text. Adds Supabase auth + persistence, PDF.js/mammoth.js extraction, PDF clause viewer, and wired analytics.
 
-![Frontend — Beta Target](diagrams/frontend-beta.png)
+<img src="https://raw.githubusercontent.com/kamalbhatiapm/LeaseComplianceApp/main/architecture/diagrams/frontend-beta.png" width="100%" alt="Frontend — Beta Target" />
 
 ### Beta Target — Changes Required
 
