@@ -16,9 +16,10 @@ const INTENTS = [
   { value: 'asc842_compliance',  label: 'ASC 842 Compliance Report',  short: 'ASC 842',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under ASC 842 (US GAAP)' },
 ]
 
-export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent }) {
-  const fileRef  = useRef(null)
-  const navigate = useNavigate()
+export default function Dashboard({ selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent }) {
+  const fileRef   = useRef(null)
+  const zoneRef   = useRef(null)
+  const navigate  = useNavigate()
   const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
@@ -28,7 +29,15 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
   const onDrop = e => {
     e.preventDefault()
     setDragging(false)
-    if (e.dataTransfer.files.length) handleFileSelected(e.dataTransfer.files[0])
+    if (e.dataTransfer.files.length) handleFileDrop(e.dataTransfer.files[0])
+  }
+
+  const onDragLeave = e => {
+    // Only clear dragging state when leaving the zone entirely, not when
+    // moving between child elements (icon, text, tags, etc.)
+    if (zoneRef.current && !zoneRef.current.contains(e.relatedTarget)) {
+      setDragging(false)
+    }
   }
 
   const onAnalyze = () => {
@@ -65,10 +74,11 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
               <ProgressPanel file={selectedFile} progress={progress} />
             ) : (
               <div
+                ref={zoneRef}
                 className={`upload-zone${dragging ? ' drag-over' : ''}`}
                 onClick={() => !selectedFile && fileRef.current?.click()}
                 onDragOver={e => { e.preventDefault(); setDragging(true) }}
-                onDragLeave={() => setDragging(false)}
+                onDragLeave={onDragLeave}
                 onDrop={onDrop}
               >
                 <input

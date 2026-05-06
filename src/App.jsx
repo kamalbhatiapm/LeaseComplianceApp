@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import Dashboard from './screens/Dashboard.jsx'
 import LeaseAnalysis from './screens/LeaseAnalysis.jsx'
 import Playbooks from './screens/Playbooks.jsx'
@@ -29,6 +29,7 @@ export default function App() {
   const [navLocked, setNavLocked]         = useState(false)
   const [analysisIntent, setAnalysisIntent] = useState('ifrs16_compliance')
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
+  const dropPending                        = useRef(false)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -45,21 +46,38 @@ export default function App() {
 
   const sleep = ms => new Promise(r => setTimeout(r, ms))
 
-  const handleFileSelected = useCallback((file) => {
+  const validateAndSetFile = (file) => {
     const ALLOWED = new Set(['.pdf', '.doc', '.docx', '.txt'])
     const MAX_BYTES = 50 * 1024 * 1024
     const ext = '.' + file.name.split('.').pop().toLowerCase()
     if (!ALLOWED.has(ext)) {
       alert(`Unsupported file type "${ext}". Please upload a PDF, DOC, DOCX, or TXT file.`)
-      return
+      return false
     }
     if (file.size > MAX_BYTES) {
       alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is 50 MB.`)
-      return
+      return false
     }
     setSelectedFile(file)
     track('upload_started', { file_name: file.name, file_size_kb: Math.round(file.size / 1024) })
+    return true
+  }
+
+  const handleFileSelected = useCallback((file) => {
+    validateAndSetFile(file)
   }, [])
+
+  const handleFileDrop = useCallback((file) => {
+    if (validateAndSetFile(file)) dropPending.current = true
+  }, [])
+
+  // After a drop, selectedFile state has settled — trigger the analyze flow
+  useEffect(() => {
+    if (!dropPending.current || !selectedFile) return
+    dropPending.current = false
+    if (!consentGiven) { setShowConsent(true); return }
+    runAnalysis()
+  }, [selectedFile])
 
   const handleAnalyzeClick = useCallback(() => {
     if (!selectedFile) return
@@ -168,7 +186,7 @@ export default function App() {
   }
 
   const sharedProps = {
-    selectedFile, handleFileSelected, handleAnalyzeClick,
+    selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick,
     isAnalyzing, analysisData, isLiveData, progress, navLocked,
     analysisIntent, setAnalysisIntent,
     showToast, dismissToast, theme, toggleTheme,
