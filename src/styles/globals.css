@@ -646,23 +646,25 @@ nav {
   justify-content: center;
   min-height: calc(100vh - 52px);
   padding: 40px 20px;
-  background: var(--surface);
+  background: #000;
 }
 .analysis-loading-card {
-  background: var(--white);
-  border: 1px solid rgba(0,0,0,.07);
-  border-radius: 24px;
-  padding: 52px 44px 44px;
-  max-width: 480px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 28px;
+  padding: 56px 52px 48px;
+  max-width: 540px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 4px 40px rgba(0,0,0,.08), 0 1px 6px rgba(0,0,0,.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 32px 80px rgba(0,0,0,.5);
 }
 .analysis-loading-icon-wrap {
   position: relative;
-  width: 76px;
-  height: 76px;
-  margin: 0 auto 28px;
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -671,32 +673,35 @@ nav {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--brand);
-  opacity: .1;
+  background: var(--accent-on-dark);
+  opacity: .18;
   animation: al-pulse 2s ease-in-out infinite;
 }
 @keyframes al-pulse {
-  0%, 100% { transform: scale(1);    opacity: .1; }
-  50%       { transform: scale(1.35); opacity: .05; }
+  0%, 100% { transform: scale(1);    opacity: .18; }
+  50%       { transform: scale(1.4); opacity: .07; }
 }
 .analysis-loading-title {
-  font-size: 24px;
+  font-size: 34px;
   font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 8px;
-  letter-spacing: -.03em;
+  letter-spacing: -.04em;
+  margin-bottom: 10px;
+  background: linear-gradient(140deg, #fff 0%, #94d8f0 55%, #5ac8fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .analysis-loading-file {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--ink-3);
-  background: var(--surface);
-  border: 1px solid rgba(0,0,0,.08);
+  gap: 7px;
+  font-size: 13px;
+  color: rgba(255,255,255,.5);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
   border-radius: 980px;
-  padding: 5px 12px;
-  margin-bottom: 32px;
+  padding: 6px 16px;
+  margin-bottom: 36px;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -705,7 +710,7 @@ nav {
 }
 .analysis-loading-steps {
   text-align: left;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -713,33 +718,33 @@ nav {
 .al-step {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 14px;
+  padding: 11px 16px;
   border-radius: 12px;
-  font-size: 13px;
-  color: var(--ink-3);
+  font-size: 15px;
+  color: rgba(255,255,255,.32);
   transition: background .2s, color .2s;
-  letter-spacing: -.01em;
+  letter-spacing: -.015em;
 }
-.al-step.done   { color: #1a7a3c; }
-.al-step.active { color: var(--ink); font-weight: 600; background: var(--surface); }
-.al-step.error  { color: var(--red); }
+.al-step.done   { color: var(--accent-on-dark); }
+.al-step.active { color: #fff; font-weight: 600; background: rgba(255,255,255,.08); }
+.al-step.error  { color: var(--red-on-dark); }
 .al-step-icon   { width: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .al-quip {
-  font-size: 13px;
-  color: var(--ink-3);
+  font-size: 15px;
+  color: rgba(255,255,255,.48);
   font-style: italic;
-  min-height: 20px;
-  margin-bottom: 20px;
+  min-height: 22px;
+  margin-bottom: 24px;
   transition: opacity .3s ease;
   letter-spacing: -.01em;
 }
 .al-progress-track {
-  height: 4px;
-  background: rgba(0,0,0,.07);
+  height: 3px;
+  background: rgba(255,255,255,.12);
   border-radius: 99px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .al-progress-fill {
   height: 100%;
@@ -749,8 +754,8 @@ nav {
 .al-progress-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  color: var(--ink-3);
+  font-size: 12px;
+  color: rgba(255,255,255,.35);
   font-weight: 500;
 }
 .spin { animation: spin .8s linear infinite; display: block; }
