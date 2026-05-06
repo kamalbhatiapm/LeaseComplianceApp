@@ -4,7 +4,7 @@
 **Date:** 2026-05-04  
 
 Each open RAI gap is classified as:
-- **UI** — fix in `legalgraph-mockups.html` (frontend only)
+- **UI** — fix in `APP.html` (frontend only)
 - **Pipeline** — fix in the n8n agent workflow and/or AI prompt (changes what the model returns)
 - **Both** — requires coordinated changes to the payload schema AND the UI that renders it
 - **Process** — requires policy, legal, or testing work outside the codebase
@@ -319,8 +319,8 @@ contracts has not been validated. Results should be treated as preliminary."
 
 | RAI Gap | Priority | Fix type | Location |
 |---------|----------|----------|----------|
-| H3 — Human sign-off | P0 | UI | `legalgraph-mockups.html` |
-| S2 — Report generation gate | P0 | UI | `legalgraph-mockups.html` |
+| H3 — Human sign-off | P0 | UI | `APP.html` |
+| S2 — Report generation gate | P0 | UI | `APP.html` |
 | H4 — ToS / accountability | P0 | UI + Process | New `/terms` page + legal work |
 | F1 — Multi-jurisdiction testing | P0 | Process + Pipeline | Eval cases + prompt |
 | P2 — Retention policy | P1 | UI + Process | Consent modal + policy doc |
@@ -332,7 +332,7 @@ contracts has not been validated. Results should be treated as preliminary."
 | F2 — Contract complexity parity | P1 | Process + Pipeline | Eval cases |
 | E3 — Score decomposition | P2 | Both | `score_breakdown` in payload + UI |
 | H2 — Audit trail completeness | P2 | Both | `extraction_metadata` in payload + UI |
-| H1 — Field correction UI | P2 | UI | `legalgraph-mockups.html` |
+| H1 — Field correction UI | P2 | UI | `APP.html` |
 | F3 — Language detection | P2 | Pipeline + UI | n8n prompt + warning banner |
 
 ### Payload schema additions needed

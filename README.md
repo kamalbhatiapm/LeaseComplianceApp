@@ -30,7 +30,7 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 
 | File | Description |
 |------|-------------|
-| `legalgraph-mockups.html` | Source of truth — all UI, CSS, and JS in one file (three screens, interactive upload flow, n8n webhook trigger) |
+| `APP.html` | Source of truth — all UI, CSS, and JS in one file (three screens, interactive upload flow, n8n webhook trigger) |
 | `build.sh` | Build script — substitutes `__PLACEHOLDER__` tokens with env vars at deploy time, outputs `dist/index.html` |
 | `netlify.toml` | Netlify build config — build command, publish dir (`dist/`), security headers |
 | `.gitignore` | Excludes `dist/` (build output) so locally-built files with injected secrets are never committed |
@@ -40,16 +40,16 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 
 | File | Description |
 |------|-------------|
-| `sample-lease-agreement.docx` | Realistic 7-year commercial office lease engineered to exercise every IFRS 16 extraction field, with discount rate intentionally absent |
+| `SAMPLE-LEASE.docx` | Realistic 7-year commercial office lease engineered to exercise every IFRS 16 extraction field, with discount rate intentionally absent |
 
 ### Product docs
 
 | File | Description |
 |------|-------------|
-| `prd-lease-compliance-2026-03-31.md` | Full product requirements — personas, jobs to be done, North Star + L1/L2 metrics, P0/P1/P2 features (v1.1) |
-| `beta-release-plan.md` | Beta release plan — entry criteria, participant profile, 6-week program structure, graduation gates |
-| `ga-release-plan.md` | GA release plan — staged rollout (4 waves), SLA commitments, GTM, 30-day success metrics, rollback plan |
-| `n8n-payload-upgrade-plan.md` | Backend schema evolution plan — 3-phase migration for richer extraction output, per-field confidence scores, and structured error envelopes |
+| `PRD.md` | Full product requirements — personas, jobs to be done, North Star + L1/L2 metrics, P0/P1/P2 features (v1.1) |
+| `BETA-PLAN.md` | Beta release plan — entry criteria, participant profile, 6-week program structure, graduation gates |
+| `GA-PLAN.md` | GA release plan — staged rollout (4 waves), SLA commitments, GTM, 30-day success metrics, rollback plan |
+| `BACKEND-PLAN.md` | Backend schema evolution plan — 3-phase migration for richer extraction output, per-field confidence scores, and structured error envelopes |
 | `docs/n8n-workflow.jpeg` | Architecture diagram of the n8n orchestrator-subagent pipeline |
 
 ### Evals
@@ -126,7 +126,7 @@ The app POSTs to an n8n webhook on analysis completion. The URL is a **test webh
 
 1. Open the app (your Netlify URL or `dist/index.html` locally)
 2. On Screen 1 (Upload), click **Choose file**
-3. Select `sample-lease-agreement.docx` from this repo
+3. Select `SAMPLE-LEASE.docx` from this repo
 
 The upload panel updates to show the filename and file size, and the button changes to **Analyze Contract**.
 
@@ -180,10 +180,10 @@ Click **View full report** (or use the sticky nav). Screen 2 shows the complete 
 
 ### How the build works
 
-`build.sh` runs on every Netlify deploy. It uses `sed` to substitute three `__PLACEHOLDER__` tokens in `legalgraph-mockups.html` with live env var values, then writes the output to `dist/index.html`. No secrets are stored in the repo.
+`build.sh` runs on every Netlify deploy. It uses `sed` to substitute three `__PLACEHOLDER__` tokens in `APP.html` with live env var values, then writes the output to `dist/index.html`. No secrets are stored in the repo.
 
 ```
-legalgraph-mockups.html  (placeholders)
+APP.html  (placeholders)
         │
         ▼  bash build.sh  (env vars injected by Netlify)
         │
@@ -222,7 +222,7 @@ netlify deploy --prod --site <your-site-name>
 
 ## What the sample contract covers
 
-`sample-lease-agreement.docx` is a 15-section commercial office lease engineered to exercise every IFRS 16 extraction field:
+`SAMPLE-LEASE.docx` is a 15-section commercial office lease engineered to exercise every IFRS 16 extraction field:
 
 | IFRS 16 Field | Location in contract | Value |
 |---|---|---|
@@ -412,7 +412,7 @@ After each human eval round, update `evals/hhh-results.md` (or `responsible-ai-r
 
 ## PRD reference
 
-See `prd-lease-compliance-2026-03-31.md` for the full product spec:
+See `PRD.md` for the full product spec:
 - Problem statement and user personas (Rachel — Compliance Lead, Jennifer — GC)
 - Jobs to be done
 - Success metrics (target: <45 min to generate quarterly compliance report)

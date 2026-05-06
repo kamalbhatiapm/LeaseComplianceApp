@@ -13,11 +13,11 @@ sed \
   -e "s|__WEBHOOK_URL__|${WEBHOOK_URL}|g" \
   -e "s|__SUPABASE_URL__|${SUPABASE_URL:-}|g" \
   -e "s|__SUPABASE_ANON_KEY__|${SUPABASE_ANON_KEY:-}|g" \
-  legalgraph-mockups.html > dist/index.html
+  APP.html > dist/index.html
 
 echo "==> Copying static assets"
-cp sample-lease-agreement.docx dist/
-cp prd-lease-compliance-2026-03-31.md dist/
+cp SAMPLE-LEASE.docx dist/
+cp PRD.md dist/
 
 # Verify no placeholders remain
 if grep -q "__WEBHOOK_URL__\|__SUPABASE_URL__\|__SUPABASE_ANON_KEY__" dist/index.html; then

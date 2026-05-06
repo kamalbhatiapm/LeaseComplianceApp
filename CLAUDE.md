@@ -13,7 +13,7 @@ LegalGraph is a lease compliance tool for in-house legal and finance teams. User
 3. **Clause-level audit trail** — every extracted field cites the contract clause it came from
 4. **IFRS 16 report** — PDF export for auditors (gated behind sign-off and no unresolved High flags)
 
-The AI extraction runs via an n8n webhook. The UI is a single-file HTML/CSS/JS app (`legalgraph-mockups.html`) built and deployed to Netlify.
+The AI extraction runs via an n8n webhook. The UI is a single-file HTML/CSS/JS app (`APP.html`) built and deployed to Netlify.
 
 **Primary user:** Rachel — Compliance Lead, owns quarterly IFRS 16 reporting, currently spends 4–6 hours per lease manually.
 **Primary buyer:** Jennifer — General Counsel, cares about audit defensibility and not surprising the CFO.
@@ -23,11 +23,11 @@ The AI extraction runs via an n8n webhook. The UI is a single-file HTML/CSS/JS a
 ## Repo layout
 
 ```
-legalgraph-mockups.html   # Source of truth — all UI, CSS, and JS in one file
+APP.html   # Source of truth — all UI, CSS, and JS in one file
 build.sh                  # Injects env vars (WEBHOOK_URL etc.) via sed → dist/index.html
 dist/index.html           # Built output served by Netlify
 netlify.toml              # Build config and security headers
-prd-lease-compliance-2026-03-31.md  # Full PRD — personas, JTBDs, success metrics
+PRD.md  # Full PRD — personas, JTBDs, success metrics
 evals/
   hhh-rubric.md           # 21-question human eval rubric (Helpful / Harmless / Honest)
   hhh-results-v1.md       # Baseline scores — 74/105 (HOLD)
@@ -37,7 +37,7 @@ evals/
   qa-backlog.md           # 21 bugs; all P0+P1 resolved, 9 P2/P3 open
   run-evals.js            # Automated eval runner against the webhook
   cases/                  # Sample lease JSON for eval runs
-sample-lease-agreement.docx  # Test contract (SF HQ, Floor 12, 7-year lease)
+SAMPLE-LEASE.docx  # Test contract (SF HQ, Floor 12, 7-year lease)
 ```
 
 ---
@@ -46,7 +46,7 @@ sample-lease-agreement.docx  # Test contract (SF HQ, Floor 12, 7-year lease)
 
 **Local preview** (reads from `dist/`, no rebuild needed for HTML-only changes):
 ```bash
-cp legalgraph-mockups.html dist/index.html
+cp APP.html dist/index.html
 npx serve dist/
 ```
 
