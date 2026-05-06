@@ -47,10 +47,17 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 | File | Description |
 |------|-------------|
 | `PRD.md` | Full product requirements — personas, jobs to be done, North Star + L1/L2 metrics, P0/P1/P2 features (v1.1) |
-| `BETA-PLAN.md` | Beta release plan — entry criteria, participant profile, 6-week program structure, graduation gates |
-| `GA-PLAN.md` | GA release plan — staged rollout (4 waves), SLA commitments, GTM, 30-day success metrics, rollback plan |
-| `BACKEND-PLAN.md` | Backend schema evolution plan — 3-phase migration for richer extraction output, per-field confidence scores, and structured error envelopes |
+| `release-plan/BETA-PLAN.md` | Beta release plan — entry criteria, participant profile, 6-week program structure, graduation gates |
+| `release-plan/GA-PLAN.md` | GA release plan — staged rollout (4 waves), SLA commitments, GTM, 30-day success metrics, rollback plan |
+| `architecture/BACKEND-PLAN.md` | Backend schema evolution plan — 3-phase migration for richer extraction output, per-field confidence scores, and structured error envelopes |
 | `docs/n8n-workflow.jpeg` | Architecture diagram of the n8n orchestrator-subagent pipeline |
+
+### Research
+
+| File | Description |
+|------|-------------|
+| `research/MARKET-RESEARCH.md` | Market sizing ($800M–$1.9B TAM), 11-player competitor map, pricing benchmarks, GTM channels, white space analysis |
+| `research/USER-RESEARCH.md` | Persona deep dives (Rachel/Jennifer/David), auditor evidence requirements, AI trust gap data, Beta validation questions, design recommendations |
 
 ### Evals
 
