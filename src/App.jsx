@@ -86,6 +86,18 @@ export default function App() {
     await step(3, 'Scoring risk factors…', 80, 300)
     setProgress({ step: 4, label: 'Sending to AI workflow…', pct: 90 })
 
+    // Hard cap: no matter what hangs, loading always clears within 13s
+    let safetyFired = false
+    const safetyTimer = setTimeout(() => {
+      safetyFired = true
+      setProgress({ step: 4, label: 'Webhook unavailable — showing demo results', pct: 100, error: true })
+      showToast('error', 'Request timed out', 'Demo data shown below')
+      setAnalysisData(MOCK_ANALYSIS)
+      setIsLiveData(false)
+      setIsAnalyzing(false)
+      setNavLocked(false)
+    }, 13000)
+
     let fileContent = null
     try { fileContent = await fileToBase64(selectedFile) } catch {}
 
@@ -124,6 +136,9 @@ export default function App() {
       setProgress({ step: 4, label: 'Webhook unavailable — showing demo results', pct: 100, error: true })
       showToast('error', 'Webhook unavailable', reason + ' — demo data shown below')
     }
+
+    if (safetyFired) return  // safety timer already resolved everything
+    clearTimeout(safetyTimer)
 
     const displayData = responseData ?? MOCK_ANALYSIS
     setAnalysisData(displayData)
