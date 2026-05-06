@@ -487,11 +487,11 @@ nav {
 .score-header-left {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 6px; padding: 20px 16px;
+  gap: 8px; padding: 32px 20px;
 }
-.score-header-divider { background: rgba(255,255,255,.08); }
+.score-header-divider { background: rgba(255,255,255,.06); }
 .score-header-right   { display: flex; flex-direction: column; min-width: 0; }
-.score-header-meta    { padding: 16px 20px 12px; }
+.score-header-meta    { padding: 28px 28px 20px; }
 
 .score-ring {
   width: 80px; height: 80px; border-radius: 50%;
