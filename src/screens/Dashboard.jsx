@@ -12,12 +12,8 @@ const LEASES = [
 ]
 
 const INTENTS = [
-  { value: 'key_term_extraction',  label: 'Extract Key Terms',              desc: 'Pull all key fields — parties, dates, rent, options' },
-  { value: 'compliance_report',    label: 'IFRS 16 / ASC 842 Report',       desc: 'Full compliance report with ROU asset & liability calc' },
-  { value: 'risk_assessment',      label: 'Risk Assessment',                desc: 'Score risk flags, missing clauses, and red-line issues' },
-  { value: 'payment_schedule',     label: 'Payment Schedule Analysis',      desc: 'Break down rent, escalations, and present value' },
-  { value: 'lease_classification', label: 'Lease Classification',           desc: 'Finance vs. operating lease test under ASC 842 / IFRS 16' },
-  { value: 'renewal_options',      label: 'Renewal Options Review',         desc: 'Assess renewal terms and reasonable certainty threshold' },
+  { value: 'ifrs16_compliance',  label: 'IFRS 16 Compliance Report',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under IFRS 16' },
+  { value: 'asc842_compliance',  label: 'ASC 842 Compliance Report',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under ASC 842 (US GAAP)' },
 ]
 
 export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent }) {
@@ -105,7 +101,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
 
                 {/* Analysis intent selector */}
                 <div className="intent-select-wrap" onClick={e => e.stopPropagation()}>
-                  <label className="intent-label">Analysis type</label>
+                  <label className="intent-label">Reporting standard</label>
                   <div className="intent-select-inner">
                     <select
                       className="intent-select"

@@ -27,7 +27,7 @@ export default function App() {
   const [toast, setToast]                 = useState(null)
   const [progress, setProgress]           = useState({ step: 0, label: '', pct: 0 })
   const [navLocked, setNavLocked]         = useState(false)
-  const [analysisIntent, setAnalysisIntent] = useState('key_term_extraction')
+  const [analysisIntent, setAnalysisIntent] = useState('ifrs16_compliance')
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
 
   useEffect(() => {
