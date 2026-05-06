@@ -286,7 +286,7 @@ function RiskFlags({ flags, onGateChange }) {
 export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme }) {
   if (isAnalyzing) {
     return (
-      <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '64px' }}>
+      <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
         <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
         <AnalysisLoader file={selectedFile} progress={progress} />
       </div>
@@ -322,7 +322,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
   const badgeTxt  = isDemo ? 'Demo data' : isLiveData ? 'Live extraction' : 'Demo fallback'
 
   return (
-    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '64px' }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
       <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 

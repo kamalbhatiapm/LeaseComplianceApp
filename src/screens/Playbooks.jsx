@@ -48,7 +48,7 @@ const PLAYBOOKS = [
 
 export default function Playbooks({ navLocked, theme, toggleTheme }) {
   return (
-    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '64px' }}>
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
       <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 

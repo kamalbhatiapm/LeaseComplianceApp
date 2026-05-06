@@ -33,7 +33,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
   const pctColor = p => p >= 90 ? 'var(--ink-3)' : p >= 75 ? 'var(--amber)' : 'var(--red)'
 
   return (
-    <div style={{ background: 'var(--white)', minHeight: '100vh', paddingTop: '64px' }}>
+    <div style={{ background: 'var(--white)', minHeight: '100vh', paddingTop: '53px' }}>
       <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 
