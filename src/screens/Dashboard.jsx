@@ -51,8 +51,15 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
       <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 
-      {/* Hero */}
-      <div className="s1-hero">
+      {/* Hero — full section is the drop target */}
+      <div
+        ref={zoneRef}
+        className="s1-hero"
+        onDragEnter={onDragEnter}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+      >
         <div className="s1-hero-inner">
           <div className="s1-hero-copy">
             <div className="s1-kicker">IFRS 16 / ASC 842 Compliance Suite</div>
@@ -74,13 +81,8 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
               <ProgressPanel file={selectedFile} progress={progress} />
             ) : (
               <div
-                ref={zoneRef}
                 className={`upload-zone${dragging ? ' drag-over' : ''}`}
                 onClick={() => !selectedFile && fileRef.current?.click()}
-                onDragEnter={onDragEnter}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
               >
                 <input
                   ref={fileRef}
