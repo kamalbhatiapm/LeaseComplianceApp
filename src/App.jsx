@@ -108,10 +108,10 @@ export default function App() {
         body: JSON.stringify(payload),
         signal: controller.signal,
       })
-      clearTimeout(tid)
       webhookOk = res.ok
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const text = await res.text()
+      const text = await res.text()   // keep abort active until body is fully read
+      clearTimeout(tid)
       try {
         let parsed = JSON.parse(text)
         if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed
