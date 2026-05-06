@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText, FileCheck, Plus, MoreHorizontal, BarChart2 } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
@@ -16,6 +16,10 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
   const navigate = useNavigate()
   const [dragging, setDragging] = useState(false)
 
+  useEffect(() => {
+    if (isAnalyzing) navigate('/leases')
+  }, [isAnalyzing])
+
   const onDrop = e => {
     e.preventDefault()
     setDragging(false)
@@ -24,7 +28,6 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
 
   const onAnalyze = () => {
     handleAnalyzeClick()
-    if (selectedFile) navigate('/leases')
   }
 
   const pctColor = p => p >= 90 ? 'var(--ink-3)' : p >= 75 ? 'var(--amber)' : 'var(--red)'
@@ -32,6 +35,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
   return (
     <div style={{ background: 'var(--white)', minHeight: '100vh' }}>
       <Nav locked={navLocked} />
+      <main id="main-content">
 
       {/* Hero */}
       <div className="s1-hero">
@@ -91,7 +95,10 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                 )}
                 <button
                   className="btn btn-primary"
-                  onClick={e => { e.stopPropagation(); onAnalyze() }}
+                  onClick={e => {
+                    e.stopPropagation()
+                    if (selectedFile) { onAnalyze() } else { fileRef.current?.click() }
+                  }}
                 >
                   {selectedFile ? <><BarChart2 size={14} /> Analyze Contract</> : 'Choose file'}
                 </button>
@@ -113,7 +120,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
             <div className="section-title">Recent Contracts</div>
             <div style={{ display: 'flex', gap: '8px' }}>
               <button className="btn btn-outline btn-sm">Export all</button>
-              <button className="btn btn-primary btn-sm"><Plus size={12} /> Add lease</button>
+              <button className="btn btn-primary btn-sm"><Plus size={12} aria-hidden="true" /> Add lease</button>
             </div>
           </div>
           <table className="lease-table">
@@ -155,7 +162,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                       >
                         {l.status === 'red' ? 'Resolve flags' : 'View report'}
                       </button>
-                      <button className="btn-icon"><MoreHorizontal size={14} /></button>
+                      <button className="btn-icon" aria-label={`More options for ${l.name}`}><MoreHorizontal size={14} aria-hidden="true" /></button>
                     </div>
                   </td>
                 </tr>
@@ -164,6 +171,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
           </table>
         </div>
       </div>
+      </main>
     </div>
   )
 }

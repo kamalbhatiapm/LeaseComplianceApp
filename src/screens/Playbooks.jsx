@@ -48,8 +48,9 @@ const PLAYBOOKS = [
 
 export default function Playbooks({ navLocked }) {
   return (
-    <div style={{ background: 'var(--white)', minHeight: '100vh' }}>
+    <div style={{ background: '#000', minHeight: '100vh' }}>
       <Nav locked={navLocked} />
+      <main id="main-content">
 
       <div className="s3-header">
         <div className="s3-title-group">
@@ -57,8 +58,8 @@ export default function Playbooks({ navLocked }) {
           <p>Extraction rules and risk criteria applied during contract analysis</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn btn-outline btn-sm"><BookOpen size={12} /> Documentation</button>
-          <button className="btn btn-primary btn-sm"><Plus size={12} /> New playbook</button>
+          <button className="btn btn-outline btn-sm s3-btn-outline"><BookOpen size={12} aria-hidden="true" /> Documentation</button>
+          <button className="btn btn-primary btn-sm"><Plus size={12} aria-hidden="true" /> New playbook</button>
         </div>
       </div>
 
@@ -102,6 +103,7 @@ export default function Playbooks({ navLocked }) {
           ))}
         </div>
       </div>
+      </main>
     </div>
   )
 }

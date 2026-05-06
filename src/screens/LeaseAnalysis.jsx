@@ -1,12 +1,123 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, Pencil, Check, Download, Mail, RefreshCw,
   Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
+  FileText, Loader, ScanText, Brain, ShieldCheck,
 } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS } from '../utils/constants.js'
 import { track } from '../utils/track.js'
+
+const QUIPS = [
+  "Translating 'hereinafter referred to as' into English…",
+  "Counting pages so you don't have to…",
+  "Bribing the discount rate oracle…",
+  "Consulting IFRS 16 paragraph 26(b)…",
+  "Untangling the renewal option labyrinth…",
+  "Making sure the landlord can't see this…",
+  "Finding the clause lawyers buried on page 47…",
+  "Summoning the incremental borrowing rate…",
+  "Reading the fine print. Literally, all of it…",
+  "Asking the AI to ask the AI…",
+  "Reticulating lease splines…",
+  "Converting legalese to something a human would say…",
+  "Cross-referencing with every lease ever signed…",
+  "Locating the commencement date (it's always on page 3)…",
+  "Checking if 'reasonable certainty' is certain enough…",
+  "Verifying the lessor didn't sneak anything in…",
+  "Computing present value of future headaches…",
+  "Assigning blame to the escalation clause…",
+  "Teaching GPT to care about square footage…",
+  "Almost there — just double-checking the double-checks…",
+  "Summoning the orchestrator… it's bringing snacks.",
+  "Negotiating with sub-agents… one is asking for a raise.",
+  "Thinking… but like, in parallel.",
+  "Consulting 3 agents and 1 overconfident opinion.",
+  "Loading… the AI insists it's almost done.",
+]
+
+const LOADING_STEPS = [
+  { icon: FileText, label: 'Reading contract structure' },
+  { icon: ScanText, label: 'Extracting IFRS 16 fields'  },
+  { icon: Brain,    label: 'Scoring risk factors'        },
+  { icon: Sparkles, label: 'Running AI workflow'         },
+]
+
+function AnalysisLoader({ file, progress }) {
+  const { step, pct, label, error } = progress
+  const [quipIdx, setQuipIdx] = useState(() => Math.floor(Math.random() * QUIPS.length))
+  const [fade, setFade]       = useState(true)
+
+  useEffect(() => {
+    const tick = setInterval(() => {
+      setFade(false)
+      setTimeout(() => {
+        setQuipIdx(i => (i + 1) % QUIPS.length)
+        setFade(true)
+      }, 300)
+    }, 2800)
+    return () => clearInterval(tick)
+  }, [])
+
+  return (
+    <div className="analysis-loading">
+      <div className="analysis-loading-card">
+        <div className="analysis-loading-icon-wrap">
+          <div className="analysis-loading-pulse" />
+          <Sparkles size={28} color="var(--brand)" style={{ position: 'relative', zIndex: 1 }} />
+        </div>
+
+        <div className="analysis-loading-title">Analyzing your contract</div>
+        {file && (
+          <div className="analysis-loading-file">
+            <FileText size={12} />
+            {file.name}
+          </div>
+        )}
+
+        <div className="analysis-loading-steps">
+          {LOADING_STEPS.map(({ icon: Icon, label: name }, i) => {
+            const n       = i + 1
+            const isDone  = n < step || (n === step && pct === 100 && !error)
+            const isActive= n === step && pct < 100
+            const isErr   = n === step && error
+            return (
+              <div key={name} className={`al-step ${isDone ? 'done' : isActive ? 'active' : isErr ? 'error' : ''}`}>
+                <span className="al-step-icon">
+                  {isDone  ? <Check   size={13} /> :
+                   isActive ? <Loader  size={13} className="spin" /> :
+                   isErr   ? <CircleAlert size={13} /> :
+                   <Icon size={13} />}
+                </span>
+                <span>{name}</span>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="al-quip" style={{ opacity: fade ? 1 : 0 }}>
+          {QUIPS[quipIdx]}
+        </div>
+
+        <div
+          className="al-progress-track"
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Analysis progress"
+        >
+          <div className="al-progress-fill" style={{ width: `${pct}%`, background: error ? 'var(--red)' : 'var(--brand)' }} />
+        </div>
+        <div className="al-progress-meta">
+          <span>{label || 'Starting…'}</span>
+          <span>{pct}%</span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function getRiskMeta(score) {
   if (score < 50) return { level: 'Low',    color: 'var(--green)', pillCls: 'pill-green', pct: score }
@@ -70,12 +181,12 @@ function TermsGrid({ fields, termsMissing = [] }) {
 
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '20px' }}>
-      <div style={{ padding: '12px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: '12px 18px', borderBottom: '1px solid rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div className="card-title" style={{ margin: 0 }}>Extracted Lease Terms</div>
         <button
           className="btn btn-outline btn-sm"
           onClick={() => setEditMode(m => !m)}
-          style={editMode ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : {}}
+          style={editMode ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : { color: 'rgba(255,255,255,.7)', borderColor: 'rgba(255,255,255,.18)' }}
         >
           {editMode ? <><Check size={12} /> Save edits</> : <><Pencil size={12} /> Edit terms</>}
         </button>
@@ -123,7 +234,7 @@ function RiskFlags({ flags, onGateChange }) {
       <div className="card-title" style={{ marginBottom: '12px', marginTop: '8px' }}>Risk Flags</div>
       <div className="risk-list">
         {flags.length === 0 && (
-          <p style={{ fontSize: '13px', color: 'var(--ink-3)', padding: '12px 0' }}>No risk flags detected.</p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)', padding: '12px 0' }}>No risk flags detected.</p>
         )}
         {flags.map(flag => {
           const sev      = flag.severity ?? 'low'
@@ -141,7 +252,7 @@ function RiskFlags({ flags, onGateChange }) {
                 <span className={`pill ${pillCls} risk-sev-pill`}>{pillLbl}</span>
               </div>
               {flag.id === 'missing_discount_rate' && (
-                <div style={{ fontSize: '11px', color: 'var(--ink-3)', marginTop: '6px', lineHeight: 1.5 }}>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,.7)', marginTop: '6px', lineHeight: 1.5 }}>
                   To obtain your IBR, contact your treasury team or request a rate from your primary lender for a comparable term and collateral profile.
                 </div>
               )}
@@ -149,7 +260,7 @@ function RiskFlags({ flags, onGateChange }) {
                 <button className="btn btn-sm btn-outline">
                   {isHigh ? 'Enter IBR manually' : 'Add management note'}
                 </button>
-                {ref && <span style={{ fontSize: '11px', color: 'var(--ink-3)' }}>IFRS 16 {ref}</span>}
+                {ref && <span style={{ fontSize: '11px', color: 'rgba(255,255,255,.65)' }}>IFRS 16 {ref}</span>}
               </div>
               {isHigh && (
                 <div className="sign-off-row">
@@ -172,7 +283,15 @@ function RiskFlags({ flags, onGateChange }) {
   )
 }
 
-export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked }) {
+export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress }) {
+  if (isAnalyzing) {
+    return (
+      <div style={{ background: '#000', minHeight: '100vh' }}>
+        <Nav locked={navLocked} />
+        <AnalysisLoader file={selectedFile} progress={progress} />
+      </div>
+    )
+  }
   const navigate  = useNavigate()
   const data      = analysisData ?? MOCK_ANALYSIS
   const isDemo    = !analysisData
@@ -203,8 +322,9 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
   const badgeTxt  = isDemo ? 'Demo data' : isLiveData ? 'Live extraction' : 'Demo fallback'
 
   return (
-    <div style={{ background: 'var(--white)', minHeight: '100vh' }}>
+    <div style={{ background: '#000', minHeight: '100vh' }}>
       <Nav locked={navLocked} />
+      <main id="main-content">
 
       {/* Sub-header */}
       <div className="s2-subheader">
@@ -217,10 +337,10 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <span className={`s2-data-badge ${badgeCls}`} title={isDemo ? 'Showing placeholder data' : isLiveData ? 'Live AI extraction' : 'Demo fallback'}>
             {badgeIcon} {badgeTxt}
           </span>
-          <span style={{ fontSize: '12px', color: 'var(--ink-3)' }}>Last analyzed: {dtStr}</span>
+          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.7)' }}>Last analyzed: {dtStr}</span>
           <button className="btn btn-outline btn-sm">Re-analyze</button>
           <button className="btn btn-outline btn-sm" onClick={() => track('report_exported', { format: 'pdf', type: 'extraction' })}>
-            <Download size={12} /> Export PDF
+            <Download size={12} aria-hidden="true" /> Export PDF
           </button>
           <button
             className="btn btn-primary btn-sm"
@@ -287,9 +407,9 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <div className="sidebar-section">
             <div className="sidebar-section-title">Actions</div>
             <div className="action-list">
-              <button className="action-btn"><Download size={14} /> Export to PDF</button>
-              <button className="action-btn"><Mail size={14} /> Send to auditor</button>
-              <button className="action-btn"><RefreshCw size={14} /> Re-run extraction</button>
+              <button className="action-btn" aria-label="Export report to PDF"><Download size={14} aria-hidden="true" /> Export to PDF</button>
+              <button className="action-btn" aria-label="Send report to auditor"><Mail size={14} aria-hidden="true" /> Send to auditor</button>
+              <button className="action-btn" aria-label="Re-run lease extraction"><RefreshCw size={14} aria-hidden="true" /> Re-run extraction</button>
             </div>
           </div>
 
@@ -322,7 +442,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
                 { label: 'Commencement date', ok: true },
               ].map(({ label, ok }) => (
                 <div key={label} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--ink-2)' }}>{label}</span>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.75)' }}>{label}</span>
                   <span className={`pill pill-sm ${ok ? 'pill-green' : 'pill-red'}`}>{ok ? '✓' : 'Missing'}</span>
                 </div>
               ))}
@@ -331,13 +451,14 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
 
           <div className="sidebar-section">
             <div className="sidebar-section-title">Applied Playbook</div>
-            <div style={{ background: 'var(--brand-lt)', border: '1px solid rgba(27,79,216,.2)', borderRadius: '8px', padding: '12px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--brand)', marginBottom: '4px' }}>IFRS 16 Standard Template</div>
-              <div style={{ fontSize: '11px', color: 'var(--ink-3)' }}>Version 2.4 · 9 required fields · 14 risk rules</div>
+            <div style={{ background: 'rgba(0,113,227,.18)', border: '1px solid rgba(90,200,250,.2)', borderRadius: '8px', padding: '12px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--accent-on-dark)', marginBottom: '4px' }}>IFRS 16 Standard Template</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,.7)' }}>Version 2.4 · 9 required fields · 14 risk rules</div>
             </div>
           </div>
         </div>
       </div>
+      </main>
     </div>
   )
 }
