@@ -78,26 +78,28 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                   style={{ display: 'none' }}
                   onChange={e => { if (e.target.files.length) handleFileSelected(e.target.files[0]) }}
                 />
-                <div className="upload-icon">
-                  {selectedFile
-                    ? <FileCheck size={24} color="var(--accent-on-dark)" />
-                    : <FileText  size={24} color="var(--accent-on-dark)" />}
-                </div>
-                <div className="upload-title">
-                  {selectedFile ? selectedFile.name : 'Upload a lease contract'}
-                </div>
-                <div className="upload-sub">
-                  {selectedFile
-                    ? `${(selectedFile.size / 1024).toFixed(0)} KB · Ready to analyze`
-                    : 'Drag & drop or click to browse'}
-                </div>
-                {!selectedFile && (
-                  <div className="upload-types">
-                    {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
-                      <span key={t} className="upload-type-tag">{t}</span>
-                    ))}
+                <div className="upload-drop-area">
+                  <div className="upload-icon">
+                    {selectedFile
+                      ? <FileCheck size={24} color="var(--accent-on-dark)" />
+                      : <FileText  size={24} color="var(--accent-on-dark)" />}
                   </div>
-                )}
+                  <div className="upload-title">
+                    {selectedFile ? selectedFile.name : 'Upload a lease contract'}
+                  </div>
+                  <div className="upload-sub">
+                    {selectedFile
+                      ? `${(selectedFile.size / 1024).toFixed(0)} KB · Ready to analyze`
+                      : 'Drag & drop or click to browse'}
+                  </div>
+                  {!selectedFile && (
+                    <div className="upload-types">
+                      {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
+                        <span key={t} className="upload-type-tag">{t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 {/* Analysis intent selector */}
                 <div className="intent-select-wrap" onClick={e => e.stopPropagation()}>

@@ -349,7 +349,6 @@ nav {
 
 .s1-upload-panel { width: 400px; flex-shrink: 0; }
 .upload-zone {
-  position: relative;
   border: 1px solid rgba(255,255,255,.22);
   border-radius: 26px;
   padding: 36px 32px;
@@ -365,16 +364,15 @@ nav {
   cursor: pointer;
   transition: border-color .22s, background .22s, box-shadow .22s;
 }
-.upload-zone::before {
-  content: '';
-  position: absolute;
-  inset: 10px;
+.upload-drop-area {
   border: 1.5px dashed rgba(255,255,255,.18);
   border-radius: 18px;
-  pointer-events: none;
+  padding: 20px 16px 24px;
+  margin-bottom: 20px;
   transition: border-color .22s;
 }
-.upload-zone:hover::before, .upload-zone.drag-over::before {
+.upload-zone:hover .upload-drop-area,
+.upload-zone.drag-over .upload-drop-area {
   border-color: rgba(255,255,255,.35);
 }
 .upload-zone:hover, .upload-zone.drag-over {
@@ -397,7 +395,7 @@ nav {
 }
 .upload-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 7px; letter-spacing: -.025em; }
 .upload-sub   { font-size: 14px; color: rgba(255,255,255,.82); margin-bottom: 20px; letter-spacing: -.01em; }
-.upload-types { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; }
+.upload-types { display: flex; gap: 6px; justify-content: center; }
 .upload-type-tag {
   background: rgba(255,255,255,.1);
   color: rgba(255,255,255,.75);
