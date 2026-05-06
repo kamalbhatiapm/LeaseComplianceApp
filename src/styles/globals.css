@@ -1201,4 +1201,65 @@ nav {
   .nav-inner { padding: 0 14px; border-radius: 14px; }
   .nav-links { display: none; }
   .s3-grid { grid-template-columns: 1fr; }
+
+  /* Tablet: hide less-critical columns */
+  .lease-table th:nth-child(3),
+  .lease-table td:nth-child(3),
+  .lease-table th:nth-child(4),
+  .lease-table td:nth-child(4),
+  .lease-table th:nth-child(7),
+  .lease-table td:nth-child(7) { display: none; }
+}
+
+@media (max-width: 600px) {
+  /* Mobile: convert table rows to cards */
+  .lease-table-card { border-radius: 14px; }
+  .lease-table thead { display: none; }
+  .lease-table, .lease-table tbody { display: block; }
+  .lease-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+    gap: 4px 8px;
+  }
+  .lease-table tr:last-child { border-bottom: none; }
+  .lease-table tbody tr:hover td { background: transparent; }
+
+  /* Contract name — full width top row */
+  .lease-table td:nth-child(1) {
+    grid-column: 1 / 2; grid-row: 1;
+    padding: 0; border: none; font-size: 14px;
+  }
+  /* Standard badge — top right */
+  .lease-table td:nth-child(2) {
+    grid-column: 2 / 3; grid-row: 1;
+    padding: 0; border: none; text-align: right;
+    display: flex; align-items: flex-start; justify-content: flex-end;
+  }
+  /* Annual payment — second row left */
+  .lease-table td:nth-child(5) {
+    grid-column: 1 / 2; grid-row: 2;
+    padding: 0; border: none;
+    font-size: 13px; color: var(--ink-2); font-weight: 500;
+  }
+  /* Status pill — second row right */
+  .lease-table td:nth-child(6) {
+    grid-column: 2 / 3; grid-row: 2;
+    padding: 0; border: none;
+    display: flex; align-items: center; justify-content: flex-end;
+  }
+  /* Action buttons — third row full width */
+  .lease-table td:nth-child(8) {
+    grid-column: 1 / 3; grid-row: 3;
+    padding: 0; border: none; padding-top: 8px;
+  }
+  /* Hide commencement, term, extraction on mobile */
+  .lease-table td:nth-child(3),
+  .lease-table td:nth-child(4),
+  .lease-table td:nth-child(7) { display: none; }
+
+  .lease-table-toolbar { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
+  .s1-body { padding: 16px 12px; }
 }
