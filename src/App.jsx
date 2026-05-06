@@ -145,6 +145,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       {toast && <Toast toast={toast} onDismiss={dismissToast} />}
       {showConsent && <ConsentModal onGrant={grantConsent} onDeny={() => setShowConsent(false)} />}
       <Routes>
