@@ -95,30 +95,36 @@ export default function App() {
     setIsAnalyzing(true)
     setNavLocked(true)
 
+    const MIN_MS   = 60000   // always show loading for at least 60 s
+    const startMs  = Date.now()
+
     const step = async (n, label, pct, ms) => {
       setProgress({ step: n, label, pct })
       await sleep(ms)
     }
 
-    await step(1, 'Reading contract…', 25, 300)
-    await step(2, 'Extracting IFRS 16 fields…', 55, 400)
-    await step(3, 'Scoring risk factors…', 80, 300)
-    setProgress({ step: 4, label: 'Sending to AI workflow…', pct: 90 })
+    // Spread steps across the first ~45 s so the UI stays lively
+    await step(1, 'Reading contract…',           15,  6000)
+    await step(2, 'Parsing document structure…', 30,  8000)
+    await step(3, 'Extracting IFRS 16 fields…',  50, 10000)
+    await step(4, 'Scoring risk factors…',        68,  8000)
+    await step(5, 'Running compliance checks…',   82,  8000)
+    setProgress({ step: 6, label: 'Sending to AI workflow…', pct: 90 })
 
     let webhookOk    = false
     let responseData = null
 
     if (WEBHOOK_URL) {
-      // Hard safety cap — always clears loading within 28s no matter what
+      // Hard safety cap at 65 s — always clears loading no matter what
       let safetyFired = false
       const safetyTimer = setTimeout(() => {
         safetyFired = true
-        setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
+        setProgress({ step: 6, label: 'Extraction complete', pct: 100, done: true })
         setAnalysisData(MOCK_ANALYSIS)
         setIsLiveData(false)
         setIsAnalyzing(false)
         setNavLocked(false)
-      }, 63000)
+      }, 65000)
 
       let fileContent = null
       try { fileContent = await fileToBase64(selectedFile) } catch {}
@@ -143,27 +149,29 @@ export default function App() {
         })
         webhookOk = res.ok
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const text = await res.text()   // keep abort active until body is fully read
+        const text = await res.text()
         clearTimeout(tid)
         try {
           let parsed = JSON.parse(text)
           if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed
           responseData = parsed
         } catch {}
-        setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
       } catch (err) {
         console.error('[LegalGraph] Webhook error:', err.name, err.message)
-        setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
       }
 
       if (safetyFired) return
       clearTimeout(safetyTimer)
-    } else {
-      // No webhook configured — load demo data silently
-      await sleep(400)
-      setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
-      await sleep(300)
     }
+
+    // Enforce minimum display time — wait out the remainder if webhook was fast
+    const elapsed = Date.now() - startMs
+    if (elapsed < MIN_MS) {
+      setProgress({ step: 6, label: 'Finalising report…', pct: 95 })
+      await sleep(MIN_MS - elapsed)
+    }
+
+    setProgress({ step: 6, label: 'Extraction complete', pct: 100, done: true })
 
     const displayData = responseData ?? MOCK_ANALYSIS
     setAnalysisData(displayData)
