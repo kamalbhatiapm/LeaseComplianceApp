@@ -46,10 +46,10 @@ const PLAYBOOKS = [
   },
 ]
 
-export default function Playbooks({ navLocked }) {
+export default function Playbooks({ navLocked, theme, toggleTheme }) {
   return (
-    <div style={{ background: '#000', minHeight: '100vh' }}>
-      <Nav locked={navLocked} />
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '64px' }}>
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 
       <div className="s3-header">
