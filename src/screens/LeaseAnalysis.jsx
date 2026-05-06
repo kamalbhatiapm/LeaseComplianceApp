@@ -22,7 +22,8 @@ const QUIPS = [
   "Loading… the AI insists it's almost done.",
   "I'm like Linux. First I confuse you, then you can't live without me.",
   "Lease term: 5 years. Time spent reading it: also 5 years.",
-  "99 clauses in the contract, 99 clauses… take one down, flag it as risk…",
+  "The landlord's lawyer used 'forthwith' 11 times. We counted.",
+  "Extracting the important bits so you don't have to fake-read 47 pages.",
 ]
 
 const LOADING_STEPS = [
