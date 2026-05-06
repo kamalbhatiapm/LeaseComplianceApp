@@ -81,10 +81,6 @@ function AnalysisLoader({ file, progress }) {
           })}
         </div>
 
-        <div className="al-quip" style={{ opacity: fade ? 1 : 0 }}>
-          {QUIPS[quipIdx]}
-        </div>
-
         <div
           className="al-progress-track"
           role="progressbar"
@@ -98,6 +94,10 @@ function AnalysisLoader({ file, progress }) {
         <div className="al-progress-meta">
           <span>{label || 'Starting…'}</span>
           <span>{pct}%</span>
+        </div>
+
+        <div className="al-quip" style={{ opacity: fade ? 1 : 0 }}>
+          {QUIPS[quipIdx]}
         </div>
       </div>
     </div>
