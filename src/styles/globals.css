@@ -347,48 +347,59 @@ nav {
 }
 .s1-stat-label { font-size: 13px; color: rgba(255,255,255,.7); margin-top: 3px; letter-spacing: -.01em; }
 
-.s1-upload-panel { width: 380px; flex-shrink: 0; }
+.s1-upload-panel { width: 400px; flex-shrink: 0; }
 .upload-zone {
-  border: 1.5px solid rgba(255,255,255,.18);
-  border-radius: 20px;
-  padding: 32px 28px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 26px;
+  padding: 36px 32px;
   text-align: center;
-  background: rgba(255,255,255,.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,.09);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.28),
+    inset 0 -1px 0 rgba(255,255,255,.06),
+    0 32px 64px rgba(0,0,0,.45),
+    0 8px 24px rgba(0,0,0,.25);
   cursor: pointer;
-  transition: border-color .2s, background .2s;
+  transition: border-color .22s, background .22s, box-shadow .22s;
 }
 .upload-zone:hover, .upload-zone.drag-over {
   border-color: rgba(255,255,255,.38);
-  background: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.13);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.35),
+    inset 0 -1px 0 rgba(255,255,255,.08),
+    0 40px 72px rgba(0,0,0,.5),
+    0 8px 24px rgba(0,0,0,.28);
 }
 .upload-icon {
-  width: 56px; height: 56px;
-  background: rgba(90,200,250,.2);
-  border: 1px solid rgba(90,200,250,.25);
-  border-radius: 14px;
+  width: 60px; height: 60px;
+  background: rgba(90,200,250,.18);
+  border: 1px solid rgba(90,200,250,.3);
+  border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 18px;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 16px rgba(90,200,250,.15);
 }
-.upload-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 6px; letter-spacing: -.02em; }
-.upload-sub   { font-size: 13px; color: rgba(255,255,255,.88); margin-bottom: 20px; }
+.upload-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 7px; letter-spacing: -.025em; }
+.upload-sub   { font-size: 14px; color: rgba(255,255,255,.82); margin-bottom: 20px; letter-spacing: -.01em; }
 .upload-types { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; }
 .upload-type-tag {
-  background: rgba(255,255,255,.09);
-  color: rgba(255,255,255,.82);
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.75);
   border: 1px solid rgba(255,255,255,.18);
-  border-radius: 6px; font-size: 11px; padding: 3px 9px;
-  font-weight: 500;
+  border-radius: 7px; font-size: 12px; padding: 4px 10px;
+  font-weight: 500; letter-spacing: .01em;
 }
-.upload-progress-label { font-size: 12px; color: rgba(255,255,255,.82); margin-top: 14px; }
+.upload-progress-label { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 14px; line-height: 1.5; }
 
 /* Intent selector — Apple segmented control */
 .intent-select-wrap {
   width: 100%; margin-bottom: 16px; text-align: left;
 }
 .intent-label {
-  display: block; font-size: 11px; font-weight: 600; letter-spacing: .05em;
+  display: block; font-size: 12px; font-weight: 600; letter-spacing: .05em;
   text-transform: uppercase; color: rgba(255,255,255,.52); margin-bottom: 9px;
 }
 .intent-segmented {
@@ -399,8 +410,8 @@ nav {
 }
 .intent-seg-btn {
   flex: 1; border: none; cursor: pointer; font-family: inherit;
-  font-size: 13px; font-weight: 500; letter-spacing: -.01em;
-  padding: 8px 12px; border-radius: 9px;
+  font-size: 14px; font-weight: 500; letter-spacing: -.01em;
+  padding: 9px 12px; border-radius: 9px;
   color: rgba(255,255,255,.5);
   background: transparent;
   transition: color .18s ease, background .18s ease, box-shadow .18s ease;
@@ -416,7 +427,7 @@ nav {
   box-shadow: 0 1px 3px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
 }
 .intent-desc {
-  font-size: 11.5px; color: rgba(255,255,255,.5); margin-top: 8px;
+  font-size: 13px; color: rgba(255,255,255,.5); margin-top: 8px;
   line-height: 1.45; padding: 0 1px;
 }
 
