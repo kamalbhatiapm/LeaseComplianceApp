@@ -539,10 +539,14 @@ nav {
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(255,255,255,.1);
-  padding: 12px 28px;
-  display: flex; align-items: center; gap: 16px;
+  padding: 10px 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
   position: sticky; top: 53px; z-index: 50;
 }
+.s2-subheader-left { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.s2-subheader-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.s2-subheader-ts   { font-size: 11px; color: var(--t4); white-space: nowrap; }
+.s2-subheader-divider { width: 1px; height: 20px; background: rgba(255,255,255,.15); flex-shrink: 0; }
 .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; color: rgba(255,255,255,.7); }
 .breadcrumb a { color: var(--accent-on-dark); cursor: pointer; font-weight: 500; text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; }
@@ -708,10 +712,21 @@ nav {
 .s2-data-badge--demo     { background: rgba(255,159,10,.18); color: var(--amber); }
 .s2-data-badge--live     { background: rgba(48,209,88,.15);  color: var(--green); }
 .s2-data-badge--fallback { background: rgba(255,59,48,.15);  color: var(--red-on-dark); }
+.s2-standard-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px;
+  border-radius: 980px;
+  background: rgba(0,113,227,.18); color: var(--accent-on-dark);
+}
+[data-theme="light"] .s2-standard-badge {
+  background: var(--brand-lt); color: var(--brand);
+}
 
-.s2-subheader-actions {
-  margin-left: auto; display: flex; gap: 8px;
-  align-items: center; flex-wrap: wrap;
+.s2-subheader-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.s2-subheader-actions .btn-secondary {
+  border: 1px solid rgba(0,113,227,.4);
+  box-shadow: 0 0 0 1px rgba(0,113,227,.1), 0 2px 6px rgba(0,113,227,.15);
+  font-weight: 600;
 }
 .s2-subheader-actions .btn-outline {
   color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.18);
@@ -943,6 +958,8 @@ nav {
 
 /* Screen 2 subheader */
 [data-theme="light"] .s2-subheader { background: rgba(255,255,255,.92); border-bottom-color: rgba(0,0,0,.08); }
+[data-theme="light"] .s2-subheader-ts { color: var(--ink-3); }
+[data-theme="light"] .s2-subheader-divider { background: rgba(0,0,0,.12); }
 [data-theme="light"] .breadcrumb { color: var(--ink-3); }
 [data-theme="light"] .breadcrumb a { color: var(--brand); }
 [data-theme="light"] .breadcrumb-sep { color: rgba(0,0,0,.25); }

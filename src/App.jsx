@@ -85,17 +85,23 @@ export default function App() {
     runAnalysis()
   }, [selectedFile, consentGiven])
 
+  const handleReanalyzeAs = useCallback((intent) => {
+    if (!selectedFile) return
+    setAnalysisIntent(intent)
+    runAnalysis(intent)
+  }, [selectedFile])
+
   const grantConsent = useCallback(() => {
     setConsentGiven(true)
     setShowConsent(false)
     runAnalysis()
   }, [])
 
-  async function runAnalysis() {
+  async function runAnalysis(intentOverride) {
     setIsAnalyzing(true)
     setNavLocked(true)
 
-    const MIN_MS   = 60000   // always show loading for at least 60 s
+    const MIN_MS   = 45000   // always show loading for at least 45 s
     const startMs  = Date.now()
 
     const step = async (n, label, pct, ms) => {
@@ -103,19 +109,19 @@ export default function App() {
       await sleep(ms)
     }
 
-    // Spread steps across the first ~45 s so the UI stays lively
-    await step(1, 'Reading contract…',           15,  6000)
-    await step(2, 'Parsing document structure…', 30,  8000)
-    await step(3, 'Extracting IFRS 16 fields…',  50, 10000)
-    await step(4, 'Scoring risk factors…',        68,  8000)
-    await step(5, 'Running compliance checks…',   82,  8000)
+    // Spread steps across the first ~33 s so the UI stays lively
+    await step(1, 'Reading contract…',           15,  4000)
+    await step(2, 'Parsing document structure…', 30,  6000)
+    await step(3, 'Extracting IFRS 16 fields…',  50,  8000)
+    await step(4, 'Scoring risk factors…',        68,  7000)
+    await step(5, 'Running compliance checks…',   82,  6000)
     setProgress({ step: 6, label: 'Sending to AI workflow…', pct: 90 })
 
     let webhookOk    = false
     let responseData = null
 
     if (WEBHOOK_URL) {
-      // Hard safety cap at 65 s — always clears loading no matter what
+      // Hard safety cap at 50 s — always clears loading no matter what
       let safetyFired = false
       const safetyTimer = setTimeout(() => {
         safetyFired = true
@@ -124,7 +130,7 @@ export default function App() {
         setIsLiveData(false)
         setIsAnalyzing(false)
         setNavLocked(false)
-      }, 65000)
+      }, 50000)
 
       let fileContent = null
       try { fileContent = await fileToBase64(selectedFile) } catch {}
@@ -134,7 +140,7 @@ export default function App() {
         file_type:    selectedFile.type || 'application/octet-stream',
         file_content: fileContent,
         standard:     'IFRS16',
-        intent:       analysisIntent,
+        intent:       intentOverride ?? analysisIntent,
         analyzed_at:  new Date().toISOString(),
       }
 
@@ -194,7 +200,7 @@ export default function App() {
   }
 
   const sharedProps = {
-    selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick,
+    selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick, handleReanalyzeAs,
     isAnalyzing, analysisData, isLiveData, progress, navLocked,
     analysisIntent, setAnalysisIntent,
     showToast, dismissToast, theme, toggleTheme,
