@@ -65,7 +65,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
             <div className="s1-kicker">IFRS 16 / ASC 842 Compliance Suite</div>
             <div className="s1-headline">Audit-ready lease<br />reports in minutes,<br />not hours.</div>
             <div className="s1-sub">
-              Upload a contract and LegalGraph extracts every IFRS 16 field automatically — commencement dates,
+              Upload a contract and LegalGraph extracts every IFRS 16 and ASC 842 field automatically — commencement dates,
               payment schedules, discount rates, renewal options — with a clause-level audit trail auditors can verify on the spot.
             </div>
             <div className="s1-stats">
