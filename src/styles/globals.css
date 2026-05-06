@@ -718,20 +718,20 @@ nav {
 .analysis-loading-card {
   background: rgba(255,255,255,.07);
   border: 1px solid rgba(255,255,255,.13);
-  border-radius: 28px;
-  padding: 56px 52px 48px;
-  max-width: 540px;
+  border-radius: 24px;
+  padding: 36px 40px 32px;
+  max-width: 460px;
   width: 100%;
   text-align: center;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0 32px 80px rgba(0,0,0,.5);
+  box-shadow: 0 24px 60px rgba(0,0,0,.5);
 }
 .analysis-loading-icon-wrap {
   position: relative;
-  width: 84px;
-  height: 84px;
-  margin: 0 auto 32px;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -749,10 +749,10 @@ nav {
   50%       { transform: scale(1.4); opacity: .07; }
 }
 .analysis-loading-title {
-  font-size: 44px;
+  font-size: 34px;
   font-weight: 700;
   letter-spacing: -.04em;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   background: linear-gradient(140deg, #fff 0%, #94d8f0 55%, #5ac8fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
