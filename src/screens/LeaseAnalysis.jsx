@@ -328,40 +328,36 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
 
       {/* Sub-header */}
       <div className="s2-subheader">
-        <div className="breadcrumb">
-          <a onClick={() => navigate('/')}>Leases</a>
-          <span className="breadcrumb-sep">›</span>
-          <span className="breadcrumb-current">{filename}</span>
+        <div className="s2-subheader-left">
+          <div className="breadcrumb">
+            <a onClick={() => navigate('/')}>Leases</a>
+            <span className="breadcrumb-sep">›</span>
+            <span className="breadcrumb-current">{filename}</span>
+          </div>
+          <div className="s2-subheader-meta">
+            <span className={`s2-data-badge ${badgeCls}`} title={isDemo ? 'Showing placeholder data' : isLiveData ? 'Live AI extraction' : 'Demo fallback'}>
+              {badgeIcon} {badgeTxt}
+            </span>
+            <span className="s2-standard-badge"><ShieldCheck size={11} /> {stdMeta.label}</span>
+            <span className="s2-subheader-ts">Analyzed {dtStr}</span>
+          </div>
         </div>
         <div className="s2-subheader-actions">
-          <span className={`s2-data-badge ${badgeCls}`} title={isDemo ? 'Showing placeholder data' : isLiveData ? 'Live AI extraction' : 'Demo fallback'}>
-            {badgeIcon} {badgeTxt}
-          </span>
-          <span className="s2-standard-badge">
-            <ShieldCheck size={11} /> {stdMeta.label}
-          </span>
-          <span style={{ fontSize: '12px', color: 'var(--t4)' }}>Last analyzed: {dtStr}</span>
-          <button className="btn btn-outline btn-sm">Re-analyze</button>
+          <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
+            <RefreshCw size={12} /> Re-analyze
+          </button>
           <button className="btn btn-outline btn-sm" onClick={() => track('report_exported', { format: 'pdf', type: 'extraction' })}>
-            <Download size={12} aria-hidden="true" /> Export PDF
+            <Download size={12} /> Export PDF
           </button>
           {selectedFile && (
             <button
-              className="btn btn-outline btn-sm"
+              className="btn btn-secondary btn-sm"
               onClick={switchStandard}
               title={`Re-run this contract under ${stdMeta.other}`}
             >
-              <RefreshCw size={12} /> Run as {stdMeta.other}
+              Run as {stdMeta.other}
             </button>
           )}
-          <button
-            className="btn btn-primary btn-sm"
-            disabled={!gateOpen}
-            title={gateOpen ? `Generate ${stdMeta.label} report` : 'Resolve all high-severity flags first'}
-            onClick={() => track('report_exported', { format: 'pdf', type: analysisIntent })}
-          >
-            Generate {stdMeta.label} Report
-          </button>
         </div>
       </div>
 
