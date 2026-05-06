@@ -1,0 +1,63 @@
+flowchart TD
+    classDef user fill:#1B4FD8,stroke:#1340B0,color:#fff
+    classDef frontend fill:#0D9488,stroke:#0F766E,color:#fff
+    classDef backend fill:#B45309,stroke:#92400E,color:#fff
+    classDef storage fill:#5B4BD8,stroke:#3D2FB0,color:#fff
+    classDef ai fill:#0E8A5F,stroke:#065A3E,color:#fff
+    classDef infra fill:#3D4F5C,stroke:#0F1923,color:#fff
+    classDef gap fill:#C0392B,stroke:#922B21,color:#fff
+
+    RACHEL["👩‍💼 Rachel\nCompliance Lead\nUploads lease contract"]:::user
+
+    subgraph FE["Frontend — Netlify (APP.html)"]
+        direction TB
+        AUTH_FE["🔐 Supabase Auth\nBeta: magic link login"]:::storage
+        EXTRACT_FE["📝 Text extraction\nBeta: PDF.js + mammoth.js\nCurrent: ❌ not done"]:::frontend
+        CONSENT_FE["🔒 Consent modal\nfires before every analysis"]:::frontend
+        ANALYSIS_FE["⚙️ Analysis flow\nProgress panel → webhook call\nDemo fallback if unavailable"]:::frontend
+        RESULTS_FE["📊 Results screen\nTerms grid + Risk flags\nBeta: + confidence + missing fields"]:::frontend
+        VIEWER_FE["🔍 PDF Clause Viewer\nBeta: click → PDF at clause\nCurrent: BUG-006 ❌"]:::frontend
+        GATE_FE["🚦 Report Gate\nHigh flags must be resolved\nSign-off required"]:::frontend
+        EXPORT_FE["📤 Export PDF\nIFRS 16 report\nfor auditor"]:::frontend
+        TRACK_FE["📊 Event tracking\nBeta: wired analytics\nCurrent: stubs only ❌"]:::frontend
+
+        AUTH_FE --> EXTRACT_FE --> CONSENT_FE --> ANALYSIS_FE
+        ANALYSIS_FE --> RESULTS_FE --> GATE_FE --> EXPORT_FE
+        RESULTS_FE --> VIEWER_FE
+        RESULTS_FE -.-> TRACK_FE
+    end
+
+    subgraph BE["Backend — n8n Cloud"]
+        direction TB
+        WEBHOOK_BE["🔗 Webhook trigger\nReceives POST from browser"]:::backend
+        EXTRACT_BE["📑 Document processing\nBeta: parse document_text\nCurrent: ignored ❌"]:::backend
+        CLAUDE_BE["🤖 Claude API call\nBeta: real extraction\nCurrent: mock only ❌"]:::ai
+        ENRICH_BE["📦 Response builder\nBeta: confidence + clause_ref\n+ terms_missing + status\nCurrent: basic JSON"]:::backend
+        ERROR_BE["⚠️ Error envelope\nBeta: structured error codes\nCurrent: generic failure ❌"]:::backend
+
+        WEBHOOK_BE --> EXTRACT_BE --> CLAUDE_BE --> ENRICH_BE
+        ENRICH_BE -.->|"on failure"| ERROR_BE
+    end
+
+    subgraph DB["Supabase"]
+        AUTH_DB["🔐 Auth\nJWT + account_id"]:::storage
+        STORE_DB["💾 Database\nextractions + flags\nBeta: persist results\nCurrent: unused ❌"]:::storage
+        FILES_DB["📁 File Storage\noriginal contracts\nfor PDF viewer\nBeta only"]:::storage
+    end
+
+    subgraph ANTHROPIC["Anthropic Claude API"]
+        MODEL["claude-sonnet-4-6\nIFRS 16 field extraction\nClause identification\nConfidence scoring"]:::ai
+    end
+
+    AUDITOR["🏦 External Auditor\nReviews PDF export\nValidates clause citations"]:::user
+
+    RACHEL -->|"upload file"| FE
+    FE -->|"POST: file metadata\nBeta: + document_text"| BE
+    BE <-->|"Beta: API call"| ANTHROPIC
+    MODEL --> CLAUDE_BE
+    BE -->|"JSON response"| FE
+    FE <-->|"Beta: persist + load"| DB
+    AUTH_DB -->|"Beta: account_id"| FE
+    RACHEL -->|"Beta: upload original"| FILES_DB
+    EXPORT_FE -->|"PDF export"| AUDITOR
+    VIEWER_FE -.->|"Beta: fetch PDF"| FILES_DB
