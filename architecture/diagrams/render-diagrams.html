@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>LegalGraph Architecture Diagrams</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:     #0F1923;
+    --navy2:    #1a2a38;
+    --brand:    #1B4FD8;
+    --teal:     #0D9488;
+    --teal-lt:  #E0F7F5;
+    --green:    #0E8A5F;
+    --green-lt: #E6F5EF;
+    --amber:    #B45309;
+    --amber-lt: #FEF3C7;
+    --red:      #C0392B;
+    --red-lt:   #FDECEA;
+    --purple:   #5B4BD8;
+    --purple-lt:#EEECFF;
+    --gray:     #6B7E8D;
+    --gray-lt:  #F5F7F9;
+    --border:   #D8E0E6;
+    --white:    #FFFFFF;
+    --font: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  body { font-family: var(--font); background: #E8EDF2; padding: 40px; }
+
+  /* ── Diagram wrapper ── */
+  .diagram { background: #fff; border-radius: 16px; padding: 40px; margin-bottom: 60px;
+             box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 8px 32px rgba(0,0,0,.06); }
+
+  h1 { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+       color: var(--gray); margin-bottom: 4px; }
+  h2 { font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: var(--gray); margin-bottom: 32px; }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--navy); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── Swimlane layout ── */
+  .lanes { display: grid; gap: 20px; }
+  .lanes-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .lanes-4 { grid-template-columns: 1fr 1.6fr 1.2fr 1fr; }
+  .lanes-fe-be { grid-template-columns: 1.1fr 1.4fr 0.9fr; }
+
+  .lane { background: var(--gray-lt); border-radius: 12px; padding: 16px;
+          border: 1.5px solid var(--border); }
+  .lane-header { font-size: 11px; font-weight: 700; letter-spacing: .1em;
+                 text-transform: uppercase; margin-bottom: 14px;
+                 padding-bottom: 10px; border-bottom: 1.5px solid var(--border);
+                 color: var(--gray); display: flex; align-items: center; gap: 6px; }
+
+  /* ── Cards ── */
+  .card { border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
+          font-size: 13px; line-height: 1.4; position: relative; }
+  .card:last-child { margin-bottom: 0; }
+  .card-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+  .card-body { font-size: 12px; opacity: .85; }
+  .card-code { font-family: 'Menlo', 'Monaco', monospace; font-size: 11px;
+               background: rgba(0,0,0,.06); border-radius: 4px;
+               padding: 6px 8px; margin-top: 6px; line-height: 1.5; }
+
+  /* Card variants */
+  .card-navy   { background: var(--navy); color: #fff; }
+  .card-brand  { background: var(--brand); color: #fff; }
+  .card-teal   { background: var(--teal); color: #fff; }
+  .card-green  { background: var(--green); color: #fff; }
+  .card-amber  { background: var(--amber-lt); color: #7A3B09; border: 1.5px solid #F6BA62; }
+  .card-red    { background: var(--red-lt); color: var(--red); border: 1.5px solid #ECA89E; }
+  .card-purple { background: var(--purple-lt); color: var(--purple); border: 1.5px solid #B0A9F0; }
+  .card-gray   { background: #fff; color: var(--navy); border: 1.5px solid var(--border); }
+
+  /* ── Arrow ── */
+  .arrow { text-align: center; font-size: 18px; color: var(--gray); margin: 4px 0;
+           display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .arrow span { font-size: 11px; color: var(--gray); }
+  .arrow-h { display: flex; align-items: center; justify-content: center;
+             font-size: 18px; color: var(--gray); }
+
+  /* ── Badge ── */
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+           font-weight: 600; border-radius: 99px; padding: 2px 8px; margin-top: 6px; }
+  .badge-ok  { background: var(--green-lt); color: var(--green); }
+  .badge-gap { background: var(--red-lt); color: var(--red); }
+  .badge-warn { background: var(--amber-lt); color: var(--amber); }
+  .badge-new  { background: #E0F2FE; color: #0369A1; }
+
+  /* ── Gap list ── */
+  .gap-list { margin-top: 24px; background: var(--red-lt);
+              border: 1.5px solid #ECA89E; border-radius: 10px; padding: 16px; }
+  .gap-list h3 { font-size: 12px; font-weight: 700; color: var(--red);
+                 letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+  .gap-item { display: flex; gap: 8px; font-size: 12px; color: #7A1F1F;
+              margin-bottom: 6px; align-items: flex-start; }
+  .gap-item:last-child { margin-bottom: 0; }
+  .gap-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 2px dashed var(--border); margin: 20px 0; }
+
+  /* ── Flow connector between lanes ── */
+  .flow-row { display: flex; align-items: center; gap: 0; margin-bottom: 20px; }
+  .flow-arrow { flex-shrink: 0; width: 40px; text-align: center;
+                font-size: 20px; color: var(--gray); }
+
+  /* ── Payload box ── */
+  .payload { background: var(--navy); color: #A8C5E0; border-radius: 8px;
+             padding: 10px 12px; font-family: 'Menlo', monospace; font-size: 11px;
+             line-height: 1.6; margin-top: 8px; }
+  .payload .key { color: #7DD3FC; }
+  .payload .val { color: #86EFAC; }
+  .payload .comment { color: #F97316; font-style: italic; }
+
+  /* ── Section label ── */
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: .12em;
+                   text-transform: uppercase; color: var(--gray);
+                   margin-bottom: 8px; margin-top: 16px; }
+  .section-label:first-child { margin-top: 0; }
+
+  /* full-width connector */
+  .connector { display: flex; align-items: center; margin: 12px 0; }
+  .connector-line { flex: 1; height: 1.5px; background: var(--border); }
+  .connector-label { font-size: 11px; color: var(--gray); padding: 0 10px;
+                     background: var(--gray-lt); border-radius: 99px;
+                     border: 1px solid var(--border); white-space: nowrap; }
+
+  /* page break hint */
+  .page-break { page-break-after: always; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DIAGRAM 1 — FRONTEND CURRENT STATE
+═══════════════════════════════════════════════════════════ -->
+<div class="diagram" id="d1">
+  <h1>LegalGraph · Frontend Architecture</h1>
+  <h2>Current State — APP.html SPA</h2>
+  <p class="subtitle">Single-file HTML/CSS/JS app deployed via Netlify. All state lives in the DOM — lost on page refresh.</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Working</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Mismatch / partial</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Missing / broken</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div>Infrastructure</div>
+  </div>
+
+  <div class="lanes lanes-3">
+
+    <!-- Build -->
+    <div class="lane">
+      <div class="lane-header">🔧 Build &amp; Deploy</div>
+      <div class="card card-navy">
+        <div class="card-title">build.sh</div>
+        <div class="card-body">Injects env vars via <code>sed</code></div>
+        <div class="card-code">APP.html → dist/index.html<br>__WEBHOOK_URL__ → real URL<br>__SUPABASE_URL__ → injected<br>__SUPABASE_ANON_KEY__ → injected</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="card card-navy">
+        <div class="card-title">☁️ Netlify CDN</div>
+        <div class="card-body">Serves dist/index.html globally</div>
+      </div>
+    </div>
+
+    <!-- Browser -->
+    <div class="lane">
+      <div class="lane-header">🌐 Browser — User Flow</div>
+
+      <div class="card card-brand">
+        <div class="card-title">Screen 1 — Dashboard</div>
+        <div class="card-body">Hardcoded static lease table</div>
+        <span class="badge badge-gap">❌ No real data</span>
+      </div>
+      <div class="arrow">↓ <span>Upload a lease</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">📁 File selected</div>
+        <div class="card-body">onFileSelected() → fileToBase64()</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔒 Consent modal</div>
+        <div class="card-body">Fires before every analysis — cannot be bypassed</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-amber">
+        <div class="card-title">⚙️ runAnalysis() — POST to webhook</div>
+        <div class="payload">
+          <span class="key">file_name</span>: <span class="val">"lease.pdf"</span><br>
+          <span class="key">file_type</span>: <span class="val">"application/pdf"</span><br>
+          <span class="key">file_content</span>: <span class="val">"JVBERi0x..." </span><span class="comment">← base64</span><br>
+          <span class="key">standard</span>: <span class="val">"IFRS16"</span><br>
+          <span class="key">analyzed_at</span>: <span class="val">"2026-05-05T..."</span>
+        </div>
+        <span class="badge badge-warn">⚠️ No intent field</span>
+        <span class="badge badge-warn">⚠️ Not binary attachment</span>
+        <span class="badge badge-gap">❌ No session_id / account_id</span>
+      </div>
+      <div class="arrow">↓ <span>30s AbortController timeout</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">📦 Parse response</div>
+        <div class="card-body">JSON.parse(text) → if Array → take [0]</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">✅ renderResults(data)</div>
+        <div class="card-body">Terms grid · Risk flags · Clause citations</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🚦 Report Gate</div>
+        <div class="card-body">Blocks export until all High flags resolved + sign-off filled</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+    </div>
+
+    <!-- Gaps -->
+    <div class="lane">
+      <div class="lane-header">⚠️ Current Gaps</div>
+
+      <div class="card card-red">
+        <div class="card-title">⚠️ Mock fallback</div>
+        <div class="card-body">MOCK_ANALYSIS shown when webhook times out or returns non-JSON. User sees demo data without knowing it.</div>
+        <span class="badge badge-gap">BUG — misleading</span>
+      </div>
+
+      <div class="card card-red">
+        <div class="card-title">❌ No PDF clause viewer</div>
+        <div class="card-body">Clause citations render as links but open nothing. Hard blocker for auditor acceptance.</div>
+        <span class="badge badge-gap">BUG-006</span>
+      </div>
+
+      <div class="card card-red">
+        <div class="card-title">❌ No persistence</div>
+        <div class="card-body">Page refresh loses all extraction results. Supabase credentials are injected but the client is never instantiated.</div>
+        <span class="badge badge-gap">BUG-009</span>
+      </div>
+
+      <div class="card card-red">
+        <div class="card-title">❌ Event tracking stubs</div>
+        <div class="card-body">track() writes to console.debug only. Cannot measure time-to-report or activation metrics.</div>
+        <span class="badge badge-gap">No analytics</span>
+      </div>
+
+      <div class="card card-red">
+        <div class="card-title">❌ No auth / identity</div>
+        <div class="card-body">No login, no session_id, no account_id. Multi-tenant isolation impossible.</div>
+        <span class="badge badge-gap">No Supabase Auth</span>
+      </div>
+
+      <div class="card card-red">
+        <div class="card-title">❌ Export PDF not wired</div>
+        <div class="card-body">Button exists and is gated correctly, but clicking it generates no PDF output.</div>
+        <span class="badge badge-gap">BUG — P0 for Beta</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     DIAGRAM 2 — BACKEND CURRENT STATE
+═══════════════════════════════════════════════════════════ -->
+<div class="diagram" id="d2">
+  <h1>LegalGraph · Backend Architecture</h1>
+  <h2>Current State — n8n Multi-Agent Pipeline</h2>
+  <p class="subtitle">Real AI extraction pipeline using OpenAI gpt-5-mini and Supabase. Critical mismatch: frontend sends base64 JSON but n8n expects a binary file attachment.</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Working</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Mismatch / partial</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Missing / broken</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>External service</div>
+  </div>
+
+  <div class="lanes lanes-4">
+
+    <!-- Request -->
+    <div class="lane">
+      <div class="lane-header">🌐 Browser Request</div>
+      <div class="card card-amber">
+        <div class="card-title">POST to webhook</div>
+        <div class="card-body">Content-Type: text/plain</div>
+        <div class="payload">
+          <span class="key">file_name</span>: <span class="val">"lease.pdf"</span><br>
+          <span class="key">file_type</span>: <span class="val">"application/pdf"</span><br>
+          <span class="key">file_content</span>: <span class="val">"JVBERi0x..."</span><br>
+          <span class="comment">← base64-encoded file</span><br>
+          <span class="key">standard</span>: <span class="val">"IFRS16"</span><br>
+          <span class="key">analyzed_at</span>: <span class="val">"2026-05-05T..."</span>
+        </div>
+        <span class="badge badge-warn">⚠️ No intent field</span>
+        <span class="badge badge-warn">⚠️ No binary attachment</span>
+      </div>
+      <div class="arrow" style="margin-top:12px">↓ <span>on timeout/error</span></div>
+      <div class="card card-red">
+        <div class="card-title">MOCK_ANALYSIS fallback</div>
+        <div class="card-body">Hardcoded demo data shown to user</div>
+      </div>
+    </div>
+
+    <!-- n8n pipeline -->
+    <div class="lane">
+      <div class="lane-header">⚙️ n8n Cloud — Agent Pipeline</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔗 Webhook Trigger</div>
+        <div class="card-body">Receives POST body as JSON</div>
+        <span class="badge badge-ok">✅ Receives request</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-red">
+        <div class="card-title">📄 Extract from File</div>
+        <div class="card-body">Expects binary data in <code>'file'</code> property.<br><br>Receives base64 string in JSON body instead → <strong>$json.text = undefined</strong></div>
+        <span class="badge badge-gap">❌ Binary mismatch — node fails</span>
+      </div>
+      <div class="arrow">↓ <span>$json.text → undefined</span></div>
+
+      <div class="card card-amber">
+        <div class="card-title">🤖 Orchestrator Agent</div>
+        <div class="card-body">OpenAI gpt-5-mini<br><br>Reads intent from <code>body.intent</code> → <strong>undefined</strong><br>Reads file text from <code>$json.text</code> → <strong>undefined</strong><br><br>Detects contract type + calls sub-agents</div>
+        <span class="badge badge-warn">⚠️ Both inputs are undefined</span>
+      </div>
+      <div class="arrow">↓ <span>Shared Memory (context window: 50)</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">📚 contract_playbook_agent</div>
+        <div class="card-body">Fetches IFRS 16 playbook rules from Supabase filtered by detected contract_type. Writes rules to shared memory.</div>
+        <span class="badge badge-ok">✅ Supabase read works</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔍 key_term_extraction_agent</div>
+        <div class="card-body">Reads contract text + playbook rules from shared memory. Extracts key terms per rule. Returns structured JSON.</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">📤 Respond to Webhook</div>
+        <div class="card-body">Returns agent output as JSON response</div>
+      </div>
+    </div>
+
+    <!-- Response -->
+    <div class="lane">
+      <div class="lane-header">📦 Response Shape</div>
+      <div class="card card-amber">
+        <div class="card-title">Current response</div>
+        <div class="payload">
+          <span class="key">contract_type</span>: <span class="val">"NDA"</span><br>
+          <span class="key">parties</span>: [<span class="val">...</span>]<br>
+          <span class="key">effective_date</span>: <span class="val">"..."</span><br>
+          <span class="key">key_terms</span>: [<br>
+          &nbsp;&nbsp;{ <span class="key">label</span>: <span class="val">"..."</span>,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">value</span>: <span class="val">"..."</span> }<br>
+          ]
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="card card-red">
+          <div class="card-title">Missing fields</div>
+          <span class="badge badge-gap">❌ No risk_score</span>
+          <span class="badge badge-gap">❌ No flags[]</span>
+          <span class="badge badge-gap">❌ No confidence scores</span>
+          <span class="badge badge-gap">❌ No clause_ref</span>
+          <span class="badge badge-gap">❌ No error envelope</span>
+          <span class="badge badge-gap">❌ No status field</span>
+          <span class="badge badge-gap">❌ No session_id</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- External services -->
+    <div class="lane">
+      <div class="lane-header">🔌 External Services</div>
+
+      <div class="section-label">OpenAI API</div>
+      <div class="card card-purple">
+        <div class="card-title">gpt-5-mini</div>
+        <div class="card-body">Shared by all 3 agents:<br>Orchestrator<br>Playbook agent<br>Extraction agent</div>
+        <span class="badge badge-ok">✅ Connected</span>
+      </div>
+
+      <div class="section-label" style="margin-top:16px">Supabase</div>
+      <div class="card card-purple">
+        <div class="card-title">contract_playbook table</div>
+        <div class="card-body">Stores IFRS 16 / MSA / NDA playbook rules per contract type</div>
+        <span class="badge badge-ok">✅ Read works</span>
+      </div>
+      <div class="card card-red" style="margin-top:8px">
+        <div class="card-title">Extraction results</div>
+        <div class="card-body">Results never written back to Supabase — no persistence</div>
+        <span class="badge badge-gap">❌ Not written</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     DIAGRAM 3 — SYSTEM END-TO-END
+═══════════════════════════════════════════════════════════ -->
+<div class="diagram" id="d3">
+  <h1>LegalGraph · System Architecture</h1>
+  <h2>End-to-End Flow — Current State</h2>
+  <p class="subtitle">Full data flow from Rachel uploading a contract to the auditor receiving a report. Red boxes show current gaps.</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Working</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Mismatch / partial</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Missing / broken</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>External service</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--brand)"></div>User / actor</div>
+  </div>
+
+  <!-- Row 1: Actors -->
+  <div style="display:flex; gap:20px; margin-bottom:20px; align-items:stretch">
+    <div class="card card-brand" style="flex:1;margin:0">
+      <div class="card-title">👩‍💼 Rachel — Compliance Lead</div>
+      <div class="card-body">Uploads lease contract (PDF / DOCX / TXT). Needs quarterly IFRS 16 report for auditor.</div>
+    </div>
+    <div style="display:flex;align-items:center;font-size:24px;color:var(--gray);padding:0 8px">→</div>
+    <div class="card card-brand" style="flex:1;margin:0">
+      <div class="card-title">🏦 External Auditor</div>
+      <div class="card-body">Receives PDF export. Validates clause citations. Currently requires manual handoff — no portal access.</div>
+      <span class="badge badge-gap">❌ Manual PDF only</span>
+    </div>
+  </div>
+
+  <div class="lanes lanes-fe-be">
+
+    <!-- Frontend -->
+    <div class="lane">
+      <div class="lane-header">🌐 Frontend — Netlify (APP.html)</div>
+
+      <div class="card card-amber">
+        <div class="card-title">No auth layer</div>
+        <div class="card-body">No login, no Supabase Auth. Supabase URL + key are injected at build time but never used in the browser.</div>
+        <span class="badge badge-gap">❌ No session identity</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">File upload + base64 encode</div>
+        <div class="card-body">fileToBase64() converts the file to a base64 string before sending</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔒 Consent modal</div>
+        <div class="card-body">Mandatory before every analysis</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-amber">
+        <div class="card-title">POST base64 JSON → n8n</div>
+        <div class="card-body">Sends file as base64 in JSON body. n8n expects binary attachment — causes Extract from File to fail.</div>
+        <span class="badge badge-warn">⚠️ Format mismatch</span>
+      </div>
+      <div class="arrow">↓ <span>on success</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">renderResults()</div>
+        <div class="card-body">Terms grid · Risk flags · Clause links</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🚦 Report Gate</div>
+        <div class="card-body">Blocks export until all High flags resolved</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-red">
+        <div class="card-title">Export PDF</div>
+        <div class="card-body">Button is gated correctly. PDF generation not wired.</div>
+        <span class="badge badge-gap">❌ No output</span>
+      </div>
+    </div>
+
+    <!-- Backend -->
+    <div class="lane">
+      <div class="lane-header">⚙️ Backend — n8n Cloud Pipeline</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔗 Webhook Trigger</div>
+        <div class="card-body">Receives POST, passes to pipeline</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-red">
+        <div class="card-title">📄 Extract from File</div>
+        <div class="card-body">Expects binary in <strong>'file'</strong> property. Receives base64 JSON body. <strong>$json.text = undefined.</strong></div>
+        <span class="badge badge-gap">❌ Always fails — mismatch</span>
+      </div>
+      <div class="arrow">↓ <span>text is undefined</span></div>
+
+      <div class="card card-amber">
+        <div class="card-title">🤖 Orchestrator Agent (gpt-5-mini)</div>
+        <div class="card-body">Reads intent + file text — both undefined. Attempts to detect contract type and route to sub-agents.</div>
+        <span class="badge badge-warn">⚠️ Works with empty context</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">📚 contract_playbook_agent</div>
+        <div class="card-body">Reads playbook rules from Supabase by contract_type. Stores in shared memory.</div>
+        <span class="badge badge-ok">✅ Supabase read works</span>
+      </div>
+      <div class="arrow">↓ <span>Simple Memory (shared context)</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔍 key_term_extraction_agent</div>
+        <div class="card-body">Extracts terms using playbook rules from memory. Returns structured JSON.</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-gray">
+        <div class="card-title">Response: {contract_type, parties, key_terms[]}</div>
+        <div class="card-body">No risk_score · No flags · No clause_ref · No confidence</div>
+        <span class="badge badge-warn">⚠️ Schema mismatch with frontend expectations</span>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="lane">
+      <div class="lane-header">🔌 External Services</div>
+
+      <div class="section-label">OpenAI API</div>
+      <div class="card card-purple">
+        <div class="card-title">gpt-5-mini</div>
+        <div class="card-body">LLM for all 3 agents. Orchestrator + Playbook + Extraction share one connection.</div>
+        <span class="badge badge-ok">✅ Connected</span>
+      </div>
+
+      <div class="section-label">Supabase</div>
+      <div class="card card-purple">
+        <div class="card-title">contract_playbook table</div>
+        <div class="card-body">Playbook rules per contract type (NDA, MSA, IFRS 16)</div>
+        <span class="badge badge-ok">✅ Read working</span>
+      </div>
+      <div class="card card-red" style="margin-top:8px">
+        <div class="card-title">Extraction results DB</div>
+        <div class="card-body">Never written. No persistence layer.</div>
+        <span class="badge badge-gap">❌ Unused</span>
+      </div>
+      <div class="card card-red" style="margin-top:8px">
+        <div class="card-title">File Storage</div>
+        <div class="card-body">Original PDFs not stored. Clause viewer has no source.</div>
+        <span class="badge badge-gap">❌ Unused</span>
+      </div>
+      <div class="card card-red" style="margin-top:8px">
+        <div class="card-title">Auth</div>
+        <div class="card-body">No session management. No account isolation.</div>
+        <span class="badge badge-gap">❌ Not set up</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Critical gaps summary -->
+  <div class="gap-list">
+    <h3>🔴 Critical gaps to fix before Beta</h3>
+    <div class="gap-item"><span class="gap-icon">1.</span><span><strong>Binary mismatch:</strong> Frontend sends base64 JSON — n8n expects binary file attachment. Fix: send file as multipart/form-data OR extract text client-side and send as plain text.</span></div>
+    <div class="gap-item"><span class="gap-icon">2.</span><span><strong>Missing intent field:</strong> n8n Orchestrator reads <code>body.intent</code> which is never set by the frontend. Fix: add <code>intent: "key_term_extraction"</code> to the POST payload.</span></div>
+    <div class="gap-item"><span class="gap-icon">3.</span><span><strong>Response schema mismatch:</strong> n8n returns <code>{contract_type, key_terms[]}</code> but frontend expects <code>{risk_score, flags[], terms_found[]}</code>. Fix: align schemas per BACKEND-PLAN.md Phase 1.</span></div>
+    <div class="gap-item"><span class="gap-icon">4.</span><span><strong>PDF clause viewer (BUG-006):</strong> Clause citations render but open nothing. Hard auditor acceptance blocker.</span></div>
+    <div class="gap-item"><span class="gap-icon">5.</span><span><strong>No persistence (BUG-009):</strong> Page refresh destroys all results. Supabase client never instantiated in browser despite credentials being injected.</span></div>
+    <div class="gap-item"><span class="gap-icon">6.</span><span><strong>PDF export not wired:</strong> Report gate works correctly but the actual PDF is never generated.</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     DIAGRAM 4 — FRONTEND BETA TARGET
+═══════════════════════════════════════════════════════════ -->
+<div class="diagram" id="d4">
+  <h1>LegalGraph · Frontend Architecture</h1>
+  <h2>Beta Target State — APP.html SPA</h2>
+  <p class="subtitle">All gaps from current state resolved. Adds Supabase auth + persistence, client-side text extraction, PDF clause viewer, and wired analytics.</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Already working</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>New for Beta</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div>Infrastructure</div>
+  </div>
+
+  <div class="lanes lanes-3">
+
+    <!-- Build -->
+    <div class="lane">
+      <div class="lane-header">🔧 Build &amp; Deploy</div>
+      <div class="card card-navy">
+        <div class="card-title">build.sh</div>
+        <div class="card-body">Same sed injection — now all 3 vars actively used</div>
+        <div class="card-code">__WEBHOOK_URL__ → n8n<br>__SUPABASE_URL__ → client ✅<br>__SUPABASE_ANON_KEY__ → client ✅</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="card card-navy">
+        <div class="card-title">☁️ Netlify CDN</div>
+        <div class="card-body">Serves dist/index.html — unchanged</div>
+      </div>
+
+      <div class="section-label">New libraries (CDN includes)</div>
+      <div class="card card-green">
+        <div class="card-title">PDF.js</div>
+        <div class="card-body">Extracts plain text from PDF files client-side before sending to n8n</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+      <div class="card card-green" style="margin-top:8px">
+        <div class="card-title">mammoth.js</div>
+        <div class="card-body">Extracts plain text from DOCX files client-side</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+      <div class="card card-green" style="margin-top:8px">
+        <div class="card-title">Supabase JS Client</div>
+        <div class="card-body">Auth + DB + Storage SDK. Instantiated once on page load.</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+    </div>
+
+    <!-- Browser flow -->
+    <div class="lane">
+      <div class="lane-header">🌐 Browser — User Flow</div>
+
+      <div class="card card-green">
+        <div class="card-title">🔐 Supabase Auth</div>
+        <div class="card-body">Magic link login on first visit. Returns account_id + JWT stored in session.</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-green">
+        <div class="card-title">📊 Screen 1 — Dashboard</div>
+        <div class="card-body">Real lease table loaded from Supabase DB on page load</div>
+        <span class="badge badge-new">✨ Live data</span>
+      </div>
+      <div class="arrow">↓ <span>Upload a lease</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">📁 File selected</div>
+        <div class="card-body">onFileSelected() — unchanged</div>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-green">
+        <div class="card-title">📝 Extract document text</div>
+        <div class="card-body">PDF.js (for PDFs) or mammoth.js (for DOCX) extracts plain text client-side. Capped at 100k chars with [TRUNCATED] marker.</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔒 Consent modal</div>
+        <div class="card-body">Unchanged — fires before every analysis</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-green">
+        <div class="card-title">⚙️ runAnalysis() — POST to webhook</div>
+        <div class="card-body">Enriched payload — all fields that n8n needs</div>
+        <div class="payload">
+          <span class="key">session_id</span>: <span class="val">"uuid-v4"</span><br>
+          <span class="key">account_id</span>: <span class="val">"acct_..."</span><br>
+          <span class="key">intent</span>: <span class="val">"key_term_extraction"</span><br>
+          <span class="key">standard</span>: <span class="val">"IFRS16"</span><br>
+          <span class="key">file_name</span>: <span class="val">"lease.pdf"</span><br>
+          <span class="key">document_text</span>: <span class="val">"The lease..."</span>
+        </div>
+        <span class="badge badge-new">✨ Binary mismatch fixed</span>
+        <span class="badge badge-new">✨ intent field added</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">✅ renderResults(data)</div>
+        <div class="card-body">+ confidence indicators per field<br>+ terms_missing section<br>+ partial banner if status=partial</div>
+        <span class="badge badge-new">✨ Richer display</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🚦 Report Gate</div>
+        <div class="card-body">Unchanged — blocks until High flags resolved</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-green">
+        <div class="card-title">📤 Export PDF</div>
+        <div class="card-body">Generates real IFRS 16 report PDF from extracted data</div>
+        <span class="badge badge-new">✨ New — wired</span>
+      </div>
+    </div>
+
+    <!-- New capabilities -->
+    <div class="lane">
+      <div class="lane-header">✨ New Beta Capabilities</div>
+
+      <div class="card card-green">
+        <div class="card-title">🔍 PDF Clause Viewer</div>
+        <div class="card-body">Modal opens on clause citation click. Shows the original PDF at the referenced page and section. Powered by clause_ref from n8n response.</div>
+        <span class="badge badge-new">BUG-006 resolved ✅</span>
+      </div>
+
+      <div class="card card-green" style="margin-top:10px">
+        <div class="card-title">💾 Supabase Persistence</div>
+        <div class="card-body">Extraction results written to DB after every successful run. Loaded on page refresh — data never lost.</div>
+        <span class="badge badge-new">BUG-009 resolved ✅</span>
+      </div>
+
+      <div class="card card-green" style="margin-top:10px">
+        <div class="card-title">📊 Analytics — wired</div>
+        <div class="card-body">track() sends real events to analytics destination:<br><br>• upload_started<br>• analysis_complete<br>• flag_resolved<br>• report_exported</div>
+        <span class="badge badge-new">✨ Metrics now measurable</span>
+      </div>
+
+      <div class="card card-green" style="margin-top:10px">
+        <div class="card-title">🔔 Structured error toasts</div>
+        <div class="card-body">On webhook error: shows error_message from the n8n error envelope — not just "Webhook unavailable".</div>
+        <span class="badge badge-new">✨ Better UX</span>
+      </div>
+
+      <div class="card card-green" style="margin-top:10px">
+        <div class="card-title">📁 Supabase File Storage</div>
+        <div class="card-body">Original contracts uploaded to Supabase Storage at analysis time. Used as source for PDF viewer.</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     DIAGRAM 5 — BACKEND BETA TARGET
+═══════════════════════════════════════════════════════════ -->
+<div class="diagram" id="d5">
+  <h1>LegalGraph · Backend Architecture</h1>
+  <h2>Beta Target State — n8n Pipeline</h2>
+  <p class="subtitle">Three-phase migration. Phase 1: schema enrichment. Phase 2: real Claude extraction via document_text. Phase 3 (GA): error envelopes + clause_ref.</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Already working</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>New — Phase 1 (Beta entry)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--brand)"></div>New — Phase 2 (Beta milestone)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>External service</div>
+  </div>
+
+  <div class="lanes lanes-4">
+
+    <!-- Request -->
+    <div class="lane">
+      <div class="lane-header">🌐 Browser Request</div>
+      <div class="card card-green">
+        <div class="card-title">POST — enriched payload</div>
+        <div class="payload">
+          <span class="key">session_id</span>: <span class="val">"uuid-v4"</span><br>
+          <span class="key">account_id</span>: <span class="val">"acct_..."</span><br>
+          <span class="key">intent</span>: <span class="val">"key_term_extraction"</span><br>
+          <span class="key">standard</span>: <span class="val">"IFRS16"</span><br>
+          <span class="key">file_name</span>: <span class="val">"lease.pdf"</span><br>
+          <span class="key">document_text</span>: <span class="val">"The lease..."</span><br>
+          <span class="comment">← plain text, max 100k chars</span>
+        </div>
+        <span class="badge badge-new">✨ No more binary mismatch</span>
+        <span class="badge badge-new">✨ intent field present</span>
+      </div>
+
+      <div style="margin-top: 12px">
+        <div class="card card-teal">
+          <div class="card-title">Demo fallback</div>
+          <div class="card-body">Still kept as safety net if webhook times out</div>
+          <span class="badge badge-ok">✅ Unchanged</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- n8n pipeline -->
+    <div class="lane">
+      <div class="lane-header">⚙️ n8n Cloud — Upgraded Pipeline</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔗 Webhook Trigger</div>
+        <div class="card-body">Receives enriched JSON payload</div>
+        <span class="badge badge-ok">✅ Unchanged</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-green">
+        <div class="card-title">📝 Read document_text</div>
+        <div class="card-body">Reads plain text from <code>body.document_text</code> — no binary extraction needed. Fixes the current mismatch.</div>
+        <span class="badge badge-new">✨ Phase 2 — replaces Extract from File</span>
+      </div>
+      <div class="arrow">↓ <span>text available in pipeline</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">🤖 Orchestrator Agent</div>
+        <div class="card-body">Now receives real intent + real document text. Routes correctly to sub-agents.</div>
+        <span class="badge badge-ok">✅ Works with real inputs</span>
+      </div>
+      <div class="arrow">↓ <span>Shared Memory</span></div>
+
+      <div class="card card-teal">
+        <div class="card-title">📚 contract_playbook_agent</div>
+        <div class="card-body">Unchanged — reads playbook rules from Supabase</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-teal">
+        <div class="card-title">🔍 key_term_extraction_agent</div>
+        <div class="card-body">Now has real contract text to work with — extracts meaningful values</div>
+        <span class="badge badge-new">✨ Real extraction</span>
+      </div>
+      <div class="arrow">↓</div>
+
+      <div class="card card-green">
+        <div class="card-title">📤 Respond to Webhook</div>
+        <div class="card-body">Returns enriched response with Phase 1 additions</div>
+        <span class="badge badge-new">✨ Richer schema</span>
+      </div>
+    </div>
+
+    <!-- Response -->
+    <div class="lane">
+      <div class="lane-header">📦 Response — Beta Shape</div>
+
+      <div class="section-label">Phase 1 additions (Beta entry)</div>
+      <div class="card card-green">
+        <div class="card-title">Enriched response</div>
+        <div class="payload">
+          <span class="key">session_id</span>: <span class="val">"uuid-v4"</span><br>
+          <span class="key">status</span>: <span class="val">"ok"</span><br>
+          <span class="key">contract_type</span>: <span class="val">"NDA"</span><br>
+          <span class="key">parties</span>: [<span class="val">...</span>]<br>
+          <span class="key">key_terms</span>: [<br>
+          &nbsp;&nbsp;{ <span class="key">label</span>: <span class="val">"..."</span>,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">value</span>: <span class="val">"..."</span>,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">confidence</span>: <span class="val">0.94</span>,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">clause_ref</span>: { <span class="val">...</span> }<br>
+          &nbsp;&nbsp;}<br>
+          ]<br>
+          <span class="key">terms_missing</span>: [<span class="val">...</span>]
+        </div>
+        <span class="badge badge-new">✨ confidence per field</span>
+        <span class="badge badge-new">✨ clause_ref</span>
+        <span class="badge badge-new">✨ terms_missing</span>
+        <span class="badge badge-new">✨ status field</span>
+      </div>
+
+      <div class="section-label">Phase 3 — GA additions</div>
+      <div class="card card-gray">
+        <div class="card-title">Error envelope</div>
+        <div class="payload">
+          <span class="key">status</span>: <span class="val">"error"</span><br>
+          <span class="key">error_code</span>: <span class="val">"timeout"</span><br>
+          <span class="key">error_message</span>: <span class="val">"..."</span><br>
+          <span class="key">retryable</span>: <span class="val">true</span>
+        </div>
+        <span class="badge" style="background:#E0F2FE;color:#0369A1">📅 GA milestone</span>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="lane">
+      <div class="lane-header">🔌 External Services</div>
+
+      <div class="section-label">OpenAI API</div>
+      <div class="card card-purple">
+        <div class="card-title">gpt-5-mini</div>
+        <div class="card-body">Unchanged — all 3 agents still use OpenAI</div>
+        <span class="badge badge-ok">✅ Connected</span>
+      </div>
+
+      <div class="section-label">Supabase</div>
+      <div class="card card-purple">
+        <div class="card-title">contract_playbook table</div>
+        <div class="card-body">Read — unchanged</div>
+        <span class="badge badge-ok">✅ Working</span>
+      </div>
+      <div class="card card-green" style="margin-top:8px">
+        <div class="card-title">Extraction results DB</div>
+        <div class="card-body">Written after each run. Keyed by session_id + account_id.</div>
+        <span class="badge badge-new">✨ Now written</span>
+      </div>
+      <div class="card card-green" style="margin-top:8px">
+        <div class="card-title">File Storage</div>
+        <div class="card-body">Original PDFs stored at upload. Referenced by PDF clause viewer.</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+      <div class="card card-green" style="margin-top:8px">
+        <div class="card-title">Auth</div>
+        <div class="card-body">JWT issued per user. account_id flows through to n8n.</div>
+        <span class="badge badge-new">✨ New</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
