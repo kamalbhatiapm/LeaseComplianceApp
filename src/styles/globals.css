@@ -71,7 +71,7 @@ nav {
   gap: 0;
 }
 .nav-logo {
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -.03em;
@@ -382,6 +382,50 @@ nav {
   font-weight: 500;
 }
 .upload-progress-label { font-size: 12px; color: rgba(255,255,255,.82); margin-top: 14px; }
+
+/* Intent selector */
+.intent-select-wrap {
+  width: 100%; margin-bottom: 16px; text-align: left;
+}
+.intent-label {
+  display: block; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 7px;
+}
+.intent-select-inner {
+  position: relative;
+}
+.intent-select-inner::after {
+  content: '▾'; position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%); pointer-events: none;
+  color: rgba(255,255,255,.5); font-size: 11px;
+}
+.intent-select {
+  width: 100%; appearance: none; -webkit-appearance: none;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 10px; padding: 10px 32px 10px 12px;
+  font-size: 13px; font-weight: 500; color: #fff;
+  font-family: inherit; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.intent-select:hover  { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.12); }
+.intent-select:focus  { outline: none; border-color: var(--brand); }
+.intent-select option { background: #1c1c1e; color: #fff; }
+.intent-desc {
+  font-size: 11px; color: rgba(255,255,255,.45); margin-top: 6px;
+  line-height: 1.4; padding: 0 2px;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .intent-label { color: var(--ink-3); }
+[data-theme="light"] .intent-select {
+  background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.14); color: var(--ink);
+}
+[data-theme="light"] .intent-select:hover  { background: rgba(0,0,0,.07); border-color: rgba(0,0,0,.24); }
+[data-theme="light"] .intent-select:focus  { border-color: var(--brand); }
+[data-theme="light"] .intent-select option { background: #fff; color: var(--ink); }
+[data-theme="light"] .intent-select-inner::after { color: var(--ink-3); }
+[data-theme="light"] .intent-desc { color: var(--ink-3); }
 
 /* Progress panel (inside upload zone) */
 .progress-panel { margin-top: 0; }

@@ -27,6 +27,7 @@ export default function App() {
   const [toast, setToast]                 = useState(null)
   const [progress, setProgress]           = useState({ step: 0, label: '', pct: 0 })
   const [navLocked, setNavLocked]         = useState(false)
+  const [analysisIntent, setAnalysisIntent] = useState('key_term_extraction')
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
 
   useEffect(() => {
@@ -109,7 +110,7 @@ export default function App() {
         file_type:    selectedFile.type || 'application/octet-stream',
         file_content: fileContent,
         standard:     'IFRS16',
-        intent:       'key_term_extraction',
+        intent:       analysisIntent,
         analyzed_at:  new Date().toISOString(),
       }
 
@@ -169,6 +170,7 @@ export default function App() {
   const sharedProps = {
     selectedFile, handleFileSelected, handleAnalyzeClick,
     isAnalyzing, analysisData, isLiveData, progress, navLocked,
+    analysisIntent, setAnalysisIntent,
     showToast, dismissToast, theme, toggleTheme,
   }
 

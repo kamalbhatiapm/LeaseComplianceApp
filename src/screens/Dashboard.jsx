@@ -11,7 +11,16 @@ const LEASES = [
   { name: 'London EMEA HQ',             sub: '30 St Mary Axe, London, EC3A 8EP',     standard: 'IFRS 16', start: 'Jul 1, 2020',  term: '10 years', rent: '£612,000',  status: 'green',  statusLabel: 'Current',       pct: 98 },
 ]
 
-export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme }) {
+const INTENTS = [
+  { value: 'key_term_extraction',  label: 'Extract Key Terms',              desc: 'Pull all key fields — parties, dates, rent, options' },
+  { value: 'compliance_report',    label: 'IFRS 16 / ASC 842 Report',       desc: 'Full compliance report with ROU asset & liability calc' },
+  { value: 'risk_assessment',      label: 'Risk Assessment',                desc: 'Score risk flags, missing clauses, and red-line issues' },
+  { value: 'payment_schedule',     label: 'Payment Schedule Analysis',      desc: 'Break down rent, escalations, and present value' },
+  { value: 'lease_classification', label: 'Lease Classification',           desc: 'Finance vs. operating lease test under ASC 842 / IFRS 16' },
+  { value: 'renewal_options',      label: 'Renewal Options Review',         desc: 'Assess renewal terms and reasonable certainty threshold' },
+]
+
+export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent }) {
   const fileRef  = useRef(null)
   const navigate = useNavigate()
   const [dragging, setDragging] = useState(false)
@@ -93,6 +102,26 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                     ))}
                   </div>
                 )}
+
+                {/* Analysis intent selector */}
+                <div className="intent-select-wrap" onClick={e => e.stopPropagation()}>
+                  <label className="intent-label">Analysis type</label>
+                  <div className="intent-select-inner">
+                    <select
+                      className="intent-select"
+                      value={analysisIntent}
+                      onChange={e => setAnalysisIntent(e.target.value)}
+                    >
+                      {INTENTS.map(i => (
+                        <option key={i.value} value={i.value}>{i.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="intent-desc">
+                    {INTENTS.find(i => i.value === analysisIntent)?.desc}
+                  </div>
+                </div>
+
                 <button
                   className="btn btn-primary"
                   onClick={e => {
