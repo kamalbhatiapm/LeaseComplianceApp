@@ -682,7 +682,7 @@ nav {
   50%       { transform: scale(1.4); opacity: .07; }
 }
 .analysis-loading-title {
-  font-size: 34px;
+  font-size: 44px;
   font-weight: 700;
   letter-spacing: -.04em;
   margin-bottom: 10px;
@@ -695,7 +695,7 @@ nav {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
+  font-size: 15px;
   color: rgba(255,255,255,.5);
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.12);
@@ -721,7 +721,7 @@ nav {
   gap: 14px;
   padding: 11px 16px;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 17px;
   color: rgba(255,255,255,.32);
   transition: background .2s, color .2s;
   letter-spacing: -.015em;
@@ -731,7 +731,7 @@ nav {
 .al-step.error  { color: var(--red-on-dark); }
 .al-step-icon   { width: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .al-quip {
-  font-size: 15px;
+  font-size: 17px;
   color: rgba(255,255,255,.48);
   font-style: italic;
   min-height: 22px;
@@ -754,7 +754,7 @@ nav {
 .al-progress-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 14px;
   color: rgba(255,255,255,.35);
   font-weight: 500;
 }
