@@ -86,59 +86,66 @@ export default function App() {
     await step(3, 'Scoring risk factors…', 80, 300)
     setProgress({ step: 4, label: 'Sending to AI workflow…', pct: 90 })
 
-    // Hard cap: no matter what hangs, loading always clears within 13s
-    let safetyFired = false
-    const safetyTimer = setTimeout(() => {
-      safetyFired = true
-      setProgress({ step: 4, label: 'Webhook unavailable — showing demo results', pct: 100, error: true })
-      showToast('error', 'Request timed out', 'Demo data shown below')
-      setAnalysisData(MOCK_ANALYSIS)
-      setIsLiveData(false)
-      setIsAnalyzing(false)
-      setNavLocked(false)
-    }, 13000)
-
-    let fileContent = null
-    try { fileContent = await fileToBase64(selectedFile) } catch {}
-
-    const payload = {
-      file_name:    selectedFile.name,
-      file_type:    selectedFile.type || 'application/octet-stream',
-      file_content: fileContent,
-      standard:     'IFRS16',
-      analyzed_at:  new Date().toISOString(),
-    }
-
     let webhookOk    = false
     let responseData = null
-    try {
-      const controller = new AbortController()
-      const tid = setTimeout(() => controller.abort(), 10000)
-      const res = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      webhookOk = res.ok
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const text = await res.text()   // keep abort active until body is fully read
-      clearTimeout(tid)
-      try {
-        let parsed = JSON.parse(text)
-        if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed
-        responseData = parsed
-      } catch {}
-      setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
-    } catch (err) {
-      const reason = err.name === 'AbortError' ? 'Request timed out after 10s' : err.message
-      console.error('[LegalGraph] Webhook error:', err.name, err.message)
-      setProgress({ step: 4, label: 'Webhook unavailable — showing demo results', pct: 100, error: true })
-      showToast('error', 'Webhook unavailable', reason + ' — demo data shown below')
-    }
 
-    if (safetyFired) return  // safety timer already resolved everything
-    clearTimeout(safetyTimer)
+    if (WEBHOOK_URL) {
+      // Hard cap: no matter what hangs, loading always clears within 13s
+      let safetyFired = false
+      const safetyTimer = setTimeout(() => {
+        safetyFired = true
+        setProgress({ step: 4, label: 'Showing demo results', pct: 100, error: true })
+        setAnalysisData(MOCK_ANALYSIS)
+        setIsLiveData(false)
+        setIsAnalyzing(false)
+        setNavLocked(false)
+      }, 13000)
+
+      let fileContent = null
+      try { fileContent = await fileToBase64(selectedFile) } catch {}
+
+      const payload = {
+        file_name:    selectedFile.name,
+        file_type:    selectedFile.type || 'application/octet-stream',
+        file_content: fileContent,
+        standard:     'IFRS16',
+        analyzed_at:  new Date().toISOString(),
+      }
+
+      try {
+        const controller = new AbortController()
+        const tid = setTimeout(() => controller.abort(), 10000)
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        webhookOk = res.ok
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const text = await res.text()   // keep abort active until body is fully read
+        clearTimeout(tid)
+        try {
+          let parsed = JSON.parse(text)
+          if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed
+          responseData = parsed
+        } catch {}
+        setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
+      } catch (err) {
+        const reason = err.name === 'AbortError' ? 'Request timed out after 10s' : err.message
+        console.error('[LegalGraph] Webhook error:', err.name, err.message)
+        setProgress({ step: 4, label: 'Showing demo results', pct: 100, error: true })
+        showToast('error', 'Webhook unavailable', reason + ' — demo data shown below')
+      }
+
+      if (safetyFired) return  // safety timer already resolved everything
+      clearTimeout(safetyTimer)
+    } else {
+      // No webhook configured — load demo data silently
+      await sleep(400)
+      setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
+      await sleep(300)
+    }
 
     const displayData = responseData ?? MOCK_ANALYSIS
     setAnalysisData(displayData)
