@@ -81,9 +81,9 @@ export default function App() {
       await sleep(ms)
     }
 
-    await step(1, 'Reading contract…', 25, 900)
-    await step(2, 'Extracting IFRS 16 fields…', 55, 1100)
-    await step(3, 'Scoring risk factors…', 80, 900)
+    await step(1, 'Reading contract…', 25, 300)
+    await step(2, 'Extracting IFRS 16 fields…', 55, 400)
+    await step(3, 'Scoring risk factors…', 80, 300)
     setProgress({ step: 4, label: 'Sending to AI workflow…', pct: 90 })
 
     let fileContent = null
@@ -101,7 +101,7 @@ export default function App() {
     let responseData = null
     try {
       const controller = new AbortController()
-      const tid = setTimeout(() => controller.abort(), 30000)
+      const tid = setTimeout(() => controller.abort(), 10000)
       const res = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -119,7 +119,7 @@ export default function App() {
       } catch {}
       setProgress({ step: 4, label: 'Extraction complete', pct: 100, done: true })
     } catch (err) {
-      const reason = err.name === 'AbortError' ? 'Request timed out after 30s' : err.message
+      const reason = err.name === 'AbortError' ? 'Request timed out after 10s' : err.message
       console.error('[LegalGraph] Webhook error:', err.name, err.message)
       setProgress({ step: 4, label: 'Webhook unavailable — showing demo results', pct: 100, error: true })
       showToast('error', 'Webhook unavailable', reason + ' — demo data shown below')
