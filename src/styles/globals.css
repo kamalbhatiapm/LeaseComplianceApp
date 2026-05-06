@@ -670,6 +670,14 @@ nav {
 .al-step.active { color: var(--ink-1); font-weight: 600; background: var(--white); }
 .al-step.error  { color: var(--red); }
 .al-step-icon   { width: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.al-quip {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-style: italic;
+  min-height: 18px;
+  margin-bottom: 16px;
+  transition: opacity .3s ease;
+}
 .al-progress-track {
   height: 6px;
   background: var(--border);

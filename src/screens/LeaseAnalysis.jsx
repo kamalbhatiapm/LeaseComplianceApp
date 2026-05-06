@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, Pencil, Check, Download, Mail, RefreshCw,
@@ -9,6 +9,29 @@ import Nav from '../components/Nav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS } from '../utils/constants.js'
 import { track } from '../utils/track.js'
 
+const QUIPS = [
+  "Translating 'hereinafter referred to as' into English…",
+  "Counting pages so you don't have to…",
+  "Bribing the discount rate oracle…",
+  "Consulting IFRS 16 paragraph 26(b)…",
+  "Untangling the renewal option labyrinth…",
+  "Making sure the landlord can't see this…",
+  "Finding the clause lawyers buried on page 47…",
+  "Summoning the incremental borrowing rate…",
+  "Reading the fine print. Literally, all of it…",
+  "Asking the AI to ask the AI…",
+  "Reticulating lease splines…",
+  "Converting legalese to something a human would say…",
+  "Cross-referencing with every lease ever signed…",
+  "Locating the commencement date (it's always on page 3)…",
+  "Checking if 'reasonable certainty' is certain enough…",
+  "Verifying the lessor didn't sneak anything in…",
+  "Computing present value of future headaches…",
+  "Assigning blame to the escalation clause…",
+  "Teaching GPT to care about square footage…",
+  "Almost there — just double-checking the double-checks…",
+]
+
 const LOADING_STEPS = [
   { icon: FileText, label: 'Reading contract structure' },
   { icon: ScanText, label: 'Extracting IFRS 16 fields'  },
@@ -18,6 +41,20 @@ const LOADING_STEPS = [
 
 function AnalysisLoader({ file, progress }) {
   const { step, pct, label, error } = progress
+  const [quipIdx, setQuipIdx] = useState(() => Math.floor(Math.random() * QUIPS.length))
+  const [fade, setFade]       = useState(true)
+
+  useEffect(() => {
+    const tick = setInterval(() => {
+      setFade(false)
+      setTimeout(() => {
+        setQuipIdx(i => (i + 1) % QUIPS.length)
+        setFade(true)
+      }, 300)
+    }, 2800)
+    return () => clearInterval(tick)
+  }, [])
+
   return (
     <div className="analysis-loading">
       <div className="analysis-loading-card">
@@ -52,6 +89,10 @@ function AnalysisLoader({ file, progress }) {
               </div>
             )
           })}
+        </div>
+
+        <div className="al-quip" style={{ opacity: fade ? 1 : 0 }}>
+          {QUIPS[quipIdx]}
         </div>
 
         <div className="al-progress-track">
