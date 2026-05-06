@@ -12,8 +12,8 @@ const LEASES = [
 ]
 
 const INTENTS = [
-  { value: 'ifrs16_compliance',  label: 'IFRS 16 Compliance Report',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under IFRS 16' },
-  { value: 'asc842_compliance',  label: 'ASC 842 Compliance Report',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under ASC 842 (US GAAP)' },
+  { value: 'ifrs16_compliance',  label: 'IFRS 16 Compliance Report',  short: 'IFRS 16',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under IFRS 16' },
+  { value: 'asc842_compliance',  label: 'ASC 842 Compliance Report',  short: 'ASC 842',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under ASC 842 (US GAAP)' },
 ]
 
 export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent }) {
@@ -102,16 +102,17 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                 {/* Analysis intent selector */}
                 <div className="intent-select-wrap" onClick={e => e.stopPropagation()}>
                   <label className="intent-label">Reporting standard</label>
-                  <div className="intent-select-inner">
-                    <select
-                      className="intent-select"
-                      value={analysisIntent}
-                      onChange={e => setAnalysisIntent(e.target.value)}
-                    >
-                      {INTENTS.map(i => (
-                        <option key={i.value} value={i.value}>{i.label}</option>
-                      ))}
-                    </select>
+                  <div className="intent-segmented">
+                    {INTENTS.map(i => (
+                      <button
+                        key={i.value}
+                        type="button"
+                        className={`intent-seg-btn${analysisIntent === i.value ? ' active' : ''}`}
+                        onClick={() => setAnalysisIntent(i.value)}
+                      >
+                        {i.short}
+                      </button>
+                    ))}
                   </div>
                   <div className="intent-desc">
                     {INTENTS.find(i => i.value === analysisIntent)?.desc}
