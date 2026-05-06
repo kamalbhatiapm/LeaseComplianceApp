@@ -67,7 +67,6 @@ export default function App() {
   async function runAnalysis() {
     setIsAnalyzing(true)
     setNavLocked(true)
-    showToast('sending', 'Sending to workflow…', 'POST → n8n webhook')
 
     const step = async (n, label, pct, ms) => {
       setProgress({ step: n, label, pct })
@@ -150,7 +149,7 @@ export default function App() {
       {showConsent && <ConsentModal onGrant={grantConsent} onDeny={() => setShowConsent(false)} />}
       <Routes>
         <Route path="/"          element={<Dashboard      {...sharedProps} />} />
-        <Route path="/leases"    element={<LeaseAnalysis  {...sharedProps} />} />
+        <Route path="/leases"    element={<LeaseAnalysis  {...sharedProps} isAnalyzing={isAnalyzing} progress={progress} />} />
         <Route path="/playbooks" element={<Playbooks      navLocked={navLocked} />} />
         <Route path="*"          element={<Navigate to="/" replace />} />
       </Routes>

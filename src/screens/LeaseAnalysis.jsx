@@ -3,10 +3,68 @@ import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, Pencil, Check, Download, Mail, RefreshCw,
   Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
+  FileText, Loader, ScanText, Brain, ShieldCheck,
 } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS } from '../utils/constants.js'
 import { track } from '../utils/track.js'
+
+const LOADING_STEPS = [
+  { icon: FileText, label: 'Reading contract structure' },
+  { icon: ScanText, label: 'Extracting IFRS 16 fields'  },
+  { icon: Brain,    label: 'Scoring risk factors'        },
+  { icon: Sparkles, label: 'Running AI workflow'         },
+]
+
+function AnalysisLoader({ file, progress }) {
+  const { step, pct, label, error } = progress
+  return (
+    <div className="analysis-loading">
+      <div className="analysis-loading-card">
+        <div className="analysis-loading-icon-wrap">
+          <div className="analysis-loading-pulse" />
+          <Sparkles size={28} color="var(--brand)" style={{ position: 'relative', zIndex: 1 }} />
+        </div>
+
+        <div className="analysis-loading-title">Analyzing your contract</div>
+        {file && (
+          <div className="analysis-loading-file">
+            <FileText size={12} />
+            {file.name}
+          </div>
+        )}
+
+        <div className="analysis-loading-steps">
+          {LOADING_STEPS.map(({ icon: Icon, label: name }, i) => {
+            const n       = i + 1
+            const isDone  = n < step || (n === step && pct === 100 && !error)
+            const isActive= n === step && pct < 100
+            const isErr   = n === step && error
+            return (
+              <div key={name} className={`al-step ${isDone ? 'done' : isActive ? 'active' : isErr ? 'error' : ''}`}>
+                <span className="al-step-icon">
+                  {isDone  ? <Check   size={13} /> :
+                   isActive ? <Loader  size={13} className="spin" /> :
+                   isErr   ? <CircleAlert size={13} /> :
+                   <Icon size={13} />}
+                </span>
+                <span>{name}</span>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="al-progress-track">
+          <div className="al-progress-fill" style={{ width: `${pct}%`, background: error ? 'var(--red)' : 'var(--brand)' }} />
+        </div>
+        <div className="al-progress-meta">
+          <span>{label || 'Starting…'}</span>
+          <span>{pct}%</span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function getRiskMeta(score) {
   if (score < 50) return { level: 'Low',    color: 'var(--green)', pillCls: 'pill-green', pct: score }
@@ -172,7 +230,15 @@ function RiskFlags({ flags, onGateChange }) {
   )
 }
 
-export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked }) {
+export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress }) {
+  if (isAnalyzing) {
+    return (
+      <div style={{ background: 'var(--white)', minHeight: '100vh' }}>
+        <Nav locked={navLocked} />
+        <AnalysisLoader file={selectedFile} progress={progress} />
+      </div>
+    )
+  }
   const navigate  = useNavigate()
   const data      = analysisData ?? MOCK_ANALYSIS
   const isDemo    = !analysisData
