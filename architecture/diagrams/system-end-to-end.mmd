@@ -1,63 +1,70 @@
 flowchart TD
     classDef user fill:#1B4FD8,stroke:#1340B0,color:#fff
     classDef frontend fill:#0D9488,stroke:#0F766E,color:#fff
-    classDef backend fill:#B45309,stroke:#92400E,color:#fff
+    classDef backend fill:#0D9488,stroke:#0F766E,color:#fff
+    classDef openai fill:#B45309,stroke:#92400E,color:#fff
     classDef storage fill:#5B4BD8,stroke:#3D2FB0,color:#fff
-    classDef ai fill:#0E8A5F,stroke:#065A3E,color:#fff
-    classDef infra fill:#3D4F5C,stroke:#0F1923,color:#fff
     classDef gap fill:#C0392B,stroke:#922B21,color:#fff
+    classDef warn fill:#B45309,stroke:#92400E,color:#fff
+    classDef infra fill:#3D4F5C,stroke:#0F1923,color:#fff
 
     RACHEL["👩‍💼 Rachel\nCompliance Lead\nUploads lease contract"]:::user
 
     subgraph FE["Frontend — Netlify (APP.html)"]
         direction TB
-        AUTH_FE["🔐 Supabase Auth\nBeta: magic link login"]:::storage
-        EXTRACT_FE["📝 Text extraction\nBeta: PDF.js + mammoth.js\nCurrent: ❌ not done"]:::frontend
-        CONSENT_FE["🔒 Consent modal\nfires before every analysis"]:::frontend
-        ANALYSIS_FE["⚙️ Analysis flow\nProgress panel → webhook call\nDemo fallback if unavailable"]:::frontend
-        RESULTS_FE["📊 Results screen\nTerms grid + Risk flags\nBeta: + confidence + missing fields"]:::frontend
-        VIEWER_FE["🔍 PDF Clause Viewer\nBeta: click → PDF at clause\nCurrent: BUG-006 ❌"]:::frontend
-        GATE_FE["🚦 Report Gate\nHigh flags must be resolved\nSign-off required"]:::frontend
-        EXPORT_FE["📤 Export PDF\nIFRS 16 report\nfor auditor"]:::frontend
-        TRACK_FE["📊 Event tracking\nBeta: wired analytics\nCurrent: stubs only ❌"]:::frontend
+        NO_AUTH["🔐 No auth\nNo session identity\nNo account_id"]:::gap
+        UPLOAD_FE["📁 File selected\nRead as base64"]:::frontend
+        CONSENT_FE["🔒 Consent modal"]:::frontend
+        B64["📝 fileToBase64()\nConverts binary to base64 string\nWrapped in JSON payload"]:::warn
+        SEND["⚙️ POST Content-Type: text/plain\n{ file_name, file_type,\n  file_content (base64),\n  standard, analyzed_at }\n\n⚠️ No binary attachment\n⚠️ No intent field\n⚠️ No session_id"]:::warn
+        PARSE_FE["📦 Parse response\nJSON.parse → renderResults()"]:::frontend
+        FALLBACK_FE["⚠️ MOCK_ANALYSIS\nFallback when webhook\nfails or non-JSON"]:::gap
+        GATE_FE["🚦 Report Gate\nHigh flags must be resolved"]:::frontend
+        EXPORT_FE["📤 Export PDF\nButton wired\nPDF not generated ❌"]:::gap
+        CLAUSE_FE["🔗 Clause citations\nRender but open nothing\nBUG-006 ❌"]:::gap
+        NOPERSIST["💾 No persistence\nPage refresh = data lost\nBUG-009 ❌"]:::gap
 
-        AUTH_FE --> EXTRACT_FE --> CONSENT_FE --> ANALYSIS_FE
-        ANALYSIS_FE --> RESULTS_FE --> GATE_FE --> EXPORT_FE
-        RESULTS_FE --> VIEWER_FE
-        RESULTS_FE -.-> TRACK_FE
+        NO_AUTH --> UPLOAD_FE --> B64 --> CONSENT_FE --> SEND
+        SEND -->|"200 OK"| PARSE_FE
+        SEND -.->|"timeout / error"| FALLBACK_FE
+        PARSE_FE --> GATE_FE --> EXPORT_FE
+        PARSE_FE --> CLAUSE_FE
+        PARSE_FE --> NOPERSIST
     end
 
     subgraph BE["Backend — n8n Cloud"]
         direction TB
-        WEBHOOK_BE["🔗 Webhook trigger\nReceives POST from browser"]:::backend
-        EXTRACT_BE["📑 Document processing\nBeta: parse document_text\nCurrent: ignored ❌"]:::backend
-        CLAUDE_BE["🤖 Claude API call\nBeta: real extraction\nCurrent: mock only ❌"]:::ai
-        ENRICH_BE["📦 Response builder\nBeta: confidence + clause_ref\n+ terms_missing + status\nCurrent: basic JSON"]:::backend
-        ERROR_BE["⚠️ Error envelope\nBeta: structured error codes\nCurrent: generic failure ❌"]:::backend
+        HOOK_BE["🔗 Webhook trigger"]:::backend
+        EXTRACT_BE["Extract from File\n(expects binary in 'file' property)\n⚠️ Receives base64 JSON instead\n→ $json.text = undefined"]:::gap
+        ORCH_BE["🤖 Orchestrator Agent\ngpt-5-mini\n\nIntent: reads body.intent ← undefined ⚠️\nFile text: reads $json.text ← undefined ⚠️"]:::openai
+        PLAY_BE["contract_playbook_agent\nFetches rules from Supabase\nby detected contract_type ✅"]:::backend
+        EXTR_BE["key_term_extraction_agent\nExtracts terms using\nplaybook rules from memory"]:::backend
+        MEM_BE["Simple Memory\nShared between all agents"]:::backend
+        RESP_BE["Respond to Webhook\n{ contract_type, parties,\n  effective_date, key_terms[] }\n\n⚠️ No risk_score / flags\n⚠️ No confidence scores\n⚠️ No clause_ref\n⚠️ No error envelope"]:::warn
 
-        WEBHOOK_BE --> EXTRACT_BE --> CLAUDE_BE --> ENRICH_BE
-        ENRICH_BE -.->|"on failure"| ERROR_BE
+        HOOK_BE --> EXTRACT_BE --> ORCH_BE
+        ORCH_BE --> PLAY_BE --> EXTR_BE --> RESP_BE
+        MEM_BE -.->|"shared context"| ORCH_BE
+        MEM_BE -.->|"shared context"| PLAY_BE
+        MEM_BE -.->|"shared context"| EXTR_BE
     end
 
-    subgraph DB["Supabase"]
-        AUTH_DB["🔐 Auth\nJWT + account_id"]:::storage
-        STORE_DB["💾 Database\nextractions + flags\nBeta: persist results\nCurrent: unused ❌"]:::storage
-        FILES_DB["📁 File Storage\noriginal contracts\nfor PDF viewer\nBeta only"]:::storage
+    subgraph OPENAI["🤖 OpenAI API"]
+        GPT["gpt-5-mini\nAll three agents share\nthis single LLM connection"]:::openai
     end
 
-    subgraph ANTHROPIC["Anthropic Claude API"]
-        MODEL["claude-sonnet-4-6\nIFRS 16 field extraction\nClause identification\nConfidence scoring"]:::ai
+    subgraph SUPA["💾 Supabase"]
+        PLAY_DB["contract_playbook table\n✅ Read — playbook rules\nby contract type"]:::storage
+        RESULTS_DB["Extraction results\n❌ Not written\nNo persistence"]:::gap
     end
 
-    AUDITOR["🏦 External Auditor\nReviews PDF export\nValidates clause citations"]:::user
+    AUDITOR["🏦 External Auditor\nReceives PDF export\n(manual process today)"]:::user
 
     RACHEL -->|"upload file"| FE
-    FE -->|"POST: file metadata\nBeta: + document_text"| BE
-    BE <-->|"Beta: API call"| ANTHROPIC
-    MODEL --> CLAUDE_BE
-    BE -->|"JSON response"| FE
-    FE <-->|"Beta: persist + load"| DB
-    AUTH_DB -->|"Beta: account_id"| FE
-    RACHEL -->|"Beta: upload original"| FILES_DB
-    EXPORT_FE -->|"PDF export"| AUDITOR
-    VIEWER_FE -.->|"Beta: fetch PDF"| FILES_DB
+    SEND -->|"POST base64 JSON"| BE
+    ORCH_BE <-->|"LLM calls"| GPT
+    PLAY_BE <-->|"LLM calls"| GPT
+    EXTR_BE <-->|"LLM calls"| GPT
+    PLAY_BE <-->|"read playbook rules"| PLAY_DB
+    RESP_BE -->|"JSON response"| FE
+    EXPORT_FE -.->|"manual PDF handoff"| AUDITOR
