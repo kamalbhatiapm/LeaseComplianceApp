@@ -91,7 +91,10 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                 )}
                 <button
                   className="btn btn-primary"
-                  onClick={e => { e.stopPropagation(); onAnalyze() }}
+                  onClick={e => {
+                    e.stopPropagation()
+                    if (selectedFile) { onAnalyze() } else { fileRef.current?.click() }
+                  }}
                 >
                   {selectedFile ? <><BarChart2 size={14} /> Analyze Contract</> : 'Choose file'}
                 </button>
