@@ -128,7 +128,7 @@ LegalGraph implication: The PRD's "4–6 hours to <45 minutes" claim needs to be
 
 Jennifer will ask: *"Where does our contract data go? Who can see it? How long is it kept?"* Mid-market GCs are acutely aware of NDA provisions in lease contracts — many restrict sharing contract details with third parties.
 
-LegalGraph implication: The consent modal's data retention disclosure ("processed by Anthropic Claude API and retained for up to 30 days") and the privacy@legalgraph.io deletion contact are Jennifer's answers. The Beta NDA and data processing agreement (per beta-release-plan.md) must be solid before she approves Beta participation.
+LegalGraph implication: The consent modal's data retention disclosure ("processed by Anthropic Claude API and retained for up to 30 days") and the privacy@legalgraph.io deletion contact are Jennifer's answers. The Beta NDA and data processing agreement (per BETA-PLAN.md) must be solid before she approves Beta participation.
 
 ---
 
