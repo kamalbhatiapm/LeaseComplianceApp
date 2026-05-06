@@ -11,7 +11,7 @@ const LEASES = [
   { name: 'London EMEA HQ',             sub: '30 St Mary Axe, London, EC3A 8EP',     standard: 'IFRS 16', start: 'Jul 1, 2020',  term: '10 years', rent: '£612,000',  status: 'green',  statusLabel: 'Current',       pct: 98 },
 ]
 
-export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked }) {
+export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme }) {
   const fileRef  = useRef(null)
   const navigate = useNavigate()
   const [dragging, setDragging] = useState(false)
@@ -33,8 +33,8 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
   const pctColor = p => p >= 90 ? 'var(--ink-3)' : p >= 75 ? 'var(--amber)' : 'var(--red)'
 
   return (
-    <div style={{ background: 'var(--white)', minHeight: '100vh' }}>
-      <Nav locked={navLocked} />
+    <div style={{ background: 'var(--white)', minHeight: '100vh', paddingTop: '53px' }}>
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 
       {/* Hero */}
@@ -103,7 +103,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                   {selectedFile ? <><BarChart2 size={14} /> Analyze Contract</> : 'Choose file'}
                 </button>
                 <div className="upload-progress-label">Max 50 MB per file · Encrypted at rest</div>
-                <div className="upload-progress-label" style={{ marginTop: '6px', color: 'var(--ink-3)' }}>
+                <div className="upload-progress-label" style={{ marginTop: '6px' }}>
                   Best results with standard fixed-rent property leases. Subleases, variable rents, and
                   multi-party structures may require manual review.
                 </div>
@@ -143,7 +143,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                     </span>
                   </td>
                   <td>{l.start}</td>
-                  <td>{l.term}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}>{l.term}</td>
                   <td>{l.rent}</td>
                   <td><span className={`pill pill-${l.status}`}>{l.statusLabel}</span></td>
                   <td>

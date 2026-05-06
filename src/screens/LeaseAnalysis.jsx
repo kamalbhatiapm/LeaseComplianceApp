@@ -181,12 +181,12 @@ function TermsGrid({ fields, termsMissing = [] }) {
 
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '20px' }}>
-      <div style={{ padding: '12px 18px', borderBottom: '1px solid rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: '12px 18px', borderBottom: '1px solid var(--divider, rgba(255,255,255,.08))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div className="card-title" style={{ margin: 0 }}>Extracted Lease Terms</div>
         <button
           className="btn btn-outline btn-sm"
           onClick={() => setEditMode(m => !m)}
-          style={editMode ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : { color: 'rgba(255,255,255,.7)', borderColor: 'rgba(255,255,255,.18)' }}
+          style={editMode ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : { color: 'var(--t4)', borderColor: 'rgba(255,255,255,.18)' }}
         >
           {editMode ? <><Check size={12} /> Save edits</> : <><Pencil size={12} /> Edit terms</>}
         </button>
@@ -234,7 +234,7 @@ function RiskFlags({ flags, onGateChange }) {
       <div className="card-title" style={{ marginBottom: '12px', marginTop: '8px' }}>Risk Flags</div>
       <div className="risk-list">
         {flags.length === 0 && (
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)', padding: '12px 0' }}>No risk flags detected.</p>
+          <p style={{ fontSize: '13px', color: 'var(--t4)', padding: '12px 0' }}>No risk flags detected.</p>
         )}
         {flags.map(flag => {
           const sev      = flag.severity ?? 'low'
@@ -252,7 +252,7 @@ function RiskFlags({ flags, onGateChange }) {
                 <span className={`pill ${pillCls} risk-sev-pill`}>{pillLbl}</span>
               </div>
               {flag.id === 'missing_discount_rate' && (
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,.7)', marginTop: '6px', lineHeight: 1.5 }}>
+                <div style={{ fontSize: '11px', color: 'var(--t4)', marginTop: '6px', lineHeight: 1.5 }}>
                   To obtain your IBR, contact your treasury team or request a rate from your primary lender for a comparable term and collateral profile.
                 </div>
               )}
@@ -260,7 +260,7 @@ function RiskFlags({ flags, onGateChange }) {
                 <button className="btn btn-sm btn-outline">
                   {isHigh ? 'Enter IBR manually' : 'Add management note'}
                 </button>
-                {ref && <span style={{ fontSize: '11px', color: 'rgba(255,255,255,.65)' }}>IFRS 16 {ref}</span>}
+                {ref && <span style={{ fontSize: '11px', color: 'var(--t3)' }}>IFRS 16 {ref}</span>}
               </div>
               {isHigh && (
                 <div className="sign-off-row">
@@ -283,11 +283,11 @@ function RiskFlags({ flags, onGateChange }) {
   )
 }
 
-export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress }) {
+export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme }) {
   if (isAnalyzing) {
     return (
-      <div style={{ background: '#000', minHeight: '100vh' }}>
-        <Nav locked={navLocked} />
+      <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
+        <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
         <AnalysisLoader file={selectedFile} progress={progress} />
       </div>
     )
@@ -322,8 +322,8 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
   const badgeTxt  = isDemo ? 'Demo data' : isLiveData ? 'Live extraction' : 'Demo fallback'
 
   return (
-    <div style={{ background: '#000', minHeight: '100vh' }}>
-      <Nav locked={navLocked} />
+    <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 
       {/* Sub-header */}
@@ -337,7 +337,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <span className={`s2-data-badge ${badgeCls}`} title={isDemo ? 'Showing placeholder data' : isLiveData ? 'Live AI extraction' : 'Demo fallback'}>
             {badgeIcon} {badgeTxt}
           </span>
-          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.7)' }}>Last analyzed: {dtStr}</span>
+          <span style={{ fontSize: '12px', color: 'var(--t4)' }}>Last analyzed: {dtStr}</span>
           <button className="btn btn-outline btn-sm">Re-analyze</button>
           <button className="btn btn-outline btn-sm" onClick={() => track('report_exported', { format: 'pdf', type: 'extraction' })}>
             <Download size={12} aria-hidden="true" /> Export PDF
@@ -442,7 +442,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
                 { label: 'Commencement date', ok: true },
               ].map(({ label, ok }) => (
                 <div key={label} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,.75)' }}>{label}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--t2)' }}>{label}</span>
                   <span className={`pill pill-sm ${ok ? 'pill-green' : 'pill-red'}`}>{ok ? '✓' : 'Missing'}</span>
                 </div>
               ))}
@@ -451,9 +451,9 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
 
           <div className="sidebar-section">
             <div className="sidebar-section-title">Applied Playbook</div>
-            <div style={{ background: 'rgba(0,113,227,.18)', border: '1px solid rgba(90,200,250,.2)', borderRadius: '8px', padding: '12px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--accent-on-dark)', marginBottom: '4px' }}>IFRS 16 Standard Template</div>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,.7)' }}>Version 2.4 · 9 required fields · 14 risk rules</div>
+            <div style={{ background: 'var(--brand-lt)', border: '1px solid rgba(0,113,227,.2)', borderRadius: '8px', padding: '12px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--brand)', marginBottom: '4px' }}>IFRS 16 Standard Template</div>
+              <div style={{ fontSize: '11px', color: 'var(--t3)' }}>Version 2.4 · 9 required fields · 14 risk rules</div>
             </div>
           </div>
         </div>

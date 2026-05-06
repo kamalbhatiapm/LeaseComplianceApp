@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Dashboard from './screens/Dashboard.jsx'
 import LeaseAnalysis from './screens/LeaseAnalysis.jsx'
 import Playbooks from './screens/Playbooks.jsx'
@@ -27,6 +27,14 @@ export default function App() {
   const [toast, setToast]                 = useState(null)
   const [progress, setProgress]           = useState({ step: 0, label: '', pct: 0 })
   const [navLocked, setNavLocked]         = useState(false)
+  const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('lg-theme', theme)
+  }, [theme])
+
+  const toggleTheme = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), [])
 
   const showToast = useCallback((type, title, sub) => {
     setToast({ type, title, sub })
@@ -140,7 +148,7 @@ export default function App() {
   const sharedProps = {
     selectedFile, handleFileSelected, handleAnalyzeClick,
     isAnalyzing, analysisData, isLiveData, progress, navLocked,
-    showToast, dismissToast,
+    showToast, dismissToast, theme, toggleTheme,
   }
 
   return (
@@ -151,7 +159,7 @@ export default function App() {
       <Routes>
         <Route path="/"          element={<Dashboard      {...sharedProps} />} />
         <Route path="/leases"    element={<LeaseAnalysis  {...sharedProps} isAnalyzing={isAnalyzing} progress={progress} />} />
-        <Route path="/playbooks" element={<Playbooks      navLocked={navLocked} />} />
+        <Route path="/playbooks" element={<Playbooks      navLocked={navLocked} theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="*"          element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
