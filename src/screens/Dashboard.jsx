@@ -103,7 +103,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                   {selectedFile ? <><BarChart2 size={14} /> Analyze Contract</> : 'Choose file'}
                 </button>
                 <div className="upload-progress-label">Max 50 MB per file · Encrypted at rest</div>
-                <div className="upload-progress-label" style={{ marginTop: '6px', color: 'var(--ink-3)' }}>
+                <div className="upload-progress-label" style={{ marginTop: '6px' }}>
                   Best results with standard fixed-rent property leases. Subleases, variable rents, and
                   multi-party structures may require manual review.
                 </div>
