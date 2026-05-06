@@ -2,59 +2,13 @@
 **LegalGraph SPA — `APP.html`**
 **Last updated: 2026-05-05**
 
-> Visual diagrams: see [`diagrams/frontend-current.png`](diagrams/frontend-current.png) and [`diagrams/frontend-beta.png`](diagrams/frontend-beta.png)
-
 ---
 
 ## Current State
 
 A single-file HTML/CSS/JS SPA served from Netlify. No framework, no bundler. UI state lives in the DOM and is lost on page refresh. The file is read as base64 before being sent to n8n — but n8n expects a binary attachment, causing a format mismatch.
 
-```mermaid
-flowchart TD
-    subgraph Build["Build (build.sh + Netlify)"]
-        SRC["APP.html (placeholders)"]
-        ENV["Netlify env vars\nWEBHOOK_URL\nSUPABASE_URL ⚠️ injected, unused\nSUPABASE_ANON_KEY ⚠️ injected, unused"]
-        DIST["dist/index.html (substituted)"]
-        SRC -->|"sed substitution"| DIST
-        ENV -->|"injected at build"| DIST
-    end
-
-    subgraph Browser["Browser — no persistence, no auth"]
-
-        S1["Screen 1 — Dashboard\n(hardcoded static lease table)"]
-        S2["Screen 2 — Lease Analysis"]
-        S3["Screen 3 — Playbooks (read-only)"]
-
-        FILE["File input → onFileSelected()\nfileToBase64() converts to base64 string"]
-        CONSENT["Consent modal — showConsentModal()"]
-
-        ANALYZE["runAnalysis()\nPOST Content-Type: text/plain\n{\n  file_name, file_type,\n  file_content (base64),\n  standard: IFRS16,\n  analyzed_at\n}\n⚠️ No intent field\n⚠️ Not a binary attachment\n❌ No session_id / account_id"]
-
-        PARSE["Parse response\nJSON.parse(text) → if Array take [0]"]
-        MOCK["MOCK_ANALYSIS fallback\nhardcoded in APP.html\nshown when webhook times out\nor returns non-JSON"]
-
-        RENDER["renderResults(data)\nTerms grid · Risk flags · Clause citations"]
-        GATE["updateReportGate()\nblocks export if High flags unresolved\nor sign-off empty"]
-        EXPORT["Export PDF\nButton gated correctly\n❌ PDF not generated"]
-        CITATIONS["Clause citations\nlinks render but open nothing\n❌ BUG-006"]
-        PERSIST["Persistence\n❌ None — data lost on refresh (BUG-009)"]
-        TRACK["track(event, props)\n→ console.debug only\n❌ No real analytics destination"]
-
-        S1 -->|"Upload a lease"| FILE
-        FILE --> CONSENT --> ANALYZE
-        ANALYZE -->|"200 OK"| PARSE
-        ANALYZE -.->|"timeout / error"| MOCK
-        PARSE -->|"valid JSON"| RENDER
-        PARSE -.->|"non-JSON / empty"| MOCK
-        RENDER --> GATE --> EXPORT
-        RENDER --> CITATIONS
-        RENDER --> PERSIST
-        RENDER -.-> TRACK
-    end
-
-    DIST --> Browser
-```
+<img src="https://raw.githubusercontent.com/kamalbhatiapm/LeaseComplianceApp/main/architecture/diagrams/frontend-current.png" width="100%" alt="Frontend — Current State" />
 
 ### Current State — Key Gaps
 
@@ -77,52 +31,7 @@ flowchart TD
 
 Fixes the binary mismatch by extracting document text client-side and sending as plain text. Adds Supabase auth + persistence, PDF.js/mammoth.js extraction, PDF clause viewer, and wired analytics.
 
-```mermaid
-flowchart TD
-    subgraph Build["Build (build.sh + Netlify)"]
-        SRC2["APP.html (placeholders)"]
-        ENV2["Netlify env vars\nWEBHOOK_URL\nSUPABASE_URL ✅ now used\nSUPABASE_ANON_KEY ✅ now used"]
-        DIST2["dist/index.html (substituted)"]
-        SRC2 -->|"sed substitution"| DIST2
-        ENV2 -->|"injected at build"| DIST2
-    end
-
-    subgraph Browser2["Browser — Beta target"]
-
-        AUTH["Supabase Auth ✨\nMagic link login\nReturns account_id + JWT"]
-        S1B["Screen 1 — Dashboard ✨\nReal lease table from Supabase"]
-
-        FILE2["File input → onFileSelected()"]
-        EXTRACT_TEXT["Extract document_text ✨\nPDF.js for PDFs\nmammoth.js for DOCX\nCapped at 100k chars"]
-        CONSENT2["Consent modal"]
-
-        ANALYZE2["runAnalysis()\nPOST Content-Type: application/json\n{\n  session_id, account_id,\n  intent: key_term_extraction,\n  standard: IFRS16,\n  file_name, file_type,\n  document_text\n}\n✅ Binary mismatch fixed\n✅ intent field added"]
-
-        PARSE2["Parse response\n+ reads confidence, terms_missing, status"]
-        TOAST["Error toast ✨\nShows error_message from envelope"]
-
-        RENDER2["renderResults(data) ✨\n+ confidence indicators per field\n+ terms_missing section\n+ partial banner if status=partial"]
-        VIEWER["PDF Clause Viewer ✨\nModal on citation click\nHighlights source clause\nBUG-006 resolved"]
-        GATE2["updateReportGate()"]
-        EXPORT2["Export PDF ✨\nGenerates real IFRS 16 report"]
-        SUPA_DB["Supabase DB ✨\nSave results per session\nLoad on page refresh\nBUG-009 resolved"]
-        TRACK2["track(event, props) ✨\nWired to analytics\nupload_started, analysis_complete\nflag_resolved, report_exported"]
-
-        AUTH --> S1B
-        S1B -->|"Upload a lease"| FILE2
-        FILE2 --> EXTRACT_TEXT --> CONSENT2 --> ANALYZE2
-        ANALYZE2 -->|"200 OK"| PARSE2
-        ANALYZE2 -.->|"error envelope"| TOAST
-        PARSE2 --> RENDER2
-        RENDER2 -->|"clause click"| VIEWER
-        RENDER2 --> GATE2 --> EXPORT2
-        RENDER2 --> SUPA_DB
-        SUPA_DB -.->|"load on refresh"| RENDER2
-        RENDER2 -.-> TRACK2
-    end
-
-    DIST2 --> Browser2
-```
+<img src="https://raw.githubusercontent.com/kamalbhatiapm/LeaseComplianceApp/main/architecture/diagrams/frontend-beta.png" width="100%" alt="Frontend — Beta Target" />
 
 ### Beta Target — Changes Required
 
