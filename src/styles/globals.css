@@ -71,7 +71,7 @@ nav {
   gap: 0;
 }
 .nav-logo {
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -.03em;
@@ -347,41 +347,120 @@ nav {
 }
 .s1-stat-label { font-size: 13px; color: rgba(255,255,255,.7); margin-top: 3px; letter-spacing: -.01em; }
 
-.s1-upload-panel { width: 380px; flex-shrink: 0; }
+.s1-upload-panel { width: 400px; flex-shrink: 0; }
 .upload-zone {
-  border: 1.5px solid rgba(255,255,255,.18);
-  border-radius: 20px;
-  padding: 32px 28px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 26px;
+  padding: 36px 32px;
   text-align: center;
-  background: rgba(255,255,255,.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,.09);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.28),
+    inset 0 -1px 0 rgba(255,255,255,.06),
+    0 32px 64px rgba(0,0,0,.45),
+    0 8px 24px rgba(0,0,0,.25);
   cursor: pointer;
-  transition: border-color .2s, background .2s;
+  transition: border-color .22s, background .22s, box-shadow .22s;
 }
-.upload-zone:hover, .upload-zone.drag-over {
+.upload-drop-area {
+  border: 1.5px dashed rgba(255,255,255,.18);
+  border-radius: 18px;
+  padding: 20px 6px 24px;
+  margin-bottom: 20px;
+  transition: border-color .18s, background .18s;
+}
+.upload-zone:hover .upload-drop-area {
+  border-color: rgba(255,255,255,.32);
+}
+.upload-zone.drag-over .upload-drop-area {
+  border-color: rgba(90,200,250,.8);
+  background: rgba(90,200,250,.07);
+  animation: dash-march .5s linear infinite;
+}
+@keyframes dash-march {
+  to { border-dash-offset: -12px; }
+}
+.upload-zone:hover {
   border-color: rgba(255,255,255,.38);
-  background: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.13);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.35),
+    inset 0 -1px 0 rgba(255,255,255,.08),
+    0 40px 72px rgba(0,0,0,.5),
+    0 8px 24px rgba(0,0,0,.28);
+}
+.upload-zone.drag-over {
+  border-color: rgba(90,200,250,.6);
+  background: rgba(90,200,250,.1);
+  box-shadow:
+    0 0 0 3px rgba(90,200,250,.25),
+    inset 0 1.5px 0 rgba(255,255,255,.35),
+    0 40px 72px rgba(0,0,0,.5);
+}
+.upload-icon-drop {
+  background: rgba(90,200,250,.3) !important;
+  border-color: rgba(90,200,250,.5) !important;
+  box-shadow: 0 0 20px rgba(90,200,250,.3) !important;
 }
 .upload-icon {
-  width: 56px; height: 56px;
-  background: rgba(90,200,250,.2);
-  border: 1px solid rgba(90,200,250,.25);
-  border-radius: 14px;
+  width: 60px; height: 60px;
+  background: rgba(90,200,250,.18);
+  border: 1px solid rgba(90,200,250,.3);
+  border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 18px;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 16px rgba(90,200,250,.15);
 }
-.upload-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 6px; letter-spacing: -.02em; }
-.upload-sub   { font-size: 13px; color: rgba(255,255,255,.88); margin-bottom: 20px; }
-.upload-types { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; }
+.upload-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 7px; letter-spacing: -.025em; }
+.upload-sub   { font-size: 14px; color: rgba(255,255,255,.82); margin-bottom: 20px; letter-spacing: -.01em; }
+.upload-types { display: flex; gap: 6px; justify-content: center; }
 .upload-type-tag {
-  background: rgba(255,255,255,.09);
-  color: rgba(255,255,255,.82);
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.75);
   border: 1px solid rgba(255,255,255,.18);
-  border-radius: 6px; font-size: 11px; padding: 3px 9px;
-  font-weight: 500;
+  border-radius: 7px; font-size: 12px; padding: 4px 10px;
+  font-weight: 500; letter-spacing: .01em;
 }
-.upload-progress-label { font-size: 12px; color: rgba(255,255,255,.82); margin-top: 14px; }
+.upload-progress-label { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 14px; line-height: 1.5; }
+
+/* Intent selector — Apple segmented control */
+.intent-select-wrap {
+  width: 100%; margin-bottom: 16px; text-align: left;
+}
+.intent-label {
+  display: block; font-size: 12px; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; color: rgba(255,255,255,.52); margin-bottom: 9px;
+}
+.intent-segmented {
+  display: flex; gap: 0;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px; padding: 3px;
+}
+.intent-seg-btn {
+  flex: 1; border: none; cursor: pointer; font-family: inherit;
+  font-size: 14px; font-weight: 500; letter-spacing: -.01em;
+  padding: 9px 12px; border-radius: 9px;
+  color: rgba(255,255,255,.5);
+  background: transparent;
+  transition: color .18s ease, background .18s ease, box-shadow .18s ease;
+  white-space: nowrap;
+}
+.intent-seg-btn:hover:not(.active) {
+  color: rgba(255,255,255,.75);
+  background: rgba(255,255,255,.06);
+}
+.intent-seg-btn.active {
+  color: #fff;
+  background: rgba(255,255,255,.15);
+  box-shadow: 0 1px 3px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.intent-desc {
+  font-size: 13px; color: rgba(255,255,255,.5); margin-top: 8px;
+  line-height: 1.45; padding: 0 1px;
+}
 
 /* Progress panel (inside upload zone) */
 .progress-panel { margin-top: 0; }
@@ -718,20 +797,20 @@ nav {
 .analysis-loading-card {
   background: rgba(255,255,255,.07);
   border: 1px solid rgba(255,255,255,.13);
-  border-radius: 28px;
-  padding: 56px 52px 48px;
-  max-width: 540px;
+  border-radius: 24px;
+  padding: 36px 40px 32px;
+  max-width: 460px;
   width: 100%;
   text-align: center;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0 32px 80px rgba(0,0,0,.5);
+  box-shadow: 0 24px 60px rgba(0,0,0,.5);
 }
 .analysis-loading-icon-wrap {
   position: relative;
-  width: 84px;
-  height: 84px;
-  margin: 0 auto 32px;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -749,10 +828,10 @@ nav {
   50%       { transform: scale(1.4); opacity: .07; }
 }
 .analysis-loading-title {
-  font-size: 44px;
+  font-size: 34px;
   font-weight: 700;
   letter-spacing: -.04em;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   background: linear-gradient(140deg, #fff 0%, #94d8f0 55%, #5ac8fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

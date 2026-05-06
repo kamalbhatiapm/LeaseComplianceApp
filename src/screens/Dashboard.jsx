@@ -11,19 +11,33 @@ const LEASES = [
   { name: 'London EMEA HQ',             sub: '30 St Mary Axe, London, EC3A 8EP',     standard: 'IFRS 16', start: 'Jul 1, 2020',  term: '10 years', rent: '£612,000',  status: 'green',  statusLabel: 'Current',       pct: 98 },
 ]
 
-export default function Dashboard({ selectedFile, handleFileSelected, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme }) {
-  const fileRef  = useRef(null)
-  const navigate = useNavigate()
+const INTENTS = [
+  { value: 'ifrs16_compliance',  label: 'IFRS 16 Compliance Report',  short: 'IFRS 16',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under IFRS 16' },
+  { value: 'asc842_compliance',  label: 'ASC 842 Compliance Report',  short: 'ASC 842',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under ASC 842 (US GAAP)' },
+]
+
+export default function Dashboard({ selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent }) {
+  const fileRef   = useRef(null)
+  const zoneRef   = useRef(null)
+  const navigate  = useNavigate()
   const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
     if (isAnalyzing) navigate('/leases')
   }, [isAnalyzing])
 
+  const onDragEnter = e => { e.preventDefault(); setDragging(true) }
+  const onDragOver  = e => { e.preventDefault(); setDragging(true) }
+
+  const onDragLeave = e => {
+    // Only clear when leaving the zone entirely, not when moving between children
+    if (!zoneRef.current?.contains(e.relatedTarget)) setDragging(false)
+  }
+
   const onDrop = e => {
     e.preventDefault()
     setDragging(false)
-    if (e.dataTransfer.files.length) handleFileSelected(e.dataTransfer.files[0])
+    if (e.dataTransfer.files.length) handleFileDrop(e.dataTransfer.files[0])
   }
 
   const onAnalyze = () => {
@@ -37,8 +51,15 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
       <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
       <main id="main-content">
 
-      {/* Hero */}
-      <div className="s1-hero">
+      {/* Hero — full section is the drop target */}
+      <div
+        ref={zoneRef}
+        className="s1-hero"
+        onDragEnter={onDragEnter}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+      >
         <div className="s1-hero-inner">
           <div className="s1-hero-copy">
             <div className="s1-kicker">IFRS 16 / ASC 842 Compliance Suite</div>
@@ -62,9 +83,6 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
               <div
                 className={`upload-zone${dragging ? ' drag-over' : ''}`}
                 onClick={() => !selectedFile && fileRef.current?.click()}
-                onDragOver={e => { e.preventDefault(); setDragging(true) }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={onDrop}
               >
                 <input
                   ref={fileRef}
@@ -73,26 +91,61 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleAnal
                   style={{ display: 'none' }}
                   onChange={e => { if (e.target.files.length) handleFileSelected(e.target.files[0]) }}
                 />
-                <div className="upload-icon">
-                  {selectedFile
-                    ? <FileCheck size={24} color="var(--accent-on-dark)" />
-                    : <FileText  size={24} color="var(--accent-on-dark)" />}
+                <div className="upload-drop-area">
+                  {dragging ? (
+                    <>
+                      <div className="upload-icon upload-icon-drop">
+                        <FileText size={24} color="var(--accent-on-dark)" />
+                      </div>
+                      <div className="upload-title">Drop to analyze</div>
+                      <div className="upload-sub">Release to start extraction</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="upload-icon">
+                        {selectedFile
+                          ? <FileCheck size={24} color="var(--accent-on-dark)" />
+                          : <FileText  size={24} color="var(--accent-on-dark)" />}
+                      </div>
+                      <div className="upload-title">
+                        {selectedFile ? selectedFile.name : 'Upload a lease contract'}
+                      </div>
+                      <div className="upload-sub">
+                        {selectedFile
+                          ? `${(selectedFile.size / 1024).toFixed(0)} KB · Ready to analyze`
+                          : 'Drag & drop or click to browse'}
+                      </div>
+                      {!selectedFile && (
+                        <div className="upload-types">
+                          {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
+                            <span key={t} className="upload-type-tag">{t}</span>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
-                <div className="upload-title">
-                  {selectedFile ? selectedFile.name : 'Upload a lease contract'}
-                </div>
-                <div className="upload-sub">
-                  {selectedFile
-                    ? `${(selectedFile.size / 1024).toFixed(0)} KB · Ready to analyze`
-                    : 'Drag & drop or click to browse'}
-                </div>
-                {!selectedFile && (
-                  <div className="upload-types">
-                    {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
-                      <span key={t} className="upload-type-tag">{t}</span>
+
+                {/* Analysis intent selector */}
+                <div className="intent-select-wrap" onClick={e => e.stopPropagation()}>
+                  <label className="intent-label">Reporting standard</label>
+                  <div className="intent-segmented">
+                    {INTENTS.map(i => (
+                      <button
+                        key={i.value}
+                        type="button"
+                        className={`intent-seg-btn${analysisIntent === i.value ? ' active' : ''}`}
+                        onClick={() => setAnalysisIntent(i.value)}
+                      >
+                        {i.short}
+                      </button>
                     ))}
                   </div>
-                )}
+                  <div className="intent-desc">
+                    {INTENTS.find(i => i.value === analysisIntent)?.desc}
+                  </div>
+                </div>
+
                 <button
                   className="btn btn-primary"
                   onClick={e => {
