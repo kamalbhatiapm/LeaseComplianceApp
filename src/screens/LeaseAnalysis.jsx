@@ -30,6 +30,11 @@ const QUIPS = [
   "Assigning blame to the escalation clause…",
   "Teaching GPT to care about square footage…",
   "Almost there — just double-checking the double-checks…",
+  "Summoning the orchestrator… it's bringing snacks.",
+  "Negotiating with sub-agents… one is asking for a raise.",
+  "Thinking… but like, in parallel.",
+  "Consulting 3 agents and 1 overconfident opinion.",
+  "Loading… the AI insists it's almost done.",
 ]
 
 const LOADING_STEPS = [
