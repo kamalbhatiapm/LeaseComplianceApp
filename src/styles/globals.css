@@ -708,6 +708,15 @@ nav {
 .s2-data-badge--demo     { background: rgba(255,159,10,.18); color: var(--amber); }
 .s2-data-badge--live     { background: rgba(48,209,88,.15);  color: var(--green); }
 .s2-data-badge--fallback { background: rgba(255,59,48,.15);  color: var(--red-on-dark); }
+.s2-standard-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px;
+  border-radius: 980px;
+  background: rgba(0,113,227,.18); color: var(--accent-on-dark);
+}
+[data-theme="light"] .s2-standard-badge {
+  background: var(--brand-lt); color: var(--brand);
+}
 
 .s2-subheader-actions {
   margin-left: auto; display: flex; gap: 8px;

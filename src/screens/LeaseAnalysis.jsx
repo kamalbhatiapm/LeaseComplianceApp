@@ -272,7 +272,12 @@ function RiskFlags({ flags, onGateChange }) {
   )
 }
 
-export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme }) {
+const STANDARD_META = {
+  ifrs16_compliance: { label: 'IFRS 16', short: 'IFRS 16', other: 'ASC 842', otherValue: 'asc842_compliance' },
+  asc842_compliance: { label: 'ASC 842', short: 'ASC 842', other: 'IFRS 16', otherValue: 'ifrs16_compliance' },
+}
+
+export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme, analysisIntent, setAnalysisIntent, handleReanalyzeAs }) {
   if (isAnalyzing) {
     return (
       <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
@@ -306,9 +311,15 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
     setGateOpen(highFlags.length === 0 || allSigned)
   }
 
+  const stdMeta   = STANDARD_META[analysisIntent] ?? STANDARD_META.ifrs16_compliance
   const badgeCls  = isDemo ? 's2-data-badge--demo' : isLiveData ? 's2-data-badge--live' : 's2-data-badge--fallback'
   const badgeIcon = isDemo ? <FlaskConical size={12} /> : isLiveData ? <CircleCheck size={12} /> : <CircleAlert size={12} />
   const badgeTxt  = isDemo ? 'Demo data' : isLiveData ? 'Live extraction' : 'Demo fallback'
+
+  const switchStandard = () => {
+    if (!selectedFile) return
+    handleReanalyzeAs(stdMeta.otherValue)
+  }
 
   return (
     <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
@@ -326,18 +337,30 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <span className={`s2-data-badge ${badgeCls}`} title={isDemo ? 'Showing placeholder data' : isLiveData ? 'Live AI extraction' : 'Demo fallback'}>
             {badgeIcon} {badgeTxt}
           </span>
+          <span className="s2-standard-badge">
+            <ShieldCheck size={11} /> {stdMeta.label}
+          </span>
           <span style={{ fontSize: '12px', color: 'var(--t4)' }}>Last analyzed: {dtStr}</span>
           <button className="btn btn-outline btn-sm">Re-analyze</button>
           <button className="btn btn-outline btn-sm" onClick={() => track('report_exported', { format: 'pdf', type: 'extraction' })}>
             <Download size={12} aria-hidden="true" /> Export PDF
           </button>
+          {selectedFile && (
+            <button
+              className="btn btn-outline btn-sm"
+              onClick={switchStandard}
+              title={`Re-run this contract under ${stdMeta.other}`}
+            >
+              <RefreshCw size={12} /> Run as {stdMeta.other}
+            </button>
+          )}
           <button
             className="btn btn-primary btn-sm"
             disabled={!gateOpen}
-            title={gateOpen ? 'Generate IFRS 16 report' : 'Resolve all high-severity flags first'}
-            onClick={() => track('report_exported', { format: 'pdf', type: 'ifrs16_compliance' })}
+            title={gateOpen ? `Generate ${stdMeta.label} report` : 'Resolve all high-severity flags first'}
+            onClick={() => track('report_exported', { format: 'pdf', type: analysisIntent })}
           >
-            Generate IFRS 16 Report
+            Generate {stdMeta.label} Report
           </button>
         </div>
       </div>
@@ -363,12 +386,12 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
               <div className="score-header-meta">
                 <div className="score-title">{filename}</div>
                 <div className="score-sub">
-                  {[data.contract_type, 'IFRS 16', new Date(analyzedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })].filter(Boolean).join(' · ')}
+                  {[data.contract_type, stdMeta.label, new Date(analyzedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })].filter(Boolean).join(' · ')}
                 </div>
                 <div className="score-pills">
                   <span className={`pill ${pillCls}`}>{level} Risk</span>
                   <span className="pill pill-green">{termsFound.length} of {totalFields} fields extracted</span>
-                  <span className="pill pill-brand">IFRS 16 fields extracted</span>
+                  <span className="pill pill-brand">{stdMeta.label} compliant</span>
                   {riskFlags.length > 0 && <span className="pill pill-gray">{riskFlags.length} flag{riskFlags.length !== 1 ? 's' : ''} to review</span>}
                 </div>
               </div>
@@ -420,7 +443,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           </div>
 
           <div className="sidebar-section">
-            <div className="sidebar-section-title">IFRS 16 Field Coverage</div>
+            <div className="sidebar-section-title">{stdMeta.label} Field Coverage</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {[
                 { label: 'Lease term',        ok: true },
@@ -441,7 +464,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <div className="sidebar-section">
             <div className="sidebar-section-title">Applied Playbook</div>
             <div style={{ background: 'var(--brand-lt)', border: '1px solid rgba(0,113,227,.2)', borderRadius: '8px', padding: '12px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--brand)', marginBottom: '4px' }}>IFRS 16 Standard Template</div>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--brand)', marginBottom: '4px' }}>{stdMeta.label} Standard Template</div>
               <div style={{ fontSize: '11px', color: 'var(--t3)' }}>Version 2.4 · 9 required fields · 14 risk rules</div>
             </div>
           </div>
