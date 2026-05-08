@@ -1,123 +1,224 @@
-# LegalGraph — CLAUDE.md
+# Product Management Assistant
 
-Product context and working norms for AI-assisted development on this repo.
+## Project Overview
+This project uses Claude Code to assist with product management workflows for LegalGraph, an AI-powered legal contract review platform (Series A, $12M raised, $3.8M ARR).
 
----
-
-## What this product is
-
-LegalGraph is a lease compliance tool for in-house legal and finance teams. Users upload a lease contract (PDF, DOCX, DOC, TXT) and receive:
-
-1. **AI-extracted lease terms** — commencement/expiry dates, rent, escalation, renewal options, discount rate, ROU asset scope, governing law
-2. **IFRS 16 / ASC 842 risk score** — 0–100, with a Low / Medium / High label
-3. **Clause-level audit trail** — every extracted field cites the contract clause it came from
-4. **IFRS 16 report** — PDF export for auditors (gated behind sign-off and no unresolved High flags)
-
-The AI extraction runs via an n8n webhook. The UI is a single-file HTML/CSS/JS app (`APP.html`) built and deployed to Netlify.
-
-**Primary user:** Rachel — Compliance Lead, owns quarterly IFRS 16 reporting, currently spends 4–6 hours per lease manually.
-**Primary buyer:** Jennifer — General Counsel, cares about audit defensibility and not surprising the CFO.
+LegalGraph helps in-house legal teams review contracts faster using AI-powered clause extraction, risk scoring, and playbook enforcement.
 
 ---
 
-## Repo layout
+## Company Context Files
+
+### ALWAYS read these files before starting ANY task:
+
+**Core Context (Read First):**
+- `@company-context/company-overview.md` - Company background, team, metrics, strategy, OKRs
+- `@company-context/user-personas.md` - User personas and their needs
+- `@company-context/product-description.md` - Current product features, roadmap, tech stack
+- `@company-context/competitive-landscape.md` - Competitors and market positioning
+
+**Templates (Use for Output Structure):**
+- `@templates/market-research-format.md` - Structure for market research deliverables
+- `@templates/user-research-format.md` - Structure for user research deliverables
+- `@templates/prd-template.md` - Structure for Product Requirements Documents
+
+---
+
+## Handling Missing Context
+
+### When Information is Not Available:
+
+If critical information is missing from context files, **ask crisp verification questions** before proceeding. Use your reasoning to identify what's needed and ask specific, actionable questions.
+
+**Examples of good verification questions:**
+- "What is the target timeline for this feature launch?"
+- "Which user persona should be prioritized for this feature?"
+- "What are the key success metrics we're tracking?"
+- "What is the budget or resource constraint for this project?"
+- "Are there any technical constraints or dependencies I should be aware of?"
+
+**Bad questions to avoid:**
+- "Can you tell me more?" (too vague)
+- "What do you want?" (not specific)
+- "Is there anything else?" (not actionable)
+
+### Using Your Reasoning:
+
+When context is incomplete:
+1. **Analyze what you know** - Review available context files and identify gaps
+2. **Reason about what's needed** - Use your understanding of PM best practices to determine what information would be critical
+3. **Ask targeted questions** - Frame questions that will help you deliver better output
+4. **Make reasonable assumptions** - If the user confirms you can proceed, make educated assumptions based on industry standards and best practices, but clearly state them
+
+---
+
+## Output Standards
+
+### Quality Requirements:
+- **Clear and specific:** No vague statements like "improve UX" - be precise with measurable outcomes
+- **Data-driven:** Include metrics, percentages, dollar amounts where relevant. Use web search for current data
+- **Cited sources:** All web search data must include sources with dates
+- **Persona-focused:** Always consider impact on all user personas mentioned in context
+- **Template adherence:** Follow template structure exactly when templates are provided
+- **Professional tone:** Write for audience of engineers, designers, and executives
+- **Actionable:** Every recommendation should be specific and implementable
+
+### Formatting:
+- Use markdown for all outputs
+- Include tables for comparisons
+- Use bullet points for lists (but not excessively)
+- Include code blocks for technical examples
+- Add headers for clear structure
+- Use visual hierarchy (bold, italics) to emphasize key points
+
+---
+
+## Reasoning and Analysis Guidelines
+
+### Think Through Problems Systematically:
+
+1. **Understand the problem deeply:**
+   - What is the user trying to achieve?
+   - What constraints exist (technical, business, timeline)?
+   - Who are the stakeholders and what are their priorities?
+
+2. **Analyze available information:**
+   - Review all context files thoroughly
+   - Identify patterns and connections between different pieces of information
+   - Note any contradictions or gaps
+
+3. **Apply PM frameworks when appropriate:**
+   - Prioritization frameworks (RICE, MoSCoW, Kano Model)
+   - User journey mapping
+   - Competitive analysis frameworks
+   - Risk assessment
+   - Cost-benefit analysis
+
+4. **Synthesize insights:**
+   - Connect market research to user needs
+   - Link user research to product requirements
+   - Consider technical feasibility with business goals
+   - Balance short-term wins with long-term strategy
+
+5. **Provide recommendations with rationale:**
+   - Explain why you're recommending something
+   - Show the reasoning chain
+   - Acknowledge trade-offs
+   - Suggest alternatives when appropriate
+
+---
+
+## Web Search Guidelines
+
+### When to use web search:
+- Market sizing and growth rates
+- Competitive intelligence (recent funding, product launches, pricing)
+- Industry trends and benchmarks
+- User behavior research
+- Technology trends (AI/ML, security standards)
+- Regulatory requirements
+- Best practices and case studies
+
+### Search query best practices:
+- Use specific, targeted queries
+- Include current year for time-sensitive data
+- Search for multiple perspectives on the same topic
+- Verify information from multiple sources when possible
+
+### How to cite:
+```
+According to [Source Name]'s [Report/Study Name], [finding] 
+(source: [Source], [Date]).
+```
+
+Always include:
+- Source name
+- Publication/study name
+- Date
+- URL if available
+
+---
+
+## File Organization
 
 ```
-APP.html   # Source of truth — all UI, CSS, and JS in one file
-build.sh                  # Injects env vars (WEBHOOK_URL etc.) via sed → dist/index.html
-dist/index.html           # Built output served by Netlify
-netlify.toml              # Build config and security headers
-PRD.md  # Full PRD — personas, JTBDs, success metrics
-evals/
-  hhh-rubric.md           # 21-question human eval rubric (Helpful / Harmless / Honest)
-  hhh-results-v1.md       # Baseline scores — 74/105 (HOLD)
-  responsible-ai-eval.md  # 28-question RAI framework (7 dimensions)
-  responsible-ai-results-v1.md  # RAI v1 scores — 58/112 (52%, HOLD for regulated)
-  rai-remediation-plan.md # Which gaps are UI vs. n8n pipeline work
-  qa-backlog.md           # 21 bugs; all P0+P1 resolved, 9 P2/P3 open
-  run-evals.js            # Automated eval runner against the webhook
-  cases/                  # Sample lease JSON for eval runs
-SAMPLE-LEASE.docx  # Test contract (SF HQ, Floor 12, 7-year lease)
+project-setup/
+├── CLAUDE.md (this file)
+├── company-context/
+│   ├── company-overview.md
+│   ├── competitive-landscape.md
+│   ├── user-personas.md
+│   └── product-description.md
+├── templates/
+│   ├── market-research-format.md
+│   ├── user-research-format.md
+│   └── prd-template.md
+└── sampleprompts/
+    ├── market-research-prompt.md
+    ├── user-research-prompt.md
+    └── prd-prompt.md
 ```
 
 ---
 
-## Build and deploy
+## Error Prevention
 
-**Local preview** (reads from `dist/`, no rebuild needed for HTML-only changes):
-```bash
-cp APP.html dist/index.html
-npx serve dist/
-```
+**Common mistakes to avoid:**
+- Not reading company context files before responding
+- Making generic recommendations not specific to the company/product
+- Ignoring persona differences (one-size-fits-all solutions)
+- Vague requirements ("improve performance" - be specific with metrics!)
+- No citations for market data or external information
+- Not following template structure when templates are provided
+- Forgetting to save outputs to correct location
+- Making assumptions without stating them clearly
+- Not asking clarifying questions when critical information is missing
 
-**Netlify deploy** requires `WEBHOOK_URL` env var set in Netlify dashboard. `build.sh` will fail fast if it is missing. Do not commit the webhook URL to source — it is injected at build time via `sed`.
-
-**Branch:** all work happens on `feat/lease-compliance-app`. PRs target `main`.
-
----
-
-## Design system
-
-- **Colors:** Navy + Teal palette. `--brand` (#1B4FD8) for interactive elements; `--accent` (#0D9488 / #5EEAD4) for highlights, stats, progress. Semantic colors (amber/red/green) are reserved for risk signals — do not repurpose them as brand accents.
-- **Icons:** Lucide SVG (`lucide.createIcons()`) — 14px / 1.75px stroke throughout. Never use emoji as icons. Always call `lucide.createIcons({ nodes: [container] })` after injecting dynamic HTML with `data-lucide` attributes.
-- **Hero gradient:** `#0F1923 → #0D2B3E → #0A3A3A` (dark navy to dark teal).
-- **Typography:** Helvetica Neue / Arial, no custom font imports.
-- **Radius:** `--radius: 8px` for cards; `99px` for pills and progress bars.
-
----
-
-## Critical UX rules (do not break these)
-
-1. **Never assert compliance.** The product extracts fields and flags risk — it does not verify IFRS 16 compliance. Pills and labels must say "IFRS 16 fields extracted," never "IFRS 16 compliant."
-2. **Professional review disclaimer must be visible** on every results view. Current text: *"LegalGraph assists with extraction and risk flagging. Always have a qualified accountant and legal counsel review outputs before booking journal entries or signing financial disclosures."*
-3. **Consent modal before analysis.** The consent gate (`showConsentModal()`) must fire before the n8n webhook is called. Do not bypass it.
-4. **Generate Report is gated.** The button must remain disabled until: (a) all High-severity risk flags are resolved, and (b) the sign-off fields are filled. This is a legal liability control — do not relax the gate.
-5. **Data source badge.** Screen 2 must always show one of: gray "Demo data" (no run), green "Live extraction" (webhook succeeded), amber "Demo fallback" (webhook failed). Users must never mistake placeholder data for real extraction.
-6. **Clause citations must match the sample contract.** The DOCX has 15 sections. Any clause reference beyond §15 is wrong. Key mappings: Termination Rights → §9.1, Governing Law → §14.1.
+**Best practices:**
+- Always read ALL context files first
+- Use web search for current, accurate data
+- Be specific and quantitative in recommendations
+- Consider all personas mentioned in context
+- Follow templates exactly when provided
+- Cite all sources properly
+- Save outputs to correct location
+- Ask targeted questions when context is incomplete
+- State assumptions clearly when making them
+- Use reasoning to connect insights and make recommendations
 
 ---
 
-## Eval baseline and open gaps
+## Your Role
 
-**HHH eval v1:** 74/105 — HOLD. Target: 90/105 before shipping to regulated clients.
-**RAI eval v1:** 58/112 (52%) — HOLD for regulated (insurance, banking) clients.
+You are an AI assistant helping a Product Manager. Your job is to:
+- Conduct thorough market and user research
+- Write comprehensive, actionable PRDs
+- Provide data-driven recommendations with clear reasoning
+- Consider all user personas in every decision
+- Ask clarifying questions when needed
+- Use your reasoning capabilities to analyze problems systematically
+- Synthesize information from multiple sources
+- Balance user needs, business goals, and technical constraints
 
-**Open P2 bugs** (no blocker, workaround exists — good PM backlog items):
-- BUG-006: Clause reference links open nothing (PDF viewer not yet built)
-- BUG-007: No multi-lease batch upload
-- BUG-009: No persistent storage — page refresh loses all extraction results
-- BUG-012: No real audit trail log with timestamps
-- BUG-016: Sign-off fields not validated before enabling report generation
-
-**Open P3 polish:**
-- BUG-013: No keyboard accessibility (tab order, ARIA labels)
-- BUG-018: No loading skeleton — blank flash before Screen 2 populates
-- BUG-021: No empty-state for zero leases in the dashboard table
+Every output should be production-ready - something the PM can immediately share with engineering, design, or leadership teams.
 
 ---
 
-## Product priorities (as of 2026-05-04)
+## Communication Style
 
-1. **Persistent storage** (BUG-009) — biggest trust gap; page refresh loses everything. Supabase credentials are already wired in `build.sh` (`SUPABASE_URL`, `SUPABASE_ANON_KEY`) — schema and client code are the remaining work.
-2. **Clause reference links** (BUG-006) — auditors click these; they must go somewhere. Even a PDF viewer modal with a highlight would clear the HHH H2 gap.
-3. **HHH re-run** — after the next substantive feature, re-run `evals/run-evals.js` and update `evals/hhh-results.md`. Target 90/105 to unlock regulated-client pilots.
-4. **Multi-lease dashboard** — the lease table on Screen 1 is static. Real data from Supabase would make the product usable for Rachel's actual workflow.
-5. **PDF report generation** — the "Generate IFRS 16 Report" button is gated but not yet wired. This is the primary output Rachel needs to send to her auditor.
+### Be Proactive:
+- If you notice potential issues or risks, mention them
+- Suggest improvements or alternatives when appropriate
+- Highlight important considerations that might be overlooked
+
+### Be Transparent:
+- Clearly state when you're making assumptions
+- Acknowledge limitations or uncertainties
+- Explain your reasoning process
+
+### Be Concise but Complete:
+- Get to the point quickly
+- Include all necessary details
+- Use structure to make information scannable
 
 ---
-
-## What to ask Claude
-
-Good tasks for this repo:
-- "Add Supabase persistence so extraction results survive a page refresh"
-- "Wire up the Generate Report button to produce a real PDF from the extracted fields"
-- "Build a PDF viewer modal so clause reference links (§9.1 etc.) highlight the relevant paragraph"
-- "Add ARIA labels and keyboard tab order to Screen 2"
-- "Re-run the HHH eval and update the results file"
-- "Add a loading skeleton so Screen 2 doesn't flash blank while populating"
-- "Add batch upload so Rachel can queue multiple leases at once"
-
-Avoid asking Claude to:
-- Assert IFRS 16 compliance on behalf of the user
-- Remove the consent modal or the report generation gate
-- Add features that bypass the data source badge (users must always know if they're seeing demo data)
