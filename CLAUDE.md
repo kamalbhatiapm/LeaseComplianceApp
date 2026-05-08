@@ -17,11 +17,6 @@ LegalGraph helps in-house legal teams review contracts faster using AI-powered c
 - `@company-context/product-description.md` - Current product features, roadmap, tech stack
 - `@company-context/competitive-landscape.md` - Competitors and market positioning
 
-**Templates (Use for Output Structure):**
-- `@templates/market-research-format.md` - Structure for market research deliverables
-- `@templates/user-research-format.md` - Structure for user research deliverables
-- `@templates/prd-template.md` - Structure for Product Requirements Documents
-
 ---
 
 ## Handling Missing Context
@@ -149,14 +144,6 @@ project-setup/
 │   ├── competitive-landscape.md
 │   ├── user-personas.md
 │   └── product-description.md
-├── templates/
-│   ├── market-research-format.md
-│   ├── user-research-format.md
-│   └── prd-template.md
-└── sampleprompts/
-    ├── market-research-prompt.md
-    ├── user-research-prompt.md
-    └── prd-prompt.md
 ```
 
 ---
