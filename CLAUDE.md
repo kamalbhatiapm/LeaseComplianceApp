@@ -11,12 +11,16 @@ LegalGraph helps in-house legal teams review contracts faster using AI-powered c
 
 ### ALWAYS read these files before starting ANY task:
 
-**Core Context (Read First):**
+**Core Company Context (Read First):**
 - `@company-context/company-overview.md` - Company background, team, metrics, strategy, OKRs
-- `@company-context/user-personas.md` - User personas and their needs
-- `@company-context/product-description.md` - Current product features, roadmap, tech stack
-- `@company-context/competitive-landscape.md` - Competitors and market positioning
+- `@company-context/user-personas.md` - Company User personas and their needs
+- `@company-context/product-description.md` - Current company product features, roadmap, tech stack
+- `@company-context/competitive-landscape.md` - Company Competitors and market positioning
 
+**Current Project Context (Read First):**
+- `@project-context/JTBD.md` - Jobs to be done for the project
+- `@project-context/PRD.md` - Product Requirements Document for the project
+- `@company-context/USER-JOURNEY.md` - User journey for the project
 ---
 
 ## Handling Missing Context
