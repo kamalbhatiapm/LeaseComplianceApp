@@ -75,7 +75,8 @@ For each relevant persona:
 - **Beta Users & Feedback Loops:** Plan for beta or pilot to gather early feedback
 
 **Required Context Files:**
-- Read all files in `@company-context/` (company-overview.md, user-personas.md, product-description.md, competitive-landscape.md)
+- Read all files in `@company-context/` (company-overview.md, user-personas.md, product-description.md, competitive-landscape.md) for overall company context
 - Read all previous research outputs in `@outputs/` (market research, user research)
+- Read all files in `@project-context/` (JBTD.md, USER-JOURNEY.md) for this particular project context to create this project PRD)
 - Read `@templates/prd-template.md` to understand exact structure
 
