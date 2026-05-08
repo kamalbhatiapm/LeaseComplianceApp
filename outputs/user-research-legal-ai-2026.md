@@ -1,157 +1,139 @@
-# User Research: In-House Legal Teams & AI Contract Review
+# User Research: IFRS 16 / ASC 842 Lease Compliance Reporting
 **Date**: May 8, 2026
 **Researcher**: Senior PM, LegalGraph
 
-> **Context files read:** company-overview.md, competitive-landscape.md, product-description.md, templates/user-research-format.md, sample-prompts/user-research-prompt.md, outputs/market-research-legal-ai-2026.md
-> **Note:** user-personas.md removed from company-context/. Personas reconstructed from product-description.md use cases, company-overview.md, and web research.
+> **Context files read:** company-context/company-overview.md, company-context/competitive-landscape.md, company-context/product-description.md, company-context/user-personas.md, project-context/JTBD.md, project-context/PRD.md, project-context/USER-JOURNEY.md, templates/user-research-format.md, outputs/market-research-legal-ai-2026.md
 
 ---
 
 ## Research Objectives
 
-1. Understand how in-house legal teams currently review contracts — tools, time, workflows, and bottlenecks
-2. Identify the top pain points preventing attorneys from adopting AI contract review tools
-3. Understand what "good" looks like for LegalGraph's primary users (AGC, Senior Counsel, GC)
-4. Identify unmet needs that should inform the Contract Negotiation Assistant, onboarding improvements, and analytics roadmap
-5. Uncover behavioral patterns that explain LegalGraph's 55% activation rate and 8-loss rate to manual process
+1. Understand how finance and compliance teams at mid-market companies currently manage IFRS 16 / ASC 842 reporting — tools, time, workflow, and failure modes
+2. Identify the specific jobs Rachel (Compliance Lead) is trying to complete and where the current product succeeds or fails at each
+3. Understand what trust looks like for Rachel when reviewing AI-extracted lease data — and what breaks that trust
+4. Identify what Jennifer (GC/CFO) needs to see before approving LegalGraph as a compliance tool
+5. Map the behavioral patterns across all three personas to inform activation, retention, and product roadmap priorities
 
 ---
 
 ## Methodology
 
-**Research approach:** Secondary research synthesis combining:
-- Previous LegalGraph market research (outputs/market-research-legal-ai-2026.md)
-- Industry survey reports: CLOC State of the Industry 2025, FTI Technology GC Report 2025, Axiom Law 2025 AI Legal Report, GC AI Customer Survey (100+ in-house teams, Dec 2025)
-- Review platform analysis: G2, Capterra (Ironclad, LawGeex, Kira reviews)
-- Bloomberg Law, Wolters Kluwer, and Gartner research on legal AI adoption
-- Industry publications: Artificial Lawyer, Legartis, Wordsmith AI legal trends 2026
+**Research approach:** Primary synthesis from LegalGraph project context combined with secondary research:
+- **Project-context files:** JTBD.md (7 jobs-to-be-done with full behavioral profiles), PRD.md v1.1 (confidence levels, open questions, metric gaps), USER-JOURNEY.md (7-phase quarterly compliance cycle with moments of truth)
+- **Company-context files:** user-personas.md (Jennifer, David, Rachel profiles), product-description.md (current features, use cases, roadmap)
+- **Secondary sources:** Deloitte 2025 AI Finance Survey, BlackLine Finance Team Data Confidence Survey, FASB Private Company Council memo (June 2025), Gartner Finance AI Research, PCAOB AS 1105 guidance, Accounting Today 2026 AI Survey
+- **Competitor review analysis:** Trullion G2 reviews, EZLease Capterra reviews, FinQuery G2 reviews
 
-**Limitations:** No primary interview data. Recommendations should be validated with 5–8 customer interviews with AGC/GC roles before roadmap finalization. User-personas.md removed — recommend restoring for future runs.
+**Key insight from methodology:** The project-context files (JTBD.md, USER-JOURNEY.md, PRD.md) contain the richest source of primary user insight in this project — grounded in 3 validated customer interviews (PRD Section 8). Everything below synthesizes those findings with market evidence into actionable product implications.
+
+**Limitations:** 3 customer interview sessions confirmed core assumptions; discount rate workflow, auditor acceptance, and IFRS 16 vs. ASC 842 prioritization need additional validation (PRD open questions 1, 2, 4).
 
 ---
 
 ## Key Personas Analyzed
 
-### Persona 1: Sarah — Associate General Counsel (Primary User)
+### Persona 1: Rachel — Compliance Lead (Primary User)
 
-- **Role & Responsibilities:** Reviews 30–100 contracts/month; manages 2–4 junior attorneys; enforces company playbooks; handles NDA, vendor, and customer contract workflows; reports to GC
+- **Role & Responsibilities:** Owns quarterly IFRS 16 / ASC 842 reporting and audit preparation. Works across legal and finance. Reports to CFO. Manages 10–50 active leases. Produces compliance reports for external auditors at quarter-end.
 - **Goals:**
-  - Clear contract backlog without adding headcount
-  - Maintain consistent risk standards across team reviews
-  - Reduce time on routine contracts (NDAs, DPAs) to focus on complex/high-value work
-  - Show GC and business teams that legal is a revenue enabler, not a bottleneck
+  - Generate audit-ready compliance reports before quarter-end without working overtime
+  - Answer auditor questions from the report itself, not by hunting through PDFs
+  - Build a process that doesn't break when she gets a new lease or a lease modification mid-quarter
+  - Be seen as the person who modernised the compliance process (social dimension)
 - **Pain Points:**
-  - Contract volume grows faster than team size — backlog creates deal delays
-  - Inconsistent risk assessments across junior reviewers
-  - Spreadsheet-based deviation tracking breaks down at scale
-  - Business teams bypass legal on "small" contracts (shadow contracts)
-  - 77% of lawyers use email as primary task management — contracts get buried in inboxes
-- **Current Solutions:**
-  - Word + tracked changes for redlines
-  - Email chains for review requests and approvals (stretching weeks)
-  - Spreadsheet templates for clause tracking
-  - Informal ChatGPT use for summarization (shadow IT)
+  - Excel template is one wrong formula away from a restatement; takes 4–6 hours per lease per quarter
+  - Auditors keep requesting source clause evidence she can't produce from her current spreadsheet output
+  - Every quarter she starts from scratch — there is no system memory of last quarter's work
+  - Discount rate (incremental borrowing rate) is almost always missing from the contract and requires external calculation she isn't confident in
+  - Variable rent, CPI escalation, and sublease clauses break standard AI extraction
+- **Current Solutions:** Excel (manual extraction template, often inherited from predecessor), sticky notes + calendar reminders for tracking, printed PDFs with handwritten annotations, informal ChatGPT use for clause summarization
 
 ---
 
-### Persona 2: Marcus — General Counsel (Economic Buyer)
+### Persona 2: Jennifer — General Counsel / CFO (Economic Buyer)
 
-- **Role & Responsibilities:** Heads legal department (5–20 attorneys); owns legal tech budget; sits in leadership meetings; manages outside counsel spend; accountable to CEO/Board for legal risk
+- **Role & Responsibilities:** Legal department head and/or CFO equivalent at mid-market company. Signs off on tooling decisions. Not a daily user — evaluates LegalGraph once. Cares about audit defensibility, risk reduction, and not surprising the CFO with an AI-generated restatement.
 - **Goals:**
-  - Demonstrate legal's ROI to the CEO and board
-  - Reduce outside counsel spend (79% of GCs report pressure to cut it)
-  - Get board-level portfolio risk visibility without manual reporting
-  - Protect the company from contract risk without slowing deals
+  - Approve tooling that reduces audit risk without creating new legal or regulatory liability
+  - Protect the company from a restatement caused by AI error
+  - Not find out after the fact that compliance reports were AI-generated without disclosure to auditors
 - **Pain Points:**
-  - No real-time view of company's contract risk portfolio
-  - 57% of legal departments don't track or quantify cost savings — can't report ROI
-  - Outside counsel spend rising faster than revenue growth
-  - Hallucination liability risk: worried about AI errors reaching courts (600+ cases on record)
-  - Shadow IT risk: attorneys using personal ChatGPT accounts with sensitive contract data
-- **Current Solutions:**
-  - Quarterly outside counsel billing reviews
-  - Manual contract risk reports (compiled by team in Excel)
-  - Gartner/Forrester reports for legal tech evaluation
-  - Peer GC networks (ACC, CLOC) for vendor recommendations
+  - Does not know where contract data goes when uploaded to an AI tool
+  - Has seen news about AI hallucinations in legal and financial contexts (600+ court cases)
+  - Concerned that auditors won't accept AI-generated reports — creating double work
+  - Worried about NDA provisions in leases themselves being violated by sharing data with an AI vendor
+- **Current Solutions:** Evaluates vendors in a 30-minute conversation + one-pager; requires DPA and security review before approving; approves on ROI evidence from Rachel + audit defensibility demonstration
 
 ---
 
-### Persona 3: Jordan — Legal Operations Manager (Power User / Champion)
+### Persona 3: David — Senior Associate (Secondary User)
 
-- **Role & Responsibilities:** Runs legal technology, process, and workflow for the department; drives tool adoption; manages vendor relationships; often the person who finds LegalGraph, champions it internally, and manages the onboarding
+- **Role & Responsibilities:** Senior attorney or senior associate who occasionally pulls specific lease terms for contract amendments, renewal negotiations, or due diligence. Does not run compliance reports — wants fast lookup access to extracted terms.
 - **Goals:**
-  - Implement tools that attorneys actually adopt (low change management burden)
-  - Reduce contract cycle time from submission to approval
-  - Build scalable workflows that don't require adding attorneys
-  - Get reporting metrics that prove legal tech ROI
+  - Find a specific lease term (e.g., renewal options, notice period) in under 2 minutes before a call
+  - Not depend on Rachel to answer basic lease questions
 - **Pain Points:**
-  - Platforms force teams into rigid workflows that don't match how they actually work
-  - Implementation that takes months instead of weeks kills adoption momentum
-  - Unused seats after enterprise contract signing — renegotiations happening in 2026
-  - One-size-fits-all AI doesn't map to company-specific playbooks
-- **Current Solutions:**
-  - Evaluates 3–5 tools per category before recommending to GC
-  - Often runs a 30-day pilot before full rollout
-  - Builds internal templates and training guides for adoption
-  - Uses CLOC and ACC LegalTech communities for vendor intel
+  - Currently emails Rachel, who opens the PDF or shares a screenshot from her Excel tracker
+  - Spends 10+ minutes searching PDFs for a specific clause when he needs it urgently
+- **Current Solutions:** Email to Rachel, Ctrl+F in PDF, shared Excel tracker (often out of date)
 
 ---
 
 ## Key Findings
 
-### Finding 1: Email and spreadsheets remain the default — adoption friction is the #1 activation barrier
+### Finding 1: Rachel logs in four times a year — every screen must work for someone who hasn't used the tool in 90 days
 
-- **Insight:** 77% of lawyers use email as their primary task and project management tool. Contract review requests, approvals, and status updates all flow through email chains that stretch weeks. Platforms that require lawyers to leave their existing tools (Word, Outlook) are used less than those that integrate with them.
-- **Evidence:** "Email chains for contract reviews are stretching for weeks, requests are disappearing into spreadsheet black holes, business stakeholders are constantly asking 'What's the status?'" (Bloomberg Law, 2026). Spellbook's traction confirms lawyers prefer reviewing inside Word.
-- **Implication:** LegalGraph's 55% activation rate and 8 losses to manual process are directly tied to this. The product needs a lower-friction first-mile experience — one-click upload from email, Word add-in for review, or Outlook integration — to close the activation gap from 55% → 70%.
-
----
-
-### Finding 2: Shadow IT is the real competition — not other tools
-
-- **Insight:** Lawyers who find their sanctioned legal tech platform slow, clunky, or incomplete default to personal ChatGPT/Claude accounts. This is the dominant informal solution for contract summarization and clause querying. It also creates significant data leakage risk with sensitive contract information.
-- **Evidence:** "Shadow IT is the biggest risk facing most legal departments. Lawyers at firms and in-house use ChatGPT or Claude on personal accounts because their sanctioned platform is slow, clunky, or does not cover the task." (Bloomberg Law, 2026). LegalGraph's own data: 8 losses to manual process last quarter; change resistance ("lawyers prefer Word") cited directly.
-- **Implication:** Speed and simplicity in the core review flow are existential — every friction point is an invitation for users to go back to ChatGPT. Onboarding must get users to value (first contract reviewed) in under 10 minutes.
+- **Insight:** Unlike daily SaaS tools, Rachel's relationship with LegalGraph is entirely quarterly. She comes back under deadline pressure, has forgotten the UI, and needs to immediately understand: "Where do I pick up? What's left to do?" The re-entry experience is as important as the core workflow. Confusing re-entry = abandonment to Excel under time pressure.
+- **Evidence:** USER-JOURNEY.md: "Rachel logs in four times a year under deadline pressure. Every screen must be operable by someone who hasn't touched the tool in 90 days." PRD.md confidence level: "Customers will upload all leases to LegalGraph — Low confidence" (behavior change, not just a feature).
+- **Implication:** The dashboard's single most important element is a "leases ready to report / leases needing attention" split counter — Rachel's re-entry orientation signal. This does not exist yet. Building it is higher leverage than any new workflow feature because it determines whether Rachel's session starts productively or with disorientation.
 
 ---
 
-### Finding 3: Playbook customization is the biggest unlock — and biggest setup barrier
+### Finding 2: Trust is built one field at a time — not by a headline accuracy claim
 
-- **Insight:** Generic AI tools (pre-trained on public contracts) quickly hit a ceiling. Users who invest in mapping their company's specific playbook into LegalGraph see dramatically higher value and retention. But setting up playbooks is complex enough that teams often skip it, limiting the product to commodity clause extraction rather than its full differentiator.
-- **Evidence:** "Users will realize that introducing their own context — playbooks, precedents, templates, preferred legislation — will become the main driver of value." (Wordsmith AI, 2026). LegalGraph win/loss: 12 wins vs LawGeex specifically cited customization as the reason.
-- **Implication:** Playbook setup must become a guided, fast-path experience — not an advanced admin task. A "playbook wizard" with pre-built industry templates (tech, SaaS, healthcare) that teams can customize in < 30 minutes would directly drive activation and retention.
-
----
-
-### Finding 4: GCs can't quantify ROI — and that kills renewals
-
-- **Insight:** 79% of GCs report pressure to reduce outside counsel spend, but 57% of legal departments don't track or quantify savings. This means most GC buyers cannot justify legal tech renewals with hard data, leading to contract renegotiations and churn when budgets are scrutinized.
-- **Evidence:** "57% acknowledge they do not track or quantify the data or any savings they may achieve." (LegalBillReview, 2025). Gartner Q4 2025: AI and contract analytics are urgent priorities for GCs, with ROI proof as the gating factor for continued investment.
-- **Implication:** LegalGraph needs to make ROI *automatic and visible* — not something users have to calculate. The ROI report (time saved × attorney rate) must be surfaced prominently on the GC dashboard and sent as a monthly digest. This directly supports OKR Objective 2 (NPS 42 → 60) and reduces renewal risk.
+- **Insight:** Rachel does not trust AI output for high-value lease fields (annual rent, lease term, ROU asset value) without checking the source PDF. She will open the contract in another tab and verify. The moment a clause citation is clickable and the source text appears, she stops doubting that field. Trust is not general ("this AI is 94% accurate") — it is per-field, earned incrementally across the first 5–10 contracts.
+- **Evidence:** USER-JOURNEY.md Phase 3: "Rachel will not accept AI output for high-value fields without verifying against the source PDF. The moment Rachel clicks a clause reference and the source text appears, she stops doubting the AI. This is the trust anchor." Deloitte 2025: only 13.5% of finance professionals using AI today vs. 80.5% believing it will be standard in 5 years; 21.3% cite trust as the leading barrier. PRD.md JTBD J4: Rachel's specific trust questions — "Will the AI miss something that gets me in trouble?", "How do I know the extracted value is correct?", "If this is wrong, is it my fault or the tool's fault?"
+- **Implication:** BUG-006 (clause PDF viewer) is not a reporting feature — it is the trust anchor for the entire product. Shipping it before any other new feature is the single highest-leverage action. Per-field confidence scores (color dots) are the second: they direct Rachel's attention to uncertain fields and let her skip the certain ones, reducing spot-checking time by an estimated 60–70%.
 
 ---
 
-### Finding 5: AI trust deficit is the primary barrier among late adopters
+### Finding 3: The discount rate is the most common activation blocker — and LegalGraph doesn't help Rachel solve it
 
-- **Insight:** 42% of slow adopters cite distrust in AI as their primary barrier. With 600+ AI hallucination cases in courts and Stanford research showing 17–34% error rates in legal-specific tools, GCs are right to be cautious. This trust gap is holding back a large cohort of potential LegalGraph customers who are aware of AI but won't adopt without proof.
-- **Evidence:** "42% of slow adopters cite mistrust in AI and ethical concerns, 41% want to wait for AI to become more reliable." (Wolters Kluwer, 2025). LegalGraph's 88% risk scoring accuracy and 94% clause extraction accuracy are competitive — but only if backed by validated, published evidence.
-- **Implication:** Confidence scores and "AI uncertain" flags in the UI are necessary but not sufficient. An independently validated accuracy benchmark report (OKR KR2) becomes the key trust-building tool for this segment. It should be promoted in sales materials, gated content, and the product itself.
-
----
-
-### Finding 6: Contract cycle time and deal delay are the business team's pain — not just legal's
-
-- **Insight:** 57% of business development professionals report that contracting inefficiencies delay revenue recognition. 50% have experienced lost business opportunities due to slow contract review. This means the business case for LegalGraph extends beyond the legal team — sales, procurement, and ops all feel the pain.
-- **Evidence:** "57% of business development professionals report that contracting inefficiencies delay revenue recognition, whereas 50% have experienced lost business opportunities altogether." (Streamline.ai, 2026). Also reflected in LegalGraph use case 2: MSA negotiation 6 hours → 45 minutes, enabling faster deal closes.
-- **Implication:** LegalGraph's value proposition should extend to "helps your sales team close faster" — not just "saves your legal team time." This reframes the budget conversation from a legal cost center to a revenue enabler. Salesforce integration (already live) should be front-and-center in sales materials targeting RevOps and CRO audiences.
+- **Insight:** The discount rate (incremental borrowing rate, IBR) is almost always missing from the lease contract itself. When LegalGraph flags "Discount rate missing — High severity," Rachel knows she needs to provide it but doesn't know how to calculate the IBR or where to get it. The flag describes the problem without providing any guidance on how to resolve it. This creates a dead end that stalls the compliance cycle and risks flag abandonment ("I'll just dismiss this and move on").
+- **Evidence:** USER-JOURNEY.md Phase 4: "Flag text references IFRS 16.26 but doesn't tell her the IBR for this contract. Ideal state: The flag provides a calculator or guidance." PRD.md open question 1: "What discount rate do we use if the customer hasn't specified one? Do we default to the incremental borrowing rate or require manual input?" — marked as unresolved.
+- **Implication:** Each High-severity flag needs a "What do I do now?" action guidance block. For the discount rate specifically: IBR calculation guidance ("Common approach: use your company's average cost of debt at the lease commencement date. IFRS 16.26 requires documentation of the rate used."), a link to a discount rate calculator, and a way to save the chosen rate at the company level so it's not re-entered every quarter. This is a conversion unlock — the most common reason Rachel's session stalls before report generation.
 
 ---
 
-### Finding 7: Once trust is established, AI adoption expands across workflows naturally
+### Finding 4: Auditor acceptance is the real retention metric — not activation
 
-- **Insight:** Resistance to AI in contract review has dropped to just 5%. Once teams trust the tool for one contract type (e.g., NDAs), they naturally expand to MSAs, vendor contracts, and eventually playbook management. This "land and expand" behavior is a retention and upsell signal — not just an activation metric.
-- **Evidence:** "Once trust is established in contract review, AI adoption expands naturally into other legal workflows." (LegalOnTech, 2026). LegalGraph data: 92% net retention for enterprise; 12,500 contracts/month growing 18% MoM.
-- **Implication:** Activation strategy should be laser-focused on one high-value contract type first (NDAs for most customers), then systematically expand. The onboarding flow should guide users through a "first win" on their highest-volume contract type before introducing playbooks or analytics.
+- **Insight:** Rachel's north star job is not "analyze a contract in LegalGraph" — it is "hand audit-ready output to external auditors without a revision request." The PCAOB AS 1105 amendment (effective December 2025) means auditors are now specifically evaluating whether AI-generated financial outputs have full data lineage, explainability, and human review sign-off. An auditor who questions the AI-generated report sends Rachel back to Excel. An auditor who accepts it — and can click through to source clauses — converts Rachel into a reference customer.
+- **Evidence:** JTBD.md J2: "Competitor reviews confirm this is the #1 praised feature when it works (Trullion: 'go from financial entries directly to the right place in the original contract') and the #1 reason auditors accept AI-generated reports — because they can verify the AI's output independently." PRD.md L1-4: Auditor acceptance rate target ≥95%. PCAOB AS 1105 (effective December 2025): requires full audit trail and explainability for AI-generated financial outputs.
+- **Implication:** The report PDF must contain full clause trail (every field links to section + page reference + clause text excerpt), a report cover page with "AI-assisted, human-reviewed" language, and documentation of which fields were manually verified vs. AI-extracted. This is not a reporting enhancement — it is the compliance artifact that Rachel's auditor is now legally required to evaluate under PCAOB AS 1105. Ship it at GA, not GA+1.
+
+---
+
+### Finding 5: Persistent storage is a prerequisite for retention — and it doesn't exist yet
+
+- **Insight:** Without persistent per-account analysis history (BUG-009), Rachel starts from scratch every quarter. There is no memory of which leases she processed, which flags she resolved, or which discount rates she entered. This eliminates the compounding value of LegalGraph — the "it remembered where I left off" moment that converts a useful tool into an indispensable one. If Rachel has to re-analyze every lease every quarter as if it's the first time, the time savings diminish and her evaluation of LegalGraph vs. Excel becomes "is the AI extraction good enough to justify the re-setup cost each quarter?"
+- **Evidence:** USER-JOURNEY.md Phase 7: "Critical dependency: persistent per-account storage (BUG-009) is a prerequisite for a functional return journey. Without it, Rachel starts from scratch every quarter." JTBD.md: "Fired (moments of switching back to Excel): The tool forgets last quarter's analysis — Rachel has to start from scratch every quarter." PRD.md: BUG-009 flagged as P0 metric collection gap.
+- **Implication:** BUG-009 is not a metric instrumentation fix — it is a retention prerequisite. The product cannot demonstrate compound value (J5: amendment tracking, J3: portfolio status dashboard, J7: David's term lookup) without it. Fix BUG-009 before adding any new features that depend on historical state.
+
+---
+
+### Finding 6: Jennifer approves in a 30-minute conversation — and four specific questions determine the outcome
+
+- **Insight:** Jennifer's evaluation arc is not a product tour — it is a risk evaluation. She asks four questions, in order: (1) Where does our contract data go? (2) Will auditors accept this? (3) What does it cost? (4) What happens if it's wrong? Each question has a specific product and documentation answer. If any of them is unsatisfying, she blocks the purchase. The consent modal, report cover page, DPA, and "not legal advice" disclaimer are Jennifer-facing UX — as important as Rachel's workflow for deal conversion.
+- **Evidence:** USER-JOURNEY.md Journey B: "Jennifer asks four questions... reads the consent modal. If it names Anthropic Claude API explicitly and gives a deletion contact, she concludes the vendor is serious about disclosure." PRD.md J6: "What makes Jennifer approve: Clear disclosure, Report gate (High flags must be resolved before export), Clause trail, ROI evidence, Beta NDA and DPA." Company OKR: Average deal size $45k → $85k requires Jennifer's sign-off on enterprise agreements.
+- **Implication:** Create a one-pager for Jennifer: "How LegalGraph handles your contract data, meets PCAOB AS 1105 requirements, and protects you from a restatement." This is a sales enablement asset, not a product feature — but it is the gate between Rachel's trial and Jennifer's signed contract. Produce it before the next enterprise sales cycle.
+
+---
+
+### Finding 7: David's job is 90 seconds, not 45 minutes — and the product already serves it, barely
+
+- **Insight:** David's use case is a single lookup: one field, one lease, one reference. He needs the portfolio table to be searchable by lease name, and the extracted terms grid to be the first thing visible on the analysis screen. Both are partially true today (extracted terms grid is first; portfolio table is static demo data, not searchable). David doesn't need to run analysis — he needs to look up what Rachel already ran.
+- **Evidence:** JTBD.md J7: "Session duration for David: target <120 seconds." USER-JOURNEY.md Journey C: "Navigates to the Leases dashboard → finds the lease by name → goes straight to the extracted terms section → finds the field → optionally clicks the clause citation." Product-description.md: "Clause comparison across contracts, Search extracted clauses portfolio-wide" — described as a feature but not fully implemented.
+- **Implication:** Making the portfolio table searchable/filterable (currently showing demo data, BUG-009 dependency) unlocks David's use case and creates a second active user persona on every account. Two active personas per account = higher enterprise retention and expansion revenue. Low implementation cost relative to retention impact.
 
 ---
 
@@ -159,66 +141,69 @@
 
 ### High Priority
 
-1. **Frictionless contract upload from existing tools (email, Word, SharePoint)**
-   - User quote/evidence: "Word and Outlook integration matters more than marketing suggests. Lawyers live in Word and Outlook. A platform that requires leaving those surfaces gets used less." (Bloomberg Law, 2026)
-   - Business impact: Directly addresses 55% → 70% activation OKR. Every point of activation = ~8x higher conversion to paid.
+1. **Clause PDF viewer — one-click from any extracted field to source clause text (BUG-006)**
+   - User quote/evidence: "The moment Rachel clicks a clause reference and the source text appears, she stops doubting the AI. This is the trust anchor. Without it, she opens the PDF herself every time." (USER-JOURNEY.md)
+   - Business impact: GA blocker. Without it, audit defense fails — Rachel cannot answer auditor questions from the report alone. Auditor acceptance rate target of ≥95% is unreachable without BUG-006.
 
-2. **Automatic ROI reporting visible to GC (time saved, cost avoided)**
-   - User quote/evidence: "57% acknowledge they do not track or quantify savings they may achieve." (LegalBillReview, 2025)
-   - Business impact: Reduces renewal risk. Gives GC the data needed to justify budget. Supports 92% → 95% enterprise retention OKR.
+2. **Persistent per-account storage — analysis history across sessions (BUG-009)**
+   - User quote/evidence: "The tool forgets last quarter's analysis — Rachel has to start from scratch every quarter." (JTBD.md firing moment)
+   - Business impact: Retention prerequisite. Without it, J3 (portfolio status), J5 (amendment tracking), and J7 (David term lookup) are impossible. Every new feature that depends on history fails without this foundation.
 
-3. **Guided playbook setup with pre-built templates (< 30 min to first playbook)**
-   - User quote/evidence: "Introducing your own context — playbooks, precedents, templates — will become the main driver of value." (Wordsmith AI, 2026)
-   - Business impact: Unlocks the core LegalGraph differentiator. Teams that configure playbooks have significantly higher retention and expansion revenue.
+3. **Dashboard "Ready / Needs Attention" counter — Rachel's re-entry orientation signal**
+   - User quote/evidence: "How many of your leases are ready to report, and how many still have issues? Rachel needs to know this in under 60 seconds of re-entry." (USER-JOURNEY.md Phase 1)
+   - Business impact: Reduces re-entry abandonment. Rachel under deadline pressure who cannot immediately orient herself will switch back to Excel. This is a direct activation → retention bridge.
 
-4. **Published, validated accuracy benchmarks**
-   - User quote/evidence: "42% of slow adopters cite mistrust in AI and ethical concerns, 41% want to wait for AI to become more reliable." (Wolters Kluwer, 2025)
-   - Business impact: Unblocks the late-adopter segment. Directly maps to OKR Objective 3, KR2.
+4. **Discount rate guidance on High-severity IBR flag — "What do I do now?" action block**
+   - User quote/evidence: "Flag text references IFRS 16.26 but doesn't tell her what rate to use or how to calculate it." (USER-JOURNEY.md Phase 4)
+   - Business impact: Most common activation stall. Flag abandonment (dismissing unresolved High flags) degrades report quality and auditor acceptance rate. Resolving this moves more Rachel sessions from "stalled" to "report exported."
 
 ### Medium Priority
 
-5. **AI-powered redline suggestions tied to playbook (Contract Negotiation Assistant)**
-   - User quote/evidence: LegalGraph use case 2 — MSA review: 6 hours → 45 minutes with AI redline suggestions. Highest-ROI workflow for Senior Counsel.
-   - Business impact: Increases deal size ($45k → $85k OKR target). Differentiates from LawGeex and commodity review tools.
+5. **Per-field confidence scores (color dot system: green/amber/red per extracted field)**
+   - User quote/evidence: "Rachel will not accept AI output for high-value fields without verifying against the source PDF. Per-field confidence scores let her check only the uncertain fields." (USER-JOURNEY.md Phase 3)
+   - Business impact: Reduces Rachel's manual verification time by ~60%. Increases trust pace — teams that trust the AI faster stay on the platform longer.
 
-6. **Portfolio-level risk dashboard for GC (risk heatmap, trends, benchmarks)**
-   - User quote/evidence: "79% of legal departments report pressure to reduce outside counsel spend" — but no visibility into which contracts are driving risk. (LegalBillReview, 2025)
-   - Business impact: Moves LegalGraph from "attorney tool" to "GC strategic platform." Enables upsell from Professional → Enterprise tier.
+6. **IFRS 16 / ASC 842 toggle — multi-standard compliance in one product**
+   - User quote/evidence: PRD open question 2: "IFRS 16 vs. ASC 842 — do we ship both standards in V1 or IFRS 16 only first? Affects eng scope by ~2 weeks."
+   - Business impact: Opens North American market fully. ~45 enterprise accounts in LegalGraph's current base are split across IFRS 16 (international) and ASC 842 (US); single-standard support limits deal size and expansion.
 
-7. **Approval workflow with Slack/email notifications**
-   - User quote/evidence: "Email chains for contract reviews are stretching for weeks." (Bloomberg Law, 2026)
-   - Business impact: Reduces contract cycle time. Improves collaboration between legal and business stakeholders. Reduces shadow contracts.
+7. **Audit-ready PDF export — cover page, per-field clause citations, flag resolution log**
+   - User quote/evidence: "The PDF must contain: cover page with 'AI-assisted, human-reviewed' language, per-field clause reference with section + page, risk flag resolution log, audit trail of manual edits." (USER-JOURNEY.md Phase 5)
+   - Business impact: L1-4 (auditor acceptance rate) is the lagging retention metric. The report PDF is what the auditor evaluates. An incomplete export is a direct churn signal.
 
 ---
 
 ## Behavioral Patterns
 
-**Tool usage:**
-- Primary tools today: Word (drafting/redlines), Outlook (review requests/approvals), Excel/Google Sheets (clause tracking), ChatGPT (informal summarization)
-- Legal teams resist adopting new platforms that don't integrate with Word or email
-- Legal ops managers (Jordan persona) are the adoption champions — they run pilots, build training, and manage rollout
+**Temporal patterns:**
+- Rachel uses LegalGraph in four intense sessions per year — T-14 to T-0 before each quarter-end close. Each session is 45–90 minutes of focused work on 3–5 leases
+- She arrives under deadline pressure, having not used the product in 90 days. Institutional memory of the UI has reset
+- High flags must be resolved before export — Rachel's session does not end until either all flags are cleared or she abandons to Excel
 
-**Workflow patterns:**
-- Contract review is triggered by email request → manual triage → review in Word → email back with redlines → email approval chain
-- High-volume routine contracts (NDAs) reviewed in batches on Monday mornings; complex contracts (MSAs) get dedicated review sessions
-- Playbook enforcement is currently manual: attorneys "remember" standards or reference a shared doc; inconsistency grows with team size
-- Outside counsel escalation happens when internal team is overloaded, not by risk tier — an inefficiency LegalGraph can fix with AI triage
+**Tool usage:**
+- Primary current tools: Excel (manual extraction template), PDF viewer (Ctrl+F for clause hunting), email (coordination with CFO and auditor)
+- Shadow IT: informal ChatGPT for clause summarization; introduces data leakage risk with sensitive contract data
+- Decision to upload to LegalGraph: triggered by the quarterly deadline, an auditor revision request from the prior quarter, or a new lease signing that breaks the existing Excel template
+
+**Trust-building sequence (from JTBD.md and USER-JOURNEY.md):**
+1. Upload a familiar lease (one she knows well) first — uses it as a ground truth test of AI accuracy
+2. Spot-checks 2–3 high-value fields against the original PDF
+3. Reads clause references without clicking through; section numbers are enough to orient her
+4. Edits fields she knows are wrong; watches whether LegalGraph tracks the manual override
+5. Resolves High flags one at a time; expects specific guidance, not just flagging
+6. Generates and reads the export PDF before sending to auditor
+7. Sends export to auditor; waits for acceptance or revision request
+- **Critical trust break point:** If Rachel edits more than 3 fields per contract due to AI errors, she questions whether LegalGraph is faster than manual extraction. At this threshold, she considers switching back to Excel.
 
 **Decision-making:**
-- Junior attorneys flag issues and escalate; senior counsel makes risk calls; GC approves anything with high liability exposure
-- AI recommendations are trusted (78% follow LegalGraph risk scores) but only after initial trust-building period (first 5–10 contracts)
-- Buying decisions led by legal ops or AGC; GC approves budget above $50k; IT security review required for cloud tools
+- Rachel finds the tool and champions it; Jennifer approves the budget
+- Jennifer's evaluation is documentation-driven: DPA, consent modal, data retention policy, ROI evidence
+- IT security review is required for cloud tools above $50K/year; Rachel handles data security objections proactively by showing the consent modal and Anthropic disclosure
 
 **Information seeking:**
-- GC peers (ACC, CLOC) are the #1 source for tool recommendations — peer validation beats vendor marketing
-- G2 and Capterra reviews consulted during evaluation (Ironclad: 4.5/5 G2; LawGeex: 4.7/5 G2)
-- Trials and POCs are the primary conversion mechanism — "see it work on our contracts" before signing
-
-**Time allocation (estimated):**
-- 40% of attorney time: contract review and redlines
-- 25%: client/stakeholder communication and approvals
-- 20%: research, drafting, negotiation
-- 15%: admin, reporting, meeting prep
+- Jennifer's #1 trust signal: peer GC who has used it and can speak to auditor acceptance
+- Rachel's #1 trust signal: the tool correctly extracts the lease she knows best before she trusts it on any new lease
+- Both evaluate on trial/POC basis before contract; 30-day pilot is the standard conversion mechanism
 
 ---
 
@@ -226,60 +211,78 @@
 
 **Confidence: High**
 
-1. **Redesign onboarding to achieve first contract reviewed in < 10 minutes** *(addresses Findings 1, 2, 7)*
-   - Build an "email-to-LegalGraph" forwarding feature and a Word add-in (even basic) to reduce context switching
-   - Guided setup flow: contract type → upload sample → review AI results → first win
-   - Remove all steps between signup and first contract reviewed
-   - *Maps to: Activation OKR 55% → 70%; LegalGraph's biggest growth lever*
+1. **Fix BUG-006 (clause PDF viewer) before shipping any new features** *(addresses Findings 2, 4, 7)*
+   - This is the single most leveraged action in the product. Without it, Rachel cannot defend her report to an auditor, audit acceptance rate target is unreachable, and the trust-building sequence stalls at Phase 3.
+   - *Maps to: PRD L1-4 (auditor acceptance rate); JTBD J2; USER-JOURNEY.md Phase 6 (the reference customer moment)*
 
-2. **Launch "Playbook Wizard" with 10 industry-standard templates** *(addresses Finding 3)*
-   - Pre-built playbooks for SaaS/Tech, Healthcare, Real Estate, Financial Services
-   - 5-step setup: choose template → customize red lines → set approval matrix → go live
-   - Target: < 30 minutes from zero to first playbook applied
-   - *Maps to: Retention, expansion revenue, competitive differentiation vs LawGeex*
+2. **Fix BUG-009 (persistent storage) as the immediate second priority** *(addresses Finding 5)*
+   - Without persistent history, J3 (portfolio status), J5 (amendment tracking), and J7 (David's term lookup) are all blocked. No new feature that depends on session memory can ship until BUG-009 is resolved.
+   - *Maps to: PRD P0 metrics gap; JTBD J3, J5, J7; USER-JOURNEY.md Phase 7 (return journey)*
 
-3. **Build GC ROI Dashboard with auto-generated monthly digest** *(addresses Finding 4)*
-   - Dashboard: time saved this month, cost avoided, contracts reviewed, high-risk flags
-   - Monthly email digest to GC with YTD ROI (time saved × $300/hour attorney rate)
-   - *Maps to: Enterprise retention OKR 92% → 95%; reduces renewal risk*
+3. **Add "Ready / Needs Attention" counter to the dashboard header** *(addresses Finding 1)*
+   - One data element: how many leases are unblocked vs. have unresolved High flags. Costs one sprint. Saves Rachel's first 5 minutes of every quarterly session.
+   - *Maps to: JTBD J3; USER-JOURNEY.md Phase 1 (re-entry moment of truth)*
 
-4. **Publish accuracy benchmark report before Q3 2026** *(addresses Finding 5)*
-   - Partner with a law school or Big 4 legal audit firm for independent validation
-   - Publish as gated content and in-app ("This result validated at 94% accuracy by [firm]")
-   - *Maps to: OKR Objective 3 KR2; unblocks late-adopter segment (42% of prospect universe)*
+4. **Write action guidance for the IBR / discount rate flag** *(addresses Finding 3)*
+   - One block of copy + a link to an IBR calculator. No engineering required initially. Reduces the most common session stall point.
+   - *Maps to: JTBD J1, J4; USER-JOURNEY.md Phase 4; PRD open question 1*
 
-5. **Reposition messaging for RevOps/Sales audience — "close deals faster"** *(addresses Finding 6)*
-   - Add a sales-focused ROI angle: "Legal delays cost sales teams X deals/year"
-   - Salesforce integration story for AEs: "Contract status visible in your CRM in real-time"
-   - *Maps to: Deal size OKR $45k → $85k; opens new buyer persona beyond legal team*
+5. **Produce a Jennifer-facing one-pager on PCAOB AS 1105 compliance and data handling** *(addresses Finding 6)*
+   - Sales enablement, not product. Answers Jennifer's four evaluation questions in one document. Accelerates enterprise deal closing from Rachel's trial to Jennifer's signed contract.
+   - *Maps to: JTBD J6; average deal size OKR $45k → $85k; company-overview.md Objective 1*
 
 ---
 
 ## Appendix
 
-### Additional Evidence & Quotes
+### JTBD Priority Summary (from project-context/JTBD.md)
 
-- *"63% of legal departments cite bandwidth and workload as their top operational challenge."* — CLOC State of the Industry Report, 2025
-- *"More than a third of GCs (36%) are focused on adopting AI, building AI skills, or improving AI risk management."* — Gartner GC Survey, Q4 2025
-- *"Contract law firms were most interested in replacing legal-specific functions like contract drafting and review, automating previously outsourced work."* — Wolters Kluwer, 2025
-- *"Rushed adoption, unclear ROI, and poor integration can create operational friction and security exposure."* — LegalFly, 2026
-- *"Per-seat pricing is fundamentally at odds with AI's variable, outcome-driven value."* — Legal AI Trends, 2026 (implication: LegalGraph's flat $45k/year enterprise pricing is well-positioned)
-- LegalGraph internal: 92% of users trust risk scores; 78% follow AI recommendations (product-description.md)
-- LegalGraph internal: 12,500 contracts/month, 3.5 hours saved per contract = 43,750 hours/month saved across customer base
+| Job | Persona | Status | Product implication |
+|---|---|---|---|
+| J1 — Generate audit-ready IFRS 16 report | Rachel | 🔄 Partial | Full PDF export with audit trail is P0 |
+| J2 — Answer auditor question from report | Rachel | 🔄 BUG-006 | Clause viewer is the trust anchor — GA blocker |
+| J3 — Know portfolio status at re-entry | Rachel | ❌ Not built | Dashboard counter is highest-leverage re-entry fix |
+| J4 — Trust AI-extracted fields | Rachel | 🔄 n8n Phase 1 | Per-field confidence scores + clause citations |
+| J5 — See amendment impact immediately | Rachel | 🔄 Roadmap | Requires BUG-009; GA+1 |
+| J6 — Approve tooling without new liability | Jennifer | 🔄 Partial | DPA + consent modal + PCAOB one-pager |
+| J7 — Look up lease term in < 2 minutes | David | ✅ Partial | Searchable portfolio table needed (BUG-009) |
+
+### Moments of Truth (from project-context/USER-JOURNEY.md)
+
+| Phase | Moment of Truth | Status |
+|---|---|---|
+| Re-entry | "How many leases are ready to report?" | ❌ Not built |
+| Upload | Progress bar moves — analysis is working | ✅ Live |
+| Review | Clause citation opens source text in PDF | 🔄 BUG-006 |
+| Review | Per-field confidence score guides spot-checking | 🔄 n8n Phase 1 |
+| Risk resolution | "What do I do about missing discount rate?" | 🔄 Partial |
+| Export | PDF contains full clause trail + cover page | 🔄 Not fully built |
+| Audit defense | Re-open last quarter's analysis with active clause links | ❌ BUG-009 |
+| Return | "What changed since last quarter?" | ❌ BUG-009 |
+
+### Key Quotes (reconstructed from JTBD behavioral profiles)
+
+Rachel:
+- *"I don't want to feel like I need to check every single field. Show me which ones the AI is uncertain about and I'll check those."*
+- *"What rate do I use for the incremental borrowing rate? The flag just says it's missing — it doesn't tell me what to do."*
+- *"If my auditor asks where the $2.1M ROU asset value came from, I need to show them the exact clause. Not just a page number."*
+
+Jennifer:
+- *"I need to know exactly where our data goes. If this is going to an AI vendor, I need a data processing agreement before anyone uploads a single contract."*
+- *"What happens if the AI is wrong and we submit an incorrect report to our auditors? Who is liable?"*
 
 ### Data Sources
 
-- [AI Contract Review for In-House Counsel: The 2026 Guide — GC AI](https://gc.ai/blog/ai-contract-review)
-- [2025 General Counsel Survey Report — FTI Technology](https://ftitechnology.com/spotlight/gc-report-2025)
-- [Gartner Survey: AI and Contract Analytics are Urgent Priorities for General Counsel — Gartner, Q4 2025](https://www.gartner.com/en/newsroom/press-releases/2025-10-01-gartner-survey-shows-ai-and-contract-analytics-ar-urgent-priorities-for-general-counsel)
-- [2025 Legal Department Survey: Outside Counsel Oversight — LegalBillReview](https://www.legalbillreview.com/blog/2025-legal-spend-survey-results)
-- [Legal AI Adoption: Time Savings, Contract Review, Revenue Growth & Ethical Risks — Wolters Kluwer](https://www.wolterskluwer.com/en/expert-insights/legal-ai-adoption-time-savings-revenue-growth)
-- [Legal Workflow Automation in 2026 — Bloomberg Law](https://pro.bloomberglaw.com/insights/legal-solutions/legal-workflow-automation-in-2026-whats-working-and-whats-hype/)
-- [Legal AI Trends 2026: Why In-House Legal Must Own the AI Stack — Wordsmith AI](https://www.wordsmith.ai/blog/legal-ai-trends-2026)
-- [Best Contract Management Software for In-House Legal Teams 2026 — Xakia Tech](https://www.xakiatech.com/blog/best-contract-management-software-in-house-legal)
-- [AI Adoption in Contract Review Doubles Year-Over-Year — LegalOnTech](https://www.legalontech.com/press-releases/ai-adoption-in-contract-review-doubles-year-over-year)
-- [Contract Challenges for In-House Legal Teams — TermScout](https://blog.termscout.com/top-contract-challenges-for-in-house-legal-teams)
+- [JTBD.md — LegalGraph project-context (May 2026)](project-context/JTBD.md)
+- [PRD.md v1.1 — LegalGraph project-context (May 2026)](project-context/PRD.md)
+- [USER-JOURNEY.md — LegalGraph project-context (May 2026)](project-context/USER-JOURNEY.md)
+- [Deloitte 2025: AI Adoption in Finance Functions](https://www.deloitte.com)
+- [Gartner: Finance AI Research 2025–2026](https://www.gartner.com)
+- [PCAOB: AS 1105 and AS 2301 Amendments (effective December 2025)](https://pcaobus.org)
+- [BlackLine: Finance Team Data Confidence Survey 2025](https://www.blackline.com)
+- [FASB Private Company Council memo: ASC 842 Six Years Later (June 2025)](https://ileasepro.com/blog/fasb-asc-842-six-years-later-meeting/)
+- [Accounting Today: AI Thought Leaders Survey 2026](https://www.accountingtoday.com)
 
 ---
 
-*Word count: 2,104*
+*Word count: 2,487*
