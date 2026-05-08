@@ -21,6 +21,12 @@ LegalGraph helps in-house legal teams review contracts faster using AI-powered c
 - `@project-context/JTBD.md` - Jobs to be done for the project
 - `@project-context/PRD.md` - Product Requirements Document for the project
 - `@project-context/USER-JOURNEY.md` - User journey for the project
+
+**Templates (Use for Output Structure):**
+- `@templates/market-research-format.md` - Structure for market research deliverables
+- `@templates/user-research-format.md` - Structure for user research deliverables
+- `@templates/prd-template.md` - Structure for Product Requirements Documents
+
 ---
 
 ## Handling Missing Context
