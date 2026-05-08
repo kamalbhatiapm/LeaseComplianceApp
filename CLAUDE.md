@@ -20,7 +20,7 @@ LegalGraph helps in-house legal teams review contracts faster using AI-powered c
 **Current Project Context (Read First):**
 - `@project-context/JTBD.md` - Jobs to be done for the project
 - `@project-context/PRD.md` - Product Requirements Document for the project
-- `@company-context/USER-JOURNEY.md` - User journey for the project
+- `@project-context/USER-JOURNEY.md` - User journey for the project
 ---
 
 ## Handling Missing Context
