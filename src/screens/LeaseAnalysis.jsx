@@ -219,10 +219,9 @@ function ClauseDrawer({ clause, onClose }) {
   )
 }
 
-function TermsGrid({ fields, termsMissing = [] }) {
-  const [editMode, setEditMode]       = useState(false)
-  const [edits, setEdits]             = useState({})
-  const [saveConfirm, setSaveConfirm] = useState(false)
+function TermsGrid({ fields, termsMissing = [], edits, setEdits }) {
+  const [editMode, setEditMode]         = useState(false)
+  const [saveConfirm, setSaveConfirm]   = useState(false)
   const [activeClause, setActiveClause] = useState(null)
 
   const rows = Object.entries(fields).map(([key, raw]) => {
@@ -405,7 +404,7 @@ const STANDARD_META = {
   asc842_compliance: { label: 'ASC 842', short: 'ASC 842', other: 'IFRS 16', otherValue: 'ifrs16_compliance' },
 }
 
-export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme, analysisIntent, setAnalysisIntent, handleReanalyzeAs }) {
+export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme, analysisIntent, setAnalysisIntent, handleReanalyzeAs, fieldEdits, setFieldEdits }) {
   if (isAnalyzing) {
     return (
       <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
@@ -560,7 +559,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           )}
 
           {/* Terms */}
-          <TermsGrid fields={fields} termsMissing={termsMissing} />
+          <TermsGrid fields={fields} termsMissing={termsMissing} edits={fieldEdits ?? {}} setEdits={setFieldEdits ?? (() => {})} />
 
           {/* Risk flags */}
           <RiskFlags flags={riskFlags} onGateChange={onGateChange} />
@@ -610,20 +609,25 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           </div>
 
           <div className="sidebar-section">
-            <div className="sidebar-section-title">Clause Audit Trail</div>
-            {[
-              { clause: '§ 2.1 — Lease Commencement', field: 'Commencement date · Lease term' },
-              { clause: '§ 3.2 — Renewal Rights',      field: 'Renewal options' },
-              { clause: '§ 5.1 — Base Rent',            field: 'Annual payment' },
-              { clause: '§ 5.3 — Rent Adjustments',     field: 'Escalation rate' },
-              { clause: '§ 6.1 — Security Deposit',     field: 'Security deposit amount' },
-              { clause: '§ 14.1 — Early Termination',   field: 'Termination rights' },
-            ].map(a => (
-              <div key={a.clause} className="audit-trail-item">
-                <div className="audit-clause">{a.clause}</div>
-                <div className="audit-field">→ {a.field}</div>
-              </div>
-            ))}
+            <div className="sidebar-section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              Clause Audit Trail
+              <button
+                className="btn btn-sm btn-outline"
+                style={{ fontSize: '11px', padding: '2px 8px' }}
+                onClick={() => navigate('/audit')}
+              >
+                View all →
+              </button>
+            </div>
+            {Object.entries(fields)
+              .filter(([, f]) => typeof f === 'object' && f !== null && f.source_clause)
+              .slice(0, 5)
+              .map(([key, f]) => (
+                <div key={key} className="audit-trail-item">
+                  <div className="audit-clause">{f.source_clause}</div>
+                  <div className="audit-field">→ {FIELD_LABELS[key] ?? key.replace(/_/g, ' ')}</div>
+                </div>
+              ))}
           </div>
 
           <div className="sidebar-section">
