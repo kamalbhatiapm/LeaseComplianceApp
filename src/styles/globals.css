@@ -1463,6 +1463,39 @@ nav {
   padding: 24px 24px 48px;
 }
 
+/* Audit readiness banner */
+.audit-ready-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  border: 1px solid;
+}
+.audit-ready-banner--ok {
+  background: rgba(48, 209, 88, 0.08);
+  border-color: rgba(48, 209, 88, 0.25);
+  color: var(--green);
+}
+.audit-ready-banner--warn {
+  background: rgba(255, 159, 10, 0.08);
+  border-color: rgba(255, 159, 10, 0.25);
+  color: var(--amber);
+}
+.audit-ready-banner--warn .btn {
+  color: var(--t2);
+  border-color: rgba(255,255,255,.2);
+  font-size: 11px;
+  padding: 3px 10px;
+  flex-shrink: 0;
+}
+[data-theme="light"] .audit-ready-banner--ok { background: var(--green-lt); border-color: rgba(48,209,88,.3); }
+[data-theme="light"] .audit-ready-banner--warn { background: var(--amber-lt); border-color: rgba(255,159,10,.3); }
+[data-theme="light"] .audit-ready-banner--warn .btn { color: var(--ink-2); border-color: var(--border); }
+
 .audit-summary-bar {
   display: flex;
   align-items: center;

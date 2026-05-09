@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import {
   FileDown, Paperclip, AlertTriangle, CircleCheck,
-  Clock, CheckCircle2, ShieldCheck, FlaskConical,
+  Clock, CheckCircle2, ShieldCheck, FlaskConical, Lock,
 } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
-import { MOCK_ANALYSIS, FIELD_LABELS, getExtractionQuality } from '../utils/constants.js'
+import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
 import { track } from '../utils/track.js'
 
 const STANDARD_META = {
@@ -45,6 +45,14 @@ export default function AuditTrail({ selectedFile, analysisData, isLiveData, nav
 
   const editedCount  = rows.filter(r => r.edited !== undefined).length
   const highCount    = riskFlags.filter(f => f.severity === 'high').length
+  const issueCount   = highCount + termsMissing.length
+  const auditReady   = issueCount === 0
+  const exportLocked = highCount > 0
+  const lockTitle    = `Resolve ${highCount} high-risk flag${highCount !== 1 ? 's' : ''} to unlock`
+
+  // Sort: missing/high-flagged first → verify-recommended → extracted
+  const sortScore = r => r.missing ? 0 : r.relFlag?.severity === 'high' ? 1 : (r.conf > 0 && r.conf < 0.85) ? 2 : 3
+  const sortedRows = [...rows].sort((a, b) => sortScore(a) - sortScore(b))
 
   // Analysis timeline entries
   const timeline = [
@@ -81,9 +89,15 @@ export default function AuditTrail({ selectedFile, analysisData, isLiveData, nav
           </div>
           <div className="s2-subheader-actions">
             <button className="btn btn-outline btn-sm" onClick={() => navigate('/leases')}>← Back to report</button>
-            <button className="btn btn-primary btn-sm" onClick={() => track('audit_exported', { format: 'pdf' })}>
-              <FileDown size={12} /> Export audit log
-            </button>
+            <span className={exportLocked ? 'btn-tooltip-wrap' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+              <button
+                className="btn btn-primary btn-sm"
+                disabled={exportLocked}
+                onClick={() => !exportLocked && track('audit_exported', { format: 'pdf' })}
+              >
+                {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export audit log
+              </button>
+            </span>
           </div>
         </div>
 
@@ -112,6 +126,26 @@ export default function AuditTrail({ selectedFile, analysisData, isLiveData, nav
             </div>
           </div>
 
+          {/* Audit readiness banner */}
+          {auditReady ? (
+            <div className="audit-ready-banner audit-ready-banner--ok">
+              <CircleCheck size={15} />
+              <span>Audit-ready — all fields extracted, no unresolved high-risk flags.</span>
+            </div>
+          ) : (
+            <div className="audit-ready-banner audit-ready-banner--warn">
+              <AlertTriangle size={15} />
+              <span>
+                {issueCount} item{issueCount !== 1 ? 's' : ''} need attention before this log is complete
+                {termsMissing.length > 0 && ` · ${termsMissing.length} missing field${termsMissing.length !== 1 ? 's' : ''}`}
+                {highCount > 0 && ` · ${highCount} unresolved high-risk flag${highCount !== 1 ? 's' : ''}`}.
+              </span>
+              <button className="btn btn-sm btn-outline" style={{ marginLeft: 'auto' }} onClick={() => navigate('/leases')}>
+                Resolve in report →
+              </button>
+            </div>
+          )}
+
           <div className="audit-body">
 
             {/* Field extraction table */}
@@ -123,7 +157,6 @@ export default function AuditTrail({ selectedFile, analysisData, isLiveData, nav
               <table className="audit-table">
                 <thead>
                   <tr>
-                    <th>#</th>
                     <th>Field</th>
                     <th>Source Clause</th>
                     <th>Extracted Value</th>
@@ -133,9 +166,8 @@ export default function AuditTrail({ selectedFile, analysisData, isLiveData, nav
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row, i) => (
+                  {sortedRows.map((row) => (
                     <tr key={row.key} className={row.missing ? 'audit-row-missing' : row.edited !== undefined ? 'audit-row-edited' : ''}>
-                      <td className="audit-row-num">{i + 1}</td>
                       <td className="audit-field-name">{row.label}</td>
                       <td>
                         {row.clause ? (
@@ -154,7 +186,9 @@ export default function AuditTrail({ selectedFile, analysisData, isLiveData, nav
                             <span style={{ color: 'var(--brand)', fontWeight: 600 }}>{row.edited}</span>
                           </span>
                         ) : row.missing ? (
-                          <span style={{ color: 'var(--amber)', fontSize: '12px' }}>Not found in contract</span>
+                          <span style={{ color: 'var(--amber)', fontSize: '12px', lineHeight: 1.5 }}>
+                            {FIELD_HINTS[row.key] ?? 'Not found — please verify manually'}
+                          </span>
                         ) : (
                           row.value
                         )}
