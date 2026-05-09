@@ -35,7 +35,7 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 | `src/screens/LeaseAnalysis.jsx` | Full extraction results: risk score ring, terms grid, risk flags with guidance, sidebar export actions |
 | `src/screens/AuditTrail.jsx` | Per-session audit log: extraction timestamp, model version, field edits, flag resolutions |
 | `src/screens/Playbooks.jsx` | Playbook management — IFRS 16 / ASC 842 rule sets applied to incoming contracts |
-| `src/components/ConsentModal.jsx` | Pre-analysis consent gate: Anthropic Claude API disclosure, data handling, "not legal advice" |
+| `src/components/ConsentModal.jsx` | Pre-analysis consent gate: OpenAI API disclosure, data handling, "not legal advice" |
 | `src/components/ProgressPanel.jsx` | 4-step analysis progress panel shown during extraction |
 | `src/components/Nav.jsx` | Top navigation bar |
 | `src/components/Toast.jsx` | Non-blocking toast notifications (replaces all `alert()` calls) |
@@ -159,7 +159,7 @@ The upload panel shows the filename and file size. The button changes to **Analy
 ### Step 3 — Accept the consent modal
 
 On first analysis, a consent modal appears disclosing:
-- **Anthropic Claude API** processes the contract text
+- **OpenAI API** processes the contract text via the n8n workflow
 - Data is not used to train AI models
 - Output requires human review and is not legal or financial advice
 
@@ -251,7 +251,7 @@ The missing discount rate is deliberate — it matches the mock analysis wired i
 
 ## n8n Workflow Architecture
 
-The workflow follows an orchestrator-subagent pattern powered by **Anthropic Claude API**:
+The workflow follows an orchestrator-subagent pattern powered by **OpenAI Chat Model**:
 
 ```
 Webhook (POST)
@@ -260,13 +260,13 @@ Webhook (POST)
 Extract from File  ──── parses raw text from uploaded PDF/DOCX
     │
     ▼
-Orchestrator Agent  ◄── Anthropic Claude API + Simple Memory
+Orchestrator Agent  ◄── OpenAI Chat Model + Simple Memory
     │
-    ├──► key_term_extraction_agent  ◄── Claude API + Tool Output Parser
+    ├──► key_term_extraction_agent  ◄── OpenAI Chat Model + Tool Output Parser
     │         └── extracts IFRS 16 / ASC 842 fields, assigns confidence scores,
     │             cites source clauses, applies hallucination guard
     │
-    └──► contract_playbook_agent  ◄── Claude API + Memory
+    └──► contract_playbook_agent  ◄── OpenAI Chat Model + Memory
               └── fetch_playbook (getAll: row)
                         └── validates extracted fields against active playbook
     │
