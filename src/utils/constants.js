@@ -1,3 +1,33 @@
+export const FIELD_HINTS = {
+  discount_rate:     'Not found — enter your IBR manually or request from treasury.',
+  renewal_options:   'Not found — confirm whether renewal options exist and document intent language for auditors.',
+  termination_rights:'Not found — confirm the non-cancellable period and termination conditions manually.',
+  security_deposit:  'Not found — check lease schedule or side letter for deposit amount.',
+  escalation_rate:   'Not found — confirm if rent is fixed or escalates; document for IFRS 16 payment schedule.',
+  commencement_date: 'Not found — required for IFRS 16 lease term calculation. Enter manually.',
+  expiry_date:       'Not found — required to compute remaining term. Enter manually.',
+  annual_payment:    'Not found — required for present value calculation. Enter manually.',
+}
+
+export const EXTRACTION_QUALITY = { strongRatio: 0.8, fairRatio: 0.6 }
+
+export function getExtractionQuality(termsFound, termsTotal, fields) {
+  if (!termsTotal) return { level: 'Weak', color: 'var(--red)', detail: 'No fields extracted' }
+  const foundRatio = termsFound / termsTotal
+  const highConfCount = Object.values(fields ?? {}).filter(f => {
+    const conf = typeof f === 'object' && f !== null ? (f.confidence ?? 0) : 1
+    return conf >= 0.85
+  }).length
+  const highConfRatio = termsFound > 0 ? highConfCount / termsFound : 0
+  if (foundRatio >= EXTRACTION_QUALITY.strongRatio && highConfRatio >= EXTRACTION_QUALITY.strongRatio) {
+    return { level: 'Strong', color: 'var(--green)', detail: `Strong — ${termsFound} of ${termsTotal} fields found, ${highConfCount} high-confidence` }
+  }
+  if (foundRatio >= EXTRACTION_QUALITY.fairRatio) {
+    return { level: 'Fair', color: 'var(--amber)', detail: `Fair — ${termsFound} of ${termsTotal} fields found` }
+  }
+  return { level: 'Weak', color: 'var(--red)', detail: `Weak — ${termsFound} of ${termsTotal} fields found, review recommended` }
+}
+
 export const FIELD_LABELS = {
   commencement_date:   'Commencement Date',
   expiry_date:         'Expiry Date',

@@ -1,8 +1,8 @@
 const STEPS = [
-  'Reading contract structure',
-  'Extracting IFRS 16 fields',
-  'Scoring risk factors',
-  'Triggering downstream workflow',
+  'Identifying lease type and parties',
+  'Finding commencement date, rent schedule, and renewals',
+  'Scoring risk against IFRS 16 §§ 19, 26, B34',
+  'Generating your audit-ready report',
 ]
 
 export default function ProgressPanel({ file, progress }) {
