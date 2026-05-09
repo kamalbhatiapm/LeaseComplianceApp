@@ -1766,17 +1766,26 @@ nav {
 
 /* Print */
 @media print {
-  .no-print, nav, .s2-subheader { display: none !important; }
-  body { background: #fff !important; }
+  @page { margin: 18mm 16mm; size: A4; }
+  .no-print, nav, .s2-subheader, .adt-toolbar, .adt-resolve-link { display: none !important; }
+  body, html { background: #fff !important; }
   .adt-doc {
     box-shadow: none;
     margin: 0;
     max-width: 100%;
     border-radius: 0;
+    font-size: 11px;
   }
+  .adt-doc-title { font-size: 18px; }
+  .adt-doc-header { padding: 16px 20px 0; }
+  .adt-section { padding: 16px 20px; }
+  .adt-doc-footer { padding: 10px 20px; }
+  .adt-ledger td, .adt-ledger th { padding: 6px 8px; }
   .adt-ledger tr { page-break-inside: avoid; }
-  .adt-timeline-strip { flex-wrap: wrap; gap: 12px; }
+  .adt-section { page-break-inside: avoid; }
+  .adt-timeline-strip { flex-wrap: wrap; gap: 8px; }
   .adt-tl-step::after { display: none; }
+  .adt-flag-desc { -webkit-line-clamp: unset; overflow: visible; display: block; }
 }
 
 @media (max-width: 700px) {

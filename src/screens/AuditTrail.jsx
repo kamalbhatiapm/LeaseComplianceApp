@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import {
   FileDown, Paperclip, AlertTriangle, CircleCheck,
-  Clock, CheckCircle2, ShieldCheck, FlaskConical, Lock, Printer,
+  Clock, CheckCircle2, ShieldCheck, FlaskConical, Lock,
 } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
@@ -80,14 +80,11 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
           </div>
           <div className="adt-toolbar-right">
             <button className="btn btn-outline btn-sm" onClick={() => navigate('/leases')}>← Back to report</button>
-            <button className="btn btn-outline btn-sm" onClick={() => { track('audit_print'); window.print() }}>
-              <Printer size={12} /> Print
-            </button>
             <span className={exportLocked ? 'btn-tooltip-wrap' : ''} data-tip={exportLocked ? lockTitle : undefined}>
               <button
                 className="btn btn-primary btn-sm"
                 disabled={exportLocked}
-                onClick={() => !exportLocked && track('audit_exported', { format: 'pdf' })}
+                onClick={() => { if (exportLocked) return; track('audit_exported', { format: 'pdf' }); window.print() }}
               >
                 {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export audit log
               </button>
