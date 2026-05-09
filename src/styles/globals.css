@@ -545,7 +545,8 @@ nav {
 }
 .s2-subheader-left { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .s2-subheader-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.s2-subheader-ts   { font-size: 11px; color: var(--t4); white-space: nowrap; }
+.s2-subheader-ts       { font-size: 11px; color: var(--t4); white-space: nowrap; }
+.s2-legal-disclaimer   { font-size: 10px; color: var(--t4); font-style: italic; opacity: 0.7; }
 .s2-subheader-divider { width: 1px; height: 20px; background: rgba(255,255,255,.15); flex-shrink: 0; }
 .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; color: rgba(255,255,255,.7); }
 .breadcrumb a { color: var(--accent-on-dark); cursor: pointer; font-weight: 500; text-decoration: none; }
@@ -589,6 +590,12 @@ nav {
 .score-ring-val {
   position: relative; z-index: 1;
   font-size: 20px; font-weight: 700; color: var(--amber); letter-spacing: -.03em;
+  line-height: 1;
+}
+.score-ring-denom {
+  position: relative; z-index: 1;
+  font-size: 10px; font-weight: 500; color: rgba(255,255,255,.4); letter-spacing: 0;
+  margin-top: 1px;
 }
 .score-level { font-size: 12px; font-weight: 600; color: var(--amber); text-align: center; }
 .score-hint  { font-size: 11px; color: rgba(255,255,255,.65); text-align: center; cursor: help; }
