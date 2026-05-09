@@ -215,6 +215,11 @@ function TermsGrid({ fields, termsMissing = [] }) {
           </span>
         ))}
       </div>
+      <div className="term-col-headers">
+        <span>Field</span>
+        <span>Extracted Value</span>
+        <span>Source Clause</span>
+      </div>
       {rows.map(({ key, missing, confCls, uncertain, label, clause, value, edited, rawField }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">

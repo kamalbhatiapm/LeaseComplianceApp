@@ -1266,6 +1266,21 @@ nav {
 
 /* ── T.R.U.S.T UX additions ─────────────────────────────────────── */
 
+/* Terms Grid column headers */
+.term-col-headers {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  padding: 7px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: rgba(255,255,255,.35);
+}
+[data-theme="light"] .term-col-headers {
+  background: rgba(0,0,0,.03);
+  border-bottom-color: rgba(0,0,0,.07);
+  color: var(--ink-3);
+}
+
 /* Confidence uncertainty chip */
 .conf-chip {
   display: inline-block;
