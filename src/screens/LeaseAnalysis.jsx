@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Sparkles, Pencil, Check, Download, Mail, RefreshCw,
+  Sparkles, Pencil, Check, FileDown, Send, RefreshCw,
   Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
   FileText, Loader, ScanText, Brain, ShieldCheck, Lock, X, ExternalLink,
 } from 'lucide-react'
@@ -492,7 +492,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
             title={exportLocked ? lockTitle : undefined}
             onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'extraction' })}
           >
-            {exportLocked ? <Lock size={12} /> : <Download size={12} />} Export PDF
+            {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export PDF
           </button>
           {selectedFile && (
             <button
@@ -570,10 +570,10 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
               <CircleCheck size={16} />
               <span>All risks acknowledged — report is ready to export.</span>
               <button className="btn btn-sm btn-primary" onClick={() => track('report_exported', { format: 'pdf', type: 'banner' })}>
-                <Download size={12} /> Export PDF
+                <FileDown size={12} /> Export PDF
               </button>
               <button className="btn btn-sm btn-outline" onClick={() => track('report_sent', { method: 'email', source: 'banner' })}>
-                <Mail size={12} /> Send to auditor
+                <Send size={12} /> Send to auditor
               </button>
             </div>
           )}
@@ -591,7 +591,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
                 title={exportLocked ? lockTitle : undefined}
                 onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'sidebar' })}
               >
-                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Download size={14} aria-hidden="true" />} Export to PDF
+                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <FileDown size={14} aria-hidden="true" />} Export to PDF
               </button>
               <button
                 className="action-btn"
@@ -600,7 +600,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
                 title={exportLocked ? lockTitle : undefined}
                 onClick={() => !exportLocked && track('report_sent', { method: 'email' })}
               >
-                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Mail size={14} aria-hidden="true" />} Send to auditor
+                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Send size={14} aria-hidden="true" />} Send to auditor
               </button>
               <button className="action-btn" aria-label="Re-run lease extraction"><RefreshCw size={14} aria-hidden="true" /> Re-run extraction</button>
             </div>
