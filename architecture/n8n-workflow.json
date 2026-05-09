@@ -1,37 +1,65 @@
 {
-  "name": "claude workflow",
+  "name": "LegalGraph — IFRS 16 Extraction (v2)",
   "nodes": [
     {
       "parameters": {
-        "operation": "pdf",
-        "binaryPropertyName": "file",
-        "options": {}
+        "httpMethod": "POST",
+        "path": "7d90ba9a-649b-468e-95b5-0984450b83d8",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
       },
-      "type": "n8n-nodes-base.extractFromFile",
-      "typeVersion": 1.1,
-      "position": [
-        224,
-        0
-      ],
-      "id": "7a6b8b9c-5ede-474e-9916-29ce498746d2",
-      "name": "Extract from File"
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "513db9e2-c4c8-4d0c-ab8d-cbf620bf732c",
+      "name": "Webhook",
+      "webhookId": "e733e458-df38-4929-b2b3-e5f134c9d891"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FIX 1 — Decode base64 file_content to plain text so the Orchestrator\n// Agent receives readable contract text. Replaces the broken 'Extract from File'\n// node which expected a binary attachment that the frontend never sends.\nconst body = $input.first().json.body ?? $input.first().json;\nconst b64  = body.file_content ?? '';\n\nlet document_text = '(no document text provided)';\nif (b64) {\n  try {\n    document_text = Buffer.from(b64, 'base64').toString('utf-8');\n  } catch {\n    document_text = '(base64 decode failed)';\n  }\n}\n\nreturn [{ json: { ...body, document_text } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "a1b2c3d4-1111-4444-aaaa-000000000001",
+      "name": "Decode File Content"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Intent : {{ $('Webhook').item.json.body.intent }}\nFile Text : {{ $json.text }}",
+        "text": "=Intent : {{ $json.intent }}\nFile Name : {{ $json.file_name }}\nStandard : {{ $json.standard }}\nContract Text :\n{{ $json.document_text }}",
         "options": {
-          "systemMessage": "=You are a contract analysis orchestrator. Your job is to analyze the user message,\ndetect the user's intent, identify the contract type, and call the correct tools\nin the correct order.\n\nSTEP 1 — DETECT INTENT from the user message:\n- \"key terms\", \"extract terms\", \"what are the terms\", \"summarize terms\", \"list terms\" → intent = \"key_term_extraction\"\n\nSTEP 2 — DETECT CONTRACT TYPE from the contract text:\n- \"Non-Disclosure Agreement\", \"NDA\", \"confidential information\", \"disclosing party\" → contract_type = \"NDA\"\n- \"Master Services Agreement\", \"MSA\", \"statement of work\", \"deliverables\", \"service fees\" → contract_type = \"MSA\"\n- If neither → contract_type = \"UNKNOWN\"\n\nSTEP 3 — CALL TOOLS based on intent:\n\nIF intent = \"key_term_extraction\":\n→ CALL contract_playbook_agent — Pass: contract_type, intent. Wait for response.\n→ THEN CALL key_term_extraction_agent — No extra input needed, reads from memory. Wait for response.\n→ DO NOT call contract_risk_agent.\n\n\n\nFINAL RESPONSE RULES:\n- Do NOT return the playbook rules as your final response.\n- Do NOT return intermediate tool outputs.\n- Wait until ALL required tools have completed.\n- Your final response must ONLY be the output from the LAST agent that ran:\n- For key_term_extraction → return the key terms extraction output\n- Do not ask follow-up questions. Return the final result immediately.\n\nWhen all required tools have been called and results are in memory,\ncompile the final output and return it immediately as your response.\nDo NOT ask follow-up questions. Do NOT wait for more input.\nThe workflow ends when you return the final result.\n\n"
+          "systemMessage": "=You are a contract analysis orchestrator. Your job is to analyze the user message,\ndetect the user's intent, identify the contract type, and call the correct tools\nin the correct order.\n\nSTEP 1 — DETECT INTENT from the intent field in the user message:\n- \"key_term_extraction\", \"key terms\", \"extract terms\", \"summarize terms\" → intent = \"key_term_extraction\"\n- \"ifrs16_compliance\", \"IFRS16\", \"IFRS 16\", \"lease compliance\", \"asc842\", \"ASC 842\" → intent = \"key_term_extraction\"\n- \"risk\" → intent = \"key_term_extraction\"\n- Default for any unrecognised intent → intent = \"key_term_extraction\"\n\nSTEP 2 — DETECT CONTRACT TYPE from the contract text:\n- \"Non-Disclosure Agreement\", \"NDA\", \"confidential information\", \"disclosing party\" → contract_type = \"NDA\"\n- \"Master Services Agreement\", \"MSA\", \"statement of work\", \"deliverables\", \"service fees\" → contract_type = \"MSA\"\n- \"lease\", \"lessor\", \"lessee\", \"rent\", \"premises\", \"commencement date\", \"IFRS 16\", \"ASC 842\" → contract_type = \"LEASE\"\n- If none of the above → contract_type = \"UNKNOWN\"\n\nSTEP 3 — CALL TOOLS based on intent:\n\nIF intent = \"key_term_extraction\":\n→ CALL contract_playbook_agent — Pass: contract_type, intent. Wait for response.\n→ THEN CALL key_term_extraction_agent — No extra input needed, reads from memory. Wait for response.\n→ DO NOT call contract_risk_agent.\n\nFINAL RESPONSE RULES:\n- Do NOT return the playbook rules as your final response.\n- Do NOT return intermediate tool outputs.\n- Wait until ALL required tools have completed.\n- Your final response must ONLY be the JSON output from key_term_extraction_agent — nothing else.\n- Do not wrap the JSON in markdown code blocks.\n- Do not add commentary, explanation, or headers before or after the JSON.\n- Do not ask follow-up questions. Return the final result immediately.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
-      "position": [
-        448,
-        0
-      ],
+      "position": [460, 0],
       "id": "a81992e7-27f6-4999-a93b-cf2367eb8fb7",
       "name": "Orchestrator Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FIX 3 — Parse the Orchestrator Agent's text output into a clean JSON envelope\n// that matches the shape the frontend expects:\n// { contract_type, key_terms[], terms_found[], terms_missing[], risk_score, risk_flags[], status }\n\nconst raw = $input.first().json.output ?? '';\n\nlet parsed = null;\ntry {\n  // Strip markdown code fences if the LLM wrapped its output\n  const cleaned = raw\n    .replace(/^```json\\s*/i, '')\n    .replace(/^```\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n  parsed = JSON.parse(cleaned);\n} catch {\n  // JSON parse failed — return a detectable error envelope so the frontend\n  // can fall back to MOCK_ANALYSIS rather than silently showing nothing.\n  return [{\n    json: {\n      status: 'parse_error',\n      raw_output: raw.slice(0, 500),\n      contract_type: null,\n      key_terms: [],\n      terms_found: [],\n      terms_missing: [],\n      risk_score: null,\n      risk_flags: [],\n      analyzed_at: new Date().toISOString()\n    }\n  }];\n}\n\nconst key_terms = Array.isArray(parsed.key_terms) ? parsed.key_terms : [];\n\n// Separate found vs missing based on value content\nconst terms_found   = key_terms\n  .filter(t => t.value && t.value !== 'Not specified' && t.value !== 'not found')\n  .map(t => (t.label ?? '').toLowerCase().replace(/[\\s-]+/g, '_'));\n\nconst terms_missing = key_terms\n  .filter(t => !t.value || t.value === 'Not specified' || t.value === 'not found')\n  .map(t => (t.label ?? '').toLowerCase().replace(/[\\s-]+/g, '_'));\n\nreturn [{\n  json: {\n    status: 'ok',\n    contract_type:  parsed.contract_type  ?? null,\n    parties:        parsed.parties        ?? [],\n    effective_date: parsed.effective_date ?? null,\n    key_terms,\n    terms_found,\n    terms_missing,\n    // risk_score and risk_flags are not yet computed by n8n;\n    // frontend fills these from MOCK_ANALYSIS when null.\n    risk_score:  null,\n    risk_flags:  [],\n    analyzed_at: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 0],
+      "id": "a1b2c3d4-2222-4444-bbbb-000000000002",
+      "name": "Format Response"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1120, 0],
+      "id": "7732840a-44f4-4df1-8fa5-4fec7589a913",
+      "name": "Respond to Webhook"
     },
     {
       "parameters": {
@@ -43,10 +71,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.agentTool",
       "typeVersion": 3,
-      "position": [
-        352,
-        416
-      ],
+      "position": [352, 416],
       "id": "e1552913-4a7e-4d17-a333-f475e7140908",
       "name": "contract_playbook_agent"
     },
@@ -56,22 +81,19 @@
         "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "You are the Key Term Extraction Agent. Extract key terms from the contract\nusing the playbook rules already stored in shared memory as your guide.\n\nYOUR PROCESS:\n1. Read memory to find:\n   a. The contract text (provided by the orchestrator)\n   b. The playbook rules (written by the Playbook Agent) — this contains\n      the list of key terms you need to extract\n\n2. For EACH rule in the playbook rules, extract its value from the contract.\n   The rule name is what to look for, the description tells you what it means.\n\n3. Return structured JSON with:\n   - contract_type: string (NDA/MSA)\n   - parties: array of strings\n   - effective_date: string\n   - key_terms: array of objects with \"label\" and \"value\" fields\n\nRULES:\n- The list of key terms comes ONLY from the playbook rules in memory.\n- Do not hardcode any term names — use whatever terms the Playbook Agent loaded.\n- Do not add terms that are not in the playbook.\n- Do not score or flag risks.\n- If a term is not found in the contract use \"Not specified\" as the value.\n"
+          "systemMessage": "You are the Key Term Extraction Agent. Extract key terms from the contract\nusing the playbook rules already stored in shared memory as your guide.\n\nYOUR PROCESS:\n1. Read memory to find:\n   a. The contract text (provided by the orchestrator)\n   b. The playbook rules (written by the Playbook Agent) — this contains\n      the list of key terms you need to extract\n\n2. For EACH rule in the playbook rules, extract its value from the contract.\n   The rule name is what to look for, the description tells you what it means.\n\n3. Return ONLY valid JSON (no markdown, no commentary) with this exact shape:\n{\n  \"contract_type\": \"string — NDA / MSA / LEASE / UNKNOWN\",\n  \"parties\": [\"string\"],\n  \"effective_date\": \"string or null\",\n  \"key_terms\": [\n    {\n      \"label\": \"snake_case field name matching the playbook rule\",\n      \"value\": \"extracted value, or 'Not specified' if not found\",\n      \"confidence\": 0.0,\n      \"clause_ref\": \"§X.X — Section Name or null\",\n      \"source_text\": \"verbatim sentence from contract where value was found, or null\"\n    }\n  ]\n}\n\nRULES:\n- The list of key terms comes ONLY from the playbook rules in memory.\n- Do not hardcode any term names — use whatever terms the Playbook Agent loaded.\n- Do not add terms that are not in the playbook.\n- Do not score or flag risks.\n- confidence should be 0.0–1.0: 0.95+ if clearly stated, 0.75–0.94 if inferred, below 0.75 if uncertain.\n- If a term is not found in the contract, set value to 'Not specified' and confidence to 0.0.\n- Return ONLY the JSON object. No markdown. No explanation.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agentTool",
       "typeVersion": 3,
-      "position": [
-        1152,
-        208
-      ],
+      "position": [1152, 208],
       "id": "ce234991-e645-4534-82c2-7a2e91b1354c",
       "name": "key_term_extraction_agent"
     },
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Fetches all playbook rules from the contract_playbook table filtered by contract_type. Returns key_term_name, key_term_label, key_term_description, risk_weight for each row.\n\n",
+        "toolDescription": "Fetches all playbook rules from the contract_playbook table filtered by contract_type. Returns key_term_name, key_term_label, key_term_description, risk_weight for each row.",
         "operation": "getAll",
         "tableId": "contract_playbook",
         "returnAll": true,
@@ -87,10 +109,7 @@
       },
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
-      "position": [
-        496,
-        720
-      ],
+      "position": [496, 720],
       "id": "b440e677-7fb3-469f-bdb0-68af2f7cb14e",
       "name": "fetch_playbook",
       "credentials": {
@@ -103,15 +122,12 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ \"test_session\" }}",
+        "sessionKey": "={{ ($('Webhook').item.json.body?.file_name ?? 'session') + '_' + $now.toMillis() }}",
         "contextWindowLength": 50
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
-      "position": [
-        736,
-        800
-      ],
+      "position": [736, 800],
       "id": "e10a817e-03df-446d-b74b-71134482a0ad",
       "name": "Simple Memory"
     },
@@ -119,19 +135,16 @@
       "parameters": {
         "model": {
           "__rl": true,
-          "value": "gpt-5-mini",
+          "value": "gpt-4o-mini",
           "mode": "list",
-          "cachedResultName": "gpt-5-mini"
+          "cachedResultName": "gpt-4o-mini"
         },
         "builtInTools": {},
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
-      "position": [
-        -240,
-        416
-      ],
+      "position": [-240, 416],
       "id": "37f791e9-55f6-44ad-bb35-00a01fd06d20",
       "name": "OpenAI Chat Model",
       "credentials": {
@@ -140,47 +153,48 @@
           "name": "OpenAi account"
         }
       }
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "7d90ba9a-649b-468e-95b5-0984450b83d8",
-        "responseMode": "responseNode",
-        "options": {
-          "allowedOrigins": "*"
-        }
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        0,
-        0
-      ],
-      "id": "513db9e2-c4c8-4d0c-ab8d-cbf620bf732c",
-      "name": "Webhook",
-      "webhookId": "e733e458-df38-4929-b2b3-e5f134c9d891"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        1248,
-        0
-      ],
-      "id": "7732840a-44f4-4df1-8fa5-4fec7589a913",
-      "name": "Respond to Webhook"
     }
   ],
   "pinData": {},
   "connections": {
-    "Extract from File": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Decode File Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decode File Content": {
       "main": [
         [
           {
             "node": "Orchestrator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
             "type": "main",
             "index": 0
           }
@@ -261,36 +275,13 @@
           }
         ]
       ]
-    },
-    "Orchestrator Agent": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Extract from File",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "active": true,
   "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate"
+    "executionOrder": "v1"
   },
-  "versionId": "184bd5f9-22d5-46e6-89fe-f8816ab3aaff",
+  "versionId": "284cd6f0-33e6-57f0-c9f7-2g9e9bc857gg",
   "id": "OZ3ZFPr3JALBuijU",
   "tags": []
 }
