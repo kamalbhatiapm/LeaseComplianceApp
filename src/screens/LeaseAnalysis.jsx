@@ -486,14 +486,15 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
             <RefreshCw size={12} /> Re-analyze
           </button>
-          <button
-            className="btn btn-outline btn-sm"
-            disabled={exportLocked}
-            title={exportLocked ? lockTitle : undefined}
-            onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'extraction' })}
-          >
-            {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export PDF
-          </button>
+          <span className={exportLocked ? 'btn-tooltip-wrap' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+            <button
+              className="btn btn-outline btn-sm"
+              disabled={exportLocked}
+              onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'extraction' })}
+            >
+              {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export PDF
+            </button>
+          </span>
           {selectedFile && (
             <button
               className="btn btn-secondary btn-sm"
@@ -584,24 +585,26 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <div className="sidebar-section">
             <div className="sidebar-section-title">Actions</div>
             <div className="action-list">
-              <button
-                className="action-btn"
-                aria-label="Export report to PDF"
-                disabled={exportLocked}
-                title={exportLocked ? lockTitle : undefined}
-                onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'sidebar' })}
-              >
-                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <FileDown size={14} aria-hidden="true" />} Export to PDF
-              </button>
-              <button
-                className="action-btn"
-                aria-label="Send report to auditor"
-                disabled={exportLocked}
-                title={exportLocked ? lockTitle : undefined}
-                onClick={() => !exportLocked && track('report_sent', { method: 'email' })}
-              >
-                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Send size={14} aria-hidden="true" />} Send to auditor
-              </button>
+              <span className={exportLocked ? 'btn-tooltip-wrap btn-tooltip-wrap--full' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+                <button
+                  className="action-btn"
+                  aria-label="Export report to PDF"
+                  disabled={exportLocked}
+                  onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'sidebar' })}
+                >
+                  {exportLocked ? <Lock size={14} aria-hidden="true" /> : <FileDown size={14} aria-hidden="true" />} Export to PDF
+                </button>
+              </span>
+              <span className={exportLocked ? 'btn-tooltip-wrap btn-tooltip-wrap--full' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+                <button
+                  className="action-btn"
+                  aria-label="Send report to auditor"
+                  disabled={exportLocked}
+                  onClick={() => !exportLocked && track('report_sent', { method: 'email' })}
+                >
+                  {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Send size={14} aria-hidden="true" />} Send to auditor
+                </button>
+              </span>
               <button className="action-btn" aria-label="Re-run lease extraction"><RefreshCw size={14} aria-hidden="true" /> Re-run extraction</button>
             </div>
           </div>
