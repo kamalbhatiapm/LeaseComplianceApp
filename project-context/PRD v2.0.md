@@ -2,10 +2,11 @@
 
 **Status:** In Review
 **Author:** Senior PM, LegalGraph
+**Reviewer:** Priya Sharma (Head of Product)
 **Date:** 2026-05-08
-**Last Updated:** 2026-05-08
-**Supersedes:** project-context/PRD.md v1.1 (2026-03-31) — full rewrite incorporating JTBD v1.1, USER-JOURNEY v1.1, market research, and user research (May 2026)
-**Context files read:** company-context/company-overview.md · user-personas.md · product-description.md · competitive-landscape.md · project-context/JTBD.md (v1.1) · USER-JOURNEY.md (v1.1) · PRD.md (v1.1) · outputs/market-research-legal-ai-2026.md · outputs/user-research-legal-ai-2026.md · templates/prd-template.md
+**Last Updated:** 2026-05-08 (v2.1 — gap patches: L3 metrics, ASC 842 story, bulk export story, email-to-auditor story, GA+1 stories, guardrail stop-and-fix, D2/D3 trust threshold ACs)
+**Supersedes:** project-context/PRD v1.0.md (2026-03-31) — full rewrite incorporating JTBD v1.1, USER-JOURNEY v1.1, market research, and user research (May 2026)
+**Context files read:** company-context/company-overview.md · user-personas.md · product-description.md · competitive-landscape.md · project-context/JTBD.md (v1.1) · USER-JOURNEY.md (v1.1) · PRD v1.0.md · outputs/market-research-legal-ai-2026.md · outputs/user-research-legal-ai-2026.md · templates/prd-template.md
 
 ---
 
@@ -156,11 +157,25 @@ The consent modal, report cover page, and DPA template are Jennifer-facing UX �
 - False-negative flag rate (risks surfaced by auditors that LegalGraph missed)
 - Beta DPA signed within 14 days of Rachel's first analysis session (J6/J10 metric)
 
+**L3 Metrics — Operational Health (gates for regulated pilots):**
+
+| Metric | Target | Gate |
+|---|---|---|
+| Webhook success rate | ≥99.5% | All accounts |
+| p95 analysis latency | <8 seconds | All accounts |
+| HHH eval score (Helpful, Honest, Harmless) | ≥90/105 (Harmless ≥25/35) | Required for regulated pilots (insurance, banking) |
+| RAI eval score (Responsible AI) | ≥96/112 | Required for insurance/banking sector accounts |
+| Automated eval pass rate | 11/11 maintained | Regression gate — blocks any model update that drops a test |
+
+*L3 metrics are not customer-visible but gate regulated-sector pilots. Jennifer's InfoSec review will ask for HHH/RAI scores for financial services accounts.*
+
 ---
 
 ### Guardrail Metrics
 
 These cap what is permitted while optimising for the North Star. A guardrail breach triggers a stop-and-fix response regardless of North Star movement.
+
+**Stop-and-fix procedure:** On any guardrail breach — (1) Engineering Lead is paged immediately; (2) affected feature is disabled via feature flag within 1 hour; (3) impacted accounts are notified within 24 hours; (4) post-mortem completed within 5 business days before re-enabling.
 
 | Guardrail | Threshold | Protects Against |
 |---|---|---|
@@ -264,6 +279,16 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 - First-lease onboarding prompt: recommend starting with a simple fixed-rent lease
 - Post-extraction "first win" prompt: "Your extraction looks complete — resolve 2 flags and generate your first report"
 
+**Multi-Standard Support (conditional on OQ#2):**
+- IFRS 16 / ASC 842 toggle: generate reports in either standard from a single extraction — see Story R9
+- Engineering estimate: +2 weeks scope if shipped at GA; deferred if OQ#2 answer is "IFRS 16 only first"
+
+**Bulk Report Export:**
+- One-click "Export all ready leases" action from the portfolio dashboard — generates reports for all leases with no unresolved High flags in a single action — see Story R11
+
+**Email Delivery to Auditor:**
+- Send the approved compliance report directly to specified auditor email addresses from within LegalGraph — see Story R10
+
 ---
 
 ### Out-of-Scope (V1 GA)
@@ -299,7 +324,14 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 - [ ] IBR flag displays "What do I do?" guidance block on first-time trigger (see R5)
 - [ ] After first report generation, activation event is logged (L1-1 metric)
 
-*Research grounding: USER-JOURNEY Journey D; JTBD J0; user-research Finding 1 ("trust is built field-by-field on a known lease")*
+**Design constraint — D2/D3 trust thresholds (USER-JOURNEY Journey D):**
+- ≤2 wrong fields: Rachel trusts the tool and continues
+- 3 wrong fields: Rachel is uncertain; she tries one more lease before deciding
+- >3 wrong fields: Rachel concludes the AI isn't ready and abandons — **this is the critical firing threshold**
+- Design implication: onboarding must steer Rachel toward a simple fixed-rent lease (high accuracy probability), not her most complex lease. A complex first lease that returns >3 errors on unfamiliar fields will fail even if the AI is technically correct on the harder fields.
+- The IBR guidance (R5) is as critical to activation as BUG-006: if the discount rate flag fires on the first analysis (highly likely) with no guidance, Rachel hits a dead end on her very first lease.
+
+*Research grounding: USER-JOURNEY Journey D (D2 trust threshold, D3 activation event); JTBD J0; user-research Finding 1*
 
 ---
 
@@ -420,6 +452,54 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 
 ---
 
+**Story R9 — Generate a Report in Either IFRS 16 or ASC 842 Format (conditional on OQ#2)**
+
+*As a compliance lead whose company reports under ASC 842 (US FASB) rather than IFRS 16, I want to toggle the reporting standard before generating my report — without re-running the extraction — so I get the correct schedule format for my auditor without duplicating work.*
+
+**Acceptance Criteria:**
+- [ ] Standard toggle (IFRS 16 / ASC 842) visible at report generation step — defaults to the standard set at account level
+- [ ] Toggling standard re-formats the output fields accordingly (ASC 842: operating vs. finance lease classification; IFRS 16: single lessee model)
+- [ ] A single extraction can produce both standards — no re-upload required
+- [ ] Report cover page shows the applied standard explicitly
+- [ ] Account-level standard preference is saved and pre-selected on subsequent sessions
+- [ ] **Conditional:** This story is in scope only if OQ#2 is resolved as "ship both standards at GA." If IFRS 16-only, defer ASC 842 to V1.1.
+
+*Research grounding: user-research Finding 6 ("~45 enterprise accounts split across IFRS 16 and ASC 842"); PRD v1.0 P1 requirement; market-research: North American ASC 842 market*
+
+---
+
+**Story R10 — Submit Compliance Report to Auditor from Within LegalGraph**
+
+*As a compliance lead with an approved report, I want to send it directly to my external auditor's email address from within LegalGraph — with the approval record attached — so there is a single, traceable submission event linked to the report rather than a detached email chain.*
+
+**Acceptance Criteria:**
+- [ ] "Submit to auditor" button available on approved reports (after CFO sign-off is logged, or optionally without if J10 is not enabled)
+- [ ] Rachel enters one or more auditor email addresses; addresses are saved per account for future quarters
+- [ ] Email sent to auditor contains: PDF report link, a plain-text summary of the report scope (X leases, standard, period), and a read-only verification link (clause citations active)
+- [ ] Submission event is logged in the audit trail: auditor email(s), timestamp, report version submitted
+- [ ] Rachel receives a confirmation: "Report submitted to [auditor] on [date]. View submission record."
+- [ ] If a report has already been submitted, a warning is shown: "This report was already submitted to [auditor] on [date]. Submit again?" — prevents duplicate submissions
+
+*Research grounding: PRD v1.0 P1 requirement (email delivery); USER-JOURNEY Phase 6 (audit defense); JTBD J1 (audit-ready submission)*
+
+---
+
+**Story R11 — Bulk Export Reports for All Ready Leases**
+
+*As a compliance lead who has finished processing all leases in my portfolio, I want to export compliance reports for every ready lease in one action — rather than generating each report individually — so I can complete the final step of my quarterly session in under 5 minutes regardless of portfolio size.*
+
+**Acceptance Criteria:**
+- [ ] "Export all ready leases" button appears in the portfolio dashboard when ≥2 leases show "ready to report" status
+- [ ] Bulk export generates individual PDF reports per lease AND a combined portfolio summary PDF (list of leases, standards applied, per-lease risk summary)
+- [ ] Leases with unresolved High flags are excluded from bulk export with a clear notification: "2 leases skipped — unresolved High flags. Resolve to include."
+- [ ] Export completes within 30 seconds for up to 12 leases
+- [ ] Download delivered as a ZIP containing individual lease PDFs + portfolio summary
+- [ ] Bulk export event logged in audit trail with timestamp and list of included leases
+
+*Research grounding: PRD v1.0 P1 requirement (bulk report generation); JTBD J8 (batch session workflow); USER-JOURNEY Phase 8*
+
+---
+
 ### Persona 2: Jennifer — General Counsel / CFO (Economic Buyer)
 
 ---
@@ -496,6 +576,60 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 
 ---
 
+### GA+1 Stories (Design Now, Ship Post-GA)
+
+These stories are out of scope for GA but are documented now so that GA engineering decisions (data model, PDF structure, email infrastructure) are made with GA+1 in mind.
+
+---
+
+**Story GA1 — See the Compliance Impact of a New or Amended Lease Immediately (J5)**
+
+*As a compliance lead who has just received an updated lease contract (rent escalation, renewal exercised, or term extended), I want to upload it and immediately see how the IFRS 16 schedule changes vs. the prior version — so I can keep compliance records current without waiting for quarter-end.*
+
+**Acceptance Criteria:**
+- [ ] On re-upload of a lease previously analysed, system detects it as an amendment (via document similarity or manual "this replaces [lease name]" tag)
+- [ ] Delta view shows: fields that changed (old value → new value), new flags introduced, flags resolved by the amendment
+- [ ] ROU asset and liability schedule delta is displayed: "ROU asset increased by £12,000 due to rent escalation"
+- [ ] Mid-quarter amendment is saved as a new analysis version, with the prior version preserved and accessible
+- [ ] Rachel receives an in-app alert if a modification is detected on a lease she has already analysed this quarter
+- [ ] **Dependency:** Requires BUG-009 (persistent storage) and per-lease version history
+
+*Research grounding: USER-JOURNEY Phase 7 + Return journey; JTBD J5; user-research Finding 5*
+
+---
+
+**Story GA2 — Auditor Portal: Independently Verify Figures Without Accessing Client's Account (J11 — full)**
+
+*As an external auditor reviewing multiple LegalGraph clients, I want a read-only shareable link that gives me active clause citations for any lease filing — without requiring a LegalGraph account — so I can complete fieldwork across all my AI-assisted clients from a single, standardised interface.*
+
+**Acceptance Criteria:**
+- [ ] Rachel can generate a shareable auditor link for any submitted report — link is time-limited (expires 90 days after audit period)
+- [ ] Auditor link opens a read-only view: field values, clause citations (active — click to see source text), AI vs. manually-verified badges, audit trail log
+- [ ] No LegalGraph account required for the auditor — link is publicly accessible but non-guessable (UUID-based)
+- [ ] Auditor portal includes PCAOB AS 1105 compliance statement and AI model disclosure inline
+- [ ] Auditor can filter by field type, flag severity, or verification status
+- [ ] Rachel can revoke a shared link at any time; revoked links show an expired state to the auditor
+
+*Research grounding: USER-JOURNEY Journey E3; JTBD J11; market-research: "no current mid-market competitor has shipped this — first-mover opportunity"*
+
+---
+
+**Story GA3 — Proactive Quarter-End Email Nudge**
+
+*As a compliance lead who uses LegalGraph four times a year, I want to receive a proactive email 14 days before quarter-end — telling me which leases from last quarter are ready to re-analyse — so I start my reporting session on time rather than remembering to log in under deadline pressure.*
+
+**Acceptance Criteria:**
+- [ ] Email sent to Rachel 14 days before each quarter-end close (configurable; defaults to standard calendar quarter-ends)
+- [ ] Email content: "Q[X] reporting season starts in 14 days. You have [N] leases from last quarter ready to re-analyse. [Start now →]"
+- [ ] Link in email takes Rachel directly to the portfolio dashboard (authenticated deep link)
+- [ ] Email is suppressed if Rachel has already logged in during the last 7 days (not a re-reminder if she's already active)
+- [ ] Rachel can configure notification timing (7 / 14 / 21 days before quarter-end) or opt out in account settings
+- [ ] **Dependency:** Requires BUG-009 (persistent storage) and per-account quarter-end date configuration
+
+*Research grounding: USER-JOURNEY Phase 0 (trigger) and Phase 8 (batch session); JTBD J1 (quarterly deadline circumstance); user-research Finding 1 (4x/year login pattern)*
+
+---
+
 ## 6. Milestones & GTM
 
 ### Project Plan
@@ -509,21 +643,24 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 | Event tracking instrumentation for L1/L2 metrics | Engineering | P0 — all metrics blocked without this |
 
 **Phase 1 — Core Compliance Workflow (Weeks 4–7):**
-| Deliverable | Owner | Priority |
-|---|---|---|
-| Full PDF export: cover page, clause citations, flag resolution log, AI disclosure | Engineering + Design | P0 |
-| Dashboard "Ready / Needs Attention" counter (requires BUG-009) | Engineering (Frontend) | P1 |
-| Once-per-session consent (vs. per-analysis) | Engineering | P1 |
-| Per-field confidence scores wired from n8n pipeline | Engineering (ML) | P1 |
-| J10: Email-based CFO approval flow | Engineering + Design | P1 |
+| Deliverable | Owner | Priority | Story |
+|---|---|---|---|
+| Full PDF export: cover page, clause citations, flag resolution log, AI disclosure | Engineering + Design | P0 | R7 |
+| Dashboard "Ready / Needs Attention" counter (requires BUG-009) | Engineering (Frontend) | P1 | R2 |
+| Once-per-session consent (vs. per-analysis) | Engineering | P1 | R6 |
+| Per-field confidence scores wired from n8n pipeline | Engineering (ML) | P1 | R3 |
+| J10: Email-based CFO approval flow | Engineering + Design | P1 | R8, J2 |
+| R10: Submit report to auditor email from LegalGraph | Engineering + Design | P1 | R10 |
 
-**Phase 2 — Activation & Batch (Weeks 8–10):**
-| Deliverable | Owner | Priority |
-|---|---|---|
-| Journey D: First-lease onboarding guidance + post-extraction "first win" prompt | Design + Engineering | P1 |
-| J8: Session-level "X of Y leases complete" progress tracker | Engineering (Frontend) | P1 GA |
-| Company-level IBR storage and carry-forward | Engineering | P1 GA |
-| PCAOB AS 1105 compliance one-pager (sales enablement) | PM + Legal | P1 — no eng |
+**Phase 2 — Activation, Batch & Multi-Standard (Weeks 8–10):**
+| Deliverable | Owner | Priority | Story |
+|---|---|---|---|
+| Journey D: First-lease onboarding guidance + post-extraction "first win" prompt | Design + Engineering | P1 | R1 |
+| J8: Session-level "X of Y leases complete" progress tracker | Engineering (Frontend) | P1 GA | R6 |
+| Company-level IBR storage and carry-forward | Engineering | P1 GA | R5 |
+| R11: Bulk report export (all ready leases, ZIP download) | Engineering | P1 GA | R11 |
+| R9: ASC 842 toggle (conditional on OQ#2 resolution) | Engineering (ML + Frontend) | P1 GA | R9 |
+| PCAOB AS 1105 compliance one-pager (sales enablement) | PM + Legal | P1 — no eng | J1 |
 
 **Beta (Week 10–12):**
 - Invite 3–5 pilot accounts from existing enterprise customer base
@@ -537,10 +674,10 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 - L1-3 (extraction accuracy) ≥94% across ≥20 contracts
 
 **GA+1 Roadmap:**
-- J5: Amendment delta view ("field X changed from Y to Z since last analysis")
-- J11: Auditor portal — read-only shareable link; first-mover opportunity (no competitor has shipped this)
-- Proactive email nudge: "Your leases from last quarter are ready to re-analyse. Q2 close is in 14 days."
-- Intelligent triage: "Start with these 3 leases — they have unresolved flags from last quarter"
+- GA1: J5 — Amendment delta view ("field X changed from Y to Z since last analysis") — Story GA1
+- GA2: J11 — Auditor portal — read-only shareable link; first-mover opportunity; no competitor has shipped this — Story GA2
+- GA3: Proactive quarter-end email nudge — Story GA3
+- Intelligent triage: "Start with these 3 leases — they have unresolved flags from last quarter" (no story yet; design alongside GA3)
 
 ---
 
@@ -589,7 +726,8 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 
 ---
 
-*PRD Owner: Senior PM · Status: In Review · Version: 2.0*
-*Context grounded in: JTBD v1.1 · USER-JOURNEY v1.1 · market-research-legal-ai-2026.md · user-research-legal-ai-2026.md · PRD v1.1 (project-context)*
+*PRD Owner: Senior PM · Reviewer: Priya Sharma (Head of Product) · Status: In Review · Version: 2.1*
+*Context grounded in: JTBD v1.1 · USER-JOURNEY v1.1 · market-research-legal-ai-2026.md · user-research-legal-ai-2026.md · PRD v1.0 (project-context)*
 *Personas: Rachel (Compliance Lead), Jennifer (GC/CFO), David (Senior Associate), External Auditor (v1.1)*
-*Word count: ~4,800*
+*User stories: R1–R11 (Rachel) · J1–J2 (Jennifer) · D1 (David) · A1 (Auditor) · GA1–GA3 (GA+1)*
+*Word count: ~6,800*

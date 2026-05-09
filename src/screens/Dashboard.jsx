@@ -166,6 +166,75 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
         </div>
       </div>
 
+      {/* How it works */}
+      <div style={{ background: 'var(--surface)', padding: '40px 24px' }}>
+        <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', color: 'var(--brand)', textTransform: 'uppercase', marginBottom: '6px' }}>How it works</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em' }}>Three steps to an audit-ready report</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            {[
+              {
+                step: '01',
+                title: 'Upload',
+                desc: 'PDF goes to encrypted storage. AI extracts IFRS 16 fields with clause citations.',
+                icon: '📄',
+              },
+              {
+                step: '02',
+                title: 'Review',
+                desc: 'Spot-check fields, edit anything wrong, resolve risk flags. Each edit is logged.',
+                icon: '🔍',
+              },
+              {
+                step: '03',
+                title: 'Export',
+                desc: 'Generate the audit-ready PDF report, complete with cover page and audit trail.',
+                icon: '✅',
+              },
+            ].map((s, i) => (
+              <div
+                key={s.step}
+                style={{
+                  background: 'var(--white)',
+                  borderRadius: '14px',
+                  padding: '28px 24px',
+                  boxShadow: 'var(--shadow-sm)',
+                  border: '1px solid var(--border)',
+                  position: 'relative',
+                }}
+              >
+                {/* Connector arrow between cards */}
+                {i < 2 && (
+                  <div style={{
+                    position: 'absolute',
+                    right: '-18px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '24px',
+                    textAlign: 'center',
+                    fontSize: '16px',
+                    color: 'var(--ink-3)',
+                    zIndex: 1,
+                    pointerEvents: 'none',
+                  }}>→</div>
+                )}
+                <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', color: 'var(--brand)', textTransform: 'uppercase', marginBottom: '10px' }}>
+                  STEP {s.step}
+                </div>
+                <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--ink)', marginBottom: '8px', letterSpacing: '-0.01em' }}>
+                  {s.title}
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>
+                  {s.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Lease table */}
       <div className="s1-body">
         <div className="lease-table-card">
