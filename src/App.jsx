@@ -8,6 +8,7 @@ import Toast from './components/Toast.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
 import { MOCK_ANALYSIS } from './utils/constants.js'
 import { fileToBase64 } from './utils/fileToBase64.js'
+import { extractText } from './utils/extractText.js'
 import { track } from './utils/track.js'
 
 const WEBHOOK_URL   = import.meta.env.VITE_WEBHOOK_URL   ?? ''
@@ -136,16 +137,21 @@ export default function App() {
         setNavLocked(false)
       }, 50000)
 
-      let fileContent = null
-      try { fileContent = await fileToBase64(selectedFile) } catch {}
+      // Extract plain text client-side so n8n receives readable content
+      // instead of a raw base64 blob it cannot parse.
+      // PDF.js handles digital PDFs; mammoth handles DOCX/DOC; TXT reads natively.
+      const document_text = await extractText(selectedFile)
+      if (!document_text) {
+        showToast('warning', 'Limited extraction', 'Could not extract text from this file — results may be limited')
+      }
 
       const payload = {
-        file_name:    selectedFile.name,
-        file_type:    selectedFile.type || 'application/octet-stream',
-        file_content: fileContent,
-        standard:     'IFRS16',
-        intent:       intentOverride ?? analysisIntent,
-        analyzed_at:  new Date().toISOString(),
+        file_name:     selectedFile.name,
+        file_type:     selectedFile.type || 'application/octet-stream',
+        document_text,
+        standard:      'IFRS16',
+        intent:        intentOverride ?? analysisIntent,
+        analyzed_at:   new Date().toISOString(),
       }
 
       try {

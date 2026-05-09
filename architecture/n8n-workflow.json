@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// FIX 1 — Decode base64 file_content to plain text so the Orchestrator\n// Agent receives readable contract text. Replaces the broken 'Extract from File'\n// node which expected a binary attachment that the frontend never sends.\nconst body = $input.first().json.body ?? $input.first().json;\nconst b64  = body.file_content ?? '';\n\nlet document_text = '(no document text provided)';\nif (b64) {\n  try {\n    document_text = Buffer.from(b64, 'base64').toString('utf-8');\n  } catch {\n    document_text = '(base64 decode failed)';\n  }\n}\n\nreturn [{ json: { ...body, document_text } }];"
+        "jsCode": "// document_text is now extracted client-side by the frontend (PDF.js for PDFs,\n// mammoth for DOCX/DOC, native File.text() for TXT) and sent as plain UTF-8.\n// No base64 decoding needed here — just pass it through.\nconst body = $input.first().json.body ?? $input.first().json;\nconst document_text = body.document_text ?? '(no document text provided)';\nreturn [{ json: { ...body, document_text } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
