@@ -164,6 +164,32 @@ export default function App() {
         try {
           let parsed = JSON.parse(text)
           if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed
+          // Normalize n8n response to frontend schema.
+          // n8n currently returns { key_terms[{label, value, confidence, clause_ref}] }
+          // Frontend expects { fields{key: {value, confidence, source_clause}}, terms_found[], … }
+          if (parsed && Array.isArray(parsed.key_terms) && !parsed.fields) {
+            const fields = {}
+            const terms_found = []
+            for (const t of parsed.key_terms) {
+              const key = (t.label ?? '').toLowerCase().replace(/[\s-]+/g, '_')
+              if (!key) continue
+              fields[key] = {
+                value:         t.value         ?? null,
+                confidence:    t.confidence    ?? null,
+                source_clause: t.clause_ref    ?? t.source_clause ?? null,
+                source_text:   t.source_text   ?? null,
+              }
+              if (t.value != null && t.value !== '') terms_found.push(key)
+            }
+            parsed = {
+              ...parsed,
+              fields,
+              terms_found,
+              terms_missing: parsed.terms_missing ?? [],
+              risk_score:    parsed.risk_score    ?? null,
+              risk_flags:    parsed.risk_flags    ?? parsed.flags ?? [],
+            }
+          }
           responseData = parsed
         } catch {}
       } catch (err) {
