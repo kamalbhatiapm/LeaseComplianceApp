@@ -53,11 +53,13 @@ export default function App() {
     const MAX_BYTES = 50 * 1024 * 1024
     const ext = '.' + file.name.split('.').pop().toLowerCase()
     if (!ALLOWED.has(ext)) {
-      alert(`Unsupported file type "${ext}". Please upload a PDF, DOC, DOCX, or TXT file.`)
+      showToast('error', 'Unsupported file type', `"${ext}" is not supported. Please upload a PDF, DOC, DOCX, or TXT file.`)
+      setTimeout(dismissToast, 6000)
       return false
     }
     if (file.size > MAX_BYTES) {
-      alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum is 50 MB.`)
+      showToast('error', 'File too large', `${(file.size / 1024 / 1024).toFixed(1)} MB exceeds the 50 MB limit.`)
+      setTimeout(dismissToast, 6000)
       return false
     }
     setSelectedFile(file)
