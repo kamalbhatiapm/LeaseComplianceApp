@@ -1,9 +1,10 @@
 # LegalGraph — Lease Compliance App: MVP Specification
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Date:** 2026-05-09  
-**Grounded in:** PRD v2.0 · TRUST-UX-PLAN.md · User personas: Rachel (Compliance Lead), Jennifer (GC/CFO), David (Senior Associate), External Auditor  
-**Status:** Active
+**Grounded in:** PRD v2.0 · TRUST-UX-PLAN.md · Project Evaluation (stress-test, May 2026) · User personas: Rachel (Compliance Lead), Jennifer (GC/CFO), David (Senior Associate), External Auditor  
+**Status:** Active  
+**Changelog v1.1:** Added MOAT section (§11), AI pipeline architecture (§5), analytics provider + kill criteria, Why Agentic AI rationale (§1), beta validation plan per assumption
 
 ---
 
@@ -18,6 +19,8 @@ Build the end-to-end IFRS 16 / ASC 842 lease compliance reporting workflow for m
 **Economic buyer:** Jennifer — GC/CFO. Approves in 30 minutes based on four questions: data location, auditor acceptance, cost, and liability if wrong.
 
 **Regulatory driver:** PCAOB AS 1105 (effective December 2025) requires per-field data lineage, AI model disclosure, and human review sign-off for AI-assisted compliance filings.
+
+**Why Agentic AI, not rule-based parsing:** Lease PDFs are structurally non-standard. Clause numbering varies by jurisdiction and law firm; renewal language appears in definitions, recitals, and boilerplate interchangeably; discount rate provisions require inference from surrounding context rather than direct extraction; and scanned PDFs require semantic understanding, not template matching. Deterministic OCR and rule-based parsers break on all four of these — which is exactly why Trullion's top G2 complaint is inaccurate extraction on complex leases. LLMs with RAG against the source document are the only architecture that handles this variance reliably at scale.
 
 ---
 
@@ -96,7 +99,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 | **BUG-009: Persistent storage (Supabase)** | P0 | Not started | Unblocks 7+ features. User's analysis history, resolved flags, IBR, portfolio status all depend on this. |
 | **BUG-006: Clause PDF viewer** | P0 | Partial | Drawer opens from source clause tag (shipped). Needs full clause text + page reference from n8n pipeline. |
 | **J9: IBR guidance copy** | P0 | Not started | Copy-only change. No engineering. Guidance block on every "Discount rate missing — High" flag. |
-| **Event tracking instrumentation** | P0 | Partial | `track()` stub exists. Wire to real analytics provider. All L1/L2 metrics blocked until live. |
+| **Event tracking — PostHog** | P0 | Not started | Wire `track()` to PostHog before Week 10 beta invites. Priority signals: IBR flag resolution rate + Phase 4 drop-off. These two gate the GA decision. `VITE_POSTHOG_KEY` in `.env`. |
 
 ### Phase 1 — Core Compliance Workflow (Weeks 4–7)
 
@@ -161,6 +164,19 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 - **n8n webhook** (`VITE_WEBHOOK_URL`): receives base64-encoded PDF + metadata; returns structured JSON (fields, risk_flags, terms_found, etc.)
 - **Supabase** (`VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`): persistent storage for analysis history, portfolio state, resolved flags, IBR values, user sessions
 - **Anthropic Claude API**: invoked inside n8n workflow (not directly from frontend); must be named in consent modal per J6/Jennifer requirement
+- **Analytics: PostHog** — instrument before first beta invite. IBR flag resolution rate and Phase 4 drop-off are the two signals that gate the GA decision. Add `VITE_POSTHOG_KEY` to `.env`.
+
+### AI Pipeline Architecture (n8n workflow)
+The n8n workflow must implement the following to prevent clause hallucination — the top G2 complaint against Trullion and the documented failure mode in AI compliance tools (Springer Nature, 2025):
+
+1. **PDF parsing** — extract raw text preserving section numbering; flag scanned PDFs for OCR pre-processing
+2. **Semantic chunking** — split by clause/section boundaries, not fixed token windows; preserve clause reference (e.g. "§5.1") as metadata on each chunk
+3. **RAG grounding** — retrieve relevant chunks per field using vector similarity; pass source chunks as context to Claude API; never generate field values from parametric memory alone
+4. **Confidence scoring** — derive per-field confidence from retrieval similarity score + Claude's self-reported uncertainty; return as `confidence` (0–1) in the fields payload
+5. **Source citation** — return `source_clause` (e.g. "§5.1 — Base Rent") as the chunk reference, not a generated label
+6. **Hallucination guard** — if no chunk scores above similarity threshold for a field, return `value: null` and flag as missing rather than generating a plausible-sounding value
+
+This architecture means every extracted value is traceable to a specific clause in the source document — satisfying PCAOB AS 1105 data lineage requirements and enabling the clause drawer (BUG-006) to show real source text.
 
 ### Data Flow
 ```
@@ -324,7 +340,51 @@ HITL is required by PCAOB AS 1105: AI-generated financial outputs must have docu
 
 ---
 
-## 10. Open Questions (from PRD v2.0)
+## 10. MOAT Analysis
+
+The stress-test evaluation (May 2026) identified the MOAT argument as timing-dependent rather than structural. This section defines the path from timing advantage to defensible moat.
+
+### Today's Timing Advantage (erodes in 6–12 months)
+- **PCAOB AS 1105 first-mover:** Live for December 2025 fiscal years. No competitor has shipped a purpose-built PCAOB AS 1105 compliance cover page or human-review sign-off audit trail. Trullion's top G2 feature is clause navigation, not compliance documentation. EZLease has no AI.
+- **Visual Lease displacement window:** CoStar acquisition (Nov 2024) has mid-market customers in active re-evaluation. LegalGraph's outbound displacement campaign targets this cohort in Q2 2026 before renewals close.
+
+### Structural Moat Being Built (12+ months to replicate)
+- **Ground-truth accuracy dataset:** Every beta contract run through the eval harness (`evals/run-evals.cjs`) and validated by a named audit firm creates a proprietary accuracy benchmark. Competitors cannot replicate this without the same customer relationships and the same number of auditor-validated ground-truth cases. Target: 20 contracts at ≥94% accuracy before GA; 100 contracts by end of Year 1.
+- **Auditor acceptance network:** Each report accepted by an external audit firm without revision is a reference data point. At scale, this creates a feedback loop: auditors who accept LegalGraph reports recommend LegalGraph to other clients. No competitor has published auditor acceptance rate data.
+- **RAG pipeline grounded to source clauses:** The hallucination guard (return `null` rather than generate) combined with RAG grounding means LegalGraph's extraction is verifiable — every value traces to a specific clause in the source document. Trullion's complex-lease extraction bugs (G2, 2025–2026) suggest they have not fully solved this. Being consistently more accurate on complex leases (variable rent, multi-renewal, sublease) is defensible if measured and published.
+
+### What Competitors Cannot Copy Quickly
+Trullion could add a PCAOB AS 1105 cover page in a sprint. What they cannot quickly replicate is: (1) a validated ground-truth accuracy benchmark across 20+ named leases with auditor sign-off, and (2) a RAG pipeline with the hallucination guard that reliably returns `null` on uncertain fields rather than a plausible fabrication. Both require customer relationships and time, not just engineering.
+
+---
+
+## 11. Kill Criteria
+
+These are strategic go/no-go gates — distinct from the operational guardrail metrics in §9.
+
+| Scenario | Threshold | Action |
+|---|---|---|
+| Beta auditor acceptance rate | <60% across all 5 pilots after BUG-006 ships | Pause GA; commission direct auditor validation study before re-scoping |
+| IBR flag resolution rate post-J9 copy | <50% resolved vs. dismissed after 2 weeks live | Escalate: either the copy is wrong or the IBR stall is deeper than a copy fix — user interview required |
+| AI extraction accuracy on beta contracts | <90% across ≥10 contracts | Stop GA clock; audit n8n pipeline for hallucination guard and chunking strategy |
+| Activation rate at 30 days post-launch | <55% (below company baseline) | Pause new feature work; run activation audit on upload → extraction → first report funnel |
+| Webhook success rate | <99.5% sustained over 7 days | P0 incident; no new features ship until resolved |
+
+### Beta Assumption Validation Plan
+The PRD lists 6 assumptions. These are how each gets validated in beta — not just shipped:
+
+| Assumption | Confidence | Beta Validation Method |
+|---|---|---|
+| Rachel spends 4–6 hrs/quarter | High | Time-tracking prompt at session end: "How long did this take?" |
+| Auditors accept with clause trail | Medium | Direct auditor interview in beta week 1 (not just Rachel's report submission) |
+| 94% accuracy holds for IFRS 16 fields | Medium | Run `node evals/run-evals.cjs --payload` against every beta contract; publish results |
+| IFRS 16 right priority over ASC 842 | Medium | Survey beta accounts on standard used; confirm with CFO |
+| IBR guidance copy reduces abandonment | Medium | PostHog: IBR flag resolution rate before vs. after J9 ships |
+| Customers upload all leases (not a sample) | Low | Track uploads per account vs. known portfolio size; follow up if <50% of portfolio uploaded |
+
+---
+
+## 12. Open Questions (from PRD v2.0)
 
 | # | Question | Owner | Deadline |
 |---|---|---|---|
@@ -336,4 +396,4 @@ HITL is required by PCAOB AS 1105: AI-generated financial outputs must have docu
 
 ---
 
-*SPEC Owner: PM · Status: Active · Grounded in PRD v2.0 (2026-05-08)*
+*SPEC Owner: PM · Version: 1.1 · Status: Active · Grounded in PRD v2.0 (2026-05-08) · Stress-tested May 2026 (score: 23/27 → Strong)*
