@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Sparkles, Pencil, Check, Download, Mail, RefreshCw,
+  Sparkles, Pencil, Check, FileDown, Send, RefreshCw,
   Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
-  FileText, Loader, ScanText, Brain, ShieldCheck, Lock,
+  FileText, Loader, ScanText, Brain, ShieldCheck, Lock, X, ExternalLink,
 } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
@@ -152,10 +152,78 @@ function MetricGrid({ fields, data }) {
   )
 }
 
+function ClauseDrawer({ clause, onClose }) {
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  if (!clause) return null
+
+  const confLabel = clause.conf >= 0.85 ? 'High confidence' : clause.conf > 0 ? 'Verify recommended' : 'Not found'
+  const confCls   = clause.conf >= 0.85 ? 'conf-high' : clause.conf > 0 ? 'conf-med' : 'conf-low'
+
+  return (
+    <>
+      <div className="clause-drawer-backdrop" onClick={onClose} />
+      <div className="clause-drawer" role="dialog" aria-label={`Clause detail: ${clause.ref}`}>
+        <div className="clause-drawer-header">
+          <div className="clause-drawer-title">
+            <Paperclip size={14} />
+            {clause.ref}
+          </div>
+          <button className="clause-drawer-close" onClick={onClose} aria-label="Close"><X size={16} /></button>
+        </div>
+
+        <div className="clause-drawer-body">
+          <div className="clause-drawer-section">
+            <div className="clause-drawer-label">Field</div>
+            <div className="clause-drawer-value">{clause.fieldLabel}</div>
+          </div>
+
+          <div className="clause-drawer-section">
+            <div className="clause-drawer-label">Extracted Value</div>
+            <div className="clause-drawer-value" style={{ color: clause.missing ? 'var(--amber)' : 'inherit' }}>
+              {clause.missing ? 'Not found in contract' : clause.value}
+            </div>
+          </div>
+
+          <div className="clause-drawer-section">
+            <div className="clause-drawer-label">AI Confidence</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+              <span className={`confidence-dot ${confCls}`} />
+              <span className="clause-drawer-value">{confLabel}</span>
+              {clause.conf > 0 && (
+                <span style={{ fontSize: '11px', color: 'var(--t3)' }}>({Math.round(clause.conf * 100)}%)</span>
+              )}
+            </div>
+          </div>
+
+          <div className="clause-drawer-divider" />
+
+          <div className="clause-drawer-section">
+            <div className="clause-drawer-label">Clause Reference</div>
+            <div className="clause-drawer-clause-box">
+              <span>{clause.ref}</span>
+              <ExternalLink size={12} style={{ flexShrink: 0, opacity: 0.5 }} />
+            </div>
+            <div className="clause-drawer-note">
+              This clause was identified by the AI as the source for the extracted value.
+              Open the contract PDF to verify the full clause text.
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 function TermsGrid({ fields, termsMissing = [] }) {
-  const [editMode, setEditMode]     = useState(false)
-  const [edits, setEdits]           = useState({})
+  const [editMode, setEditMode]       = useState(false)
+  const [edits, setEdits]             = useState({})
   const [saveConfirm, setSaveConfirm] = useState(false)
+  const [activeClause, setActiveClause] = useState(null)
 
   const rows = Object.entries(fields).map(([key, raw]) => {
     const f       = typeof raw === 'object' && raw !== null ? raw : { value: raw }
@@ -215,7 +283,12 @@ function TermsGrid({ fields, termsMissing = [] }) {
           </span>
         ))}
       </div>
-      {rows.map(({ key, missing, confCls, uncertain, label, clause, value, edited, rawField }) => (
+      <div className="term-col-headers">
+        <span>Field</span>
+        <span>Extracted Value</span>
+        <span>Source Clause</span>
+      </div>
+      {rows.map(({ key, missing, confCls, uncertain, conf, label, clause, value, edited }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
             <span className={`confidence-dot ${confCls}`} />
@@ -242,10 +315,14 @@ function TermsGrid({ fields, termsMissing = [] }) {
             )}
           </div>
           {clause ? (
-            <div className="term-clause" style={missing ? { color: 'var(--amber)' } : {}}>
+            <button
+              className="term-clause term-clause-link"
+              style={missing ? { color: 'var(--amber)' } : {}}
+              onClick={() => setActiveClause({ ref: clause, fieldLabel: label, value: edited ?? value, conf, missing })}
+            >
               {missing ? <AlertTriangle size={12} /> : <Paperclip size={12} />}
               {clause}
-            </div>
+            </button>
           ) : <div />}
         </div>
       ))}
@@ -255,6 +332,7 @@ function TermsGrid({ fields, termsMissing = [] }) {
           Correction saved — helps improve future extractions.
         </div>
       )}
+      <ClauseDrawer clause={activeClause} onClose={() => setActiveClause(null)} />
     </div>
   )
 }
@@ -408,14 +486,15 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
             <RefreshCw size={12} /> Re-analyze
           </button>
-          <button
-            className="btn btn-outline btn-sm"
-            disabled={exportLocked}
-            title={exportLocked ? lockTitle : undefined}
-            onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'extraction' })}
-          >
-            {exportLocked ? <Lock size={12} /> : <Download size={12} />} Export PDF
-          </button>
+          <span className={exportLocked ? 'btn-tooltip-wrap' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+            <button
+              className="btn btn-outline btn-sm"
+              disabled={exportLocked}
+              onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'extraction' })}
+            >
+              {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export PDF
+            </button>
+          </span>
           {selectedFile && (
             <button
               className="btn btn-secondary btn-sm"
@@ -492,10 +571,10 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
               <CircleCheck size={16} />
               <span>All risks acknowledged — report is ready to export.</span>
               <button className="btn btn-sm btn-primary" onClick={() => track('report_exported', { format: 'pdf', type: 'banner' })}>
-                <Download size={12} /> Export PDF
+                <FileDown size={12} /> Export PDF
               </button>
               <button className="btn btn-sm btn-outline" onClick={() => track('report_sent', { method: 'email', source: 'banner' })}>
-                <Mail size={12} /> Send to auditor
+                <Send size={12} /> Send to auditor
               </button>
             </div>
           )}
@@ -506,24 +585,26 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <div className="sidebar-section">
             <div className="sidebar-section-title">Actions</div>
             <div className="action-list">
-              <button
-                className="action-btn"
-                aria-label="Export report to PDF"
-                disabled={exportLocked}
-                title={exportLocked ? lockTitle : undefined}
-                onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'sidebar' })}
-              >
-                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Download size={14} aria-hidden="true" />} Export to PDF
-              </button>
-              <button
-                className="action-btn"
-                aria-label="Send report to auditor"
-                disabled={exportLocked}
-                title={exportLocked ? lockTitle : undefined}
-                onClick={() => !exportLocked && track('report_sent', { method: 'email' })}
-              >
-                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Mail size={14} aria-hidden="true" />} Send to auditor
-              </button>
+              <span className={exportLocked ? 'btn-tooltip-wrap btn-tooltip-wrap--full' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+                <button
+                  className="action-btn"
+                  aria-label="Export report to PDF"
+                  disabled={exportLocked}
+                  onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'sidebar' })}
+                >
+                  {exportLocked ? <Lock size={14} aria-hidden="true" /> : <FileDown size={14} aria-hidden="true" />} Export to PDF
+                </button>
+              </span>
+              <span className={exportLocked ? 'btn-tooltip-wrap btn-tooltip-wrap--full' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+                <button
+                  className="action-btn"
+                  aria-label="Send report to auditor"
+                  disabled={exportLocked}
+                  onClick={() => !exportLocked && track('report_sent', { method: 'email' })}
+                >
+                  {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Send size={14} aria-hidden="true" />} Send to auditor
+                </button>
+              </span>
               <button className="action-btn" aria-label="Re-run lease extraction"><RefreshCw size={14} aria-hidden="true" /> Re-run extraction</button>
             </div>
           </div>

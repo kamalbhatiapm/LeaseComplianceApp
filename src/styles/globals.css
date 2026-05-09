@@ -1266,6 +1266,21 @@ nav {
 
 /* ── T.R.U.S.T UX additions ─────────────────────────────────────── */
 
+/* Terms Grid column headers */
+.term-col-headers {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  padding: 7px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: rgba(255,255,255,.35);
+}
+[data-theme="light"] .term-col-headers {
+  background: rgba(0,0,0,.03);
+  border-bottom-color: rgba(0,0,0,.07);
+  color: var(--ink-3);
+}
+
 /* Confidence uncertainty chip */
 .conf-chip {
   display: inline-block;
@@ -1301,6 +1316,137 @@ nav {
   flex-wrap: wrap;
 }
 .completion-banner > span { flex: 1; min-width: 180px; font-weight: 500; }
+
+/* Clause link in terms grid */
+.term-clause-link {
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-family: inherit; text-align: left;
+  font-size: 12px; color: rgba(255,255,255,.65);
+  display: flex; align-items: center; gap: 4px;
+  text-decoration: underline; text-underline-offset: 2px;
+  text-decoration-color: rgba(255,255,255,.2);
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+.term-clause-link:hover { color: var(--brand); text-decoration-color: var(--brand); }
+[data-theme="light"] .term-clause-link { color: var(--ink-2); text-decoration-color: rgba(0,0,0,.2); }
+[data-theme="light"] .term-clause-link:hover { color: var(--brand); text-decoration-color: var(--brand); }
+
+/* Clause drawer backdrop */
+.clause-drawer-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.45);
+  animation: fadeIn 0.18s ease;
+}
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+/* Clause drawer panel */
+.clause-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+  width: 360px; max-width: 92vw;
+  background: var(--card-bg, #1a1b26);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  animation: slideInRight 0.22s cubic-bezier(.32,.72,0,1);
+  box-shadow: -8px 0 40px rgba(0,0,0,.35);
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%) }
+  to   { transform: translateX(0) }
+}
+[data-theme="light"] .clause-drawer { background: #fff; }
+
+.clause-drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.clause-drawer-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700; color: var(--brand);
+  letter-spacing: -.01em;
+}
+.clause-drawer-close {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--t3); border-radius: 6px; display: flex; align-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+.clause-drawer-close:hover { background: rgba(255,255,255,.08); color: var(--t1); }
+[data-theme="light"] .clause-drawer-close:hover { background: rgba(0,0,0,.06); }
+
+.clause-drawer-body {
+  flex: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.clause-drawer-section { margin-bottom: 20px; }
+.clause-drawer-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--t3); margin-bottom: 6px;
+}
+.clause-drawer-value {
+  font-size: 14px; font-weight: 600; color: var(--t1);
+  line-height: 1.4;
+}
+.clause-drawer-divider {
+  height: 1px; background: var(--border);
+  margin: 4px 0 20px;
+}
+.clause-drawer-clause-box {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--brand-lt, rgba(0,113,227,.1));
+  border: 1px solid rgba(0,113,227,.2);
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; font-weight: 600; color: var(--brand);
+  margin-bottom: 10px;
+}
+.clause-drawer-note {
+  font-size: 12px; color: var(--t3); line-height: 1.6;
+}
+
+/* Tooltip wrapper for disabled buttons */
+.btn-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.btn-tooltip-wrap--full {
+  display: flex;
+  width: 100%;
+}
+.btn-tooltip-wrap--full .action-btn { width: 100%; }
+
+.btn-tooltip-wrap[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: rgba(15, 15, 25, 0.95);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 300;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+  border: 1px solid rgba(255,255,255,.08);
+}
+.btn-tooltip-wrap[data-tip]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(15, 15, 25, 0.95);
+  pointer-events: none;
+  z-index: 300;
+}
+[data-theme="light"] .btn-tooltip-wrap[data-tip]:hover::after {
+  background: rgba(20, 20, 30, 0.92);
+  border-color: rgba(0,0,0,.12);
+}
 
 /* Disabled action buttons with lock state */
 .action-btn:disabled,
