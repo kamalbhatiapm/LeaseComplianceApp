@@ -336,6 +336,73 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits }) {
   )
 }
 
+const FLAG_GUIDANCE = {
+  missing_discount_rate: {
+    steps: [
+      { label: 'What it is', text: 'Your incremental borrowing rate (IBR) — the rate you would pay to borrow a similar amount for a similar term on the commencement date (IFRS 16.26 / ASC 842-20-30).' },
+      { label: 'How to get it', text: 'Ask your treasury team for your average cost of debt at lease commencement. If unavailable, request a rate indication from your primary lender for a comparable term and collateral profile.' },
+      { label: 'What auditors need', text: 'Document the rate used, the methodology, and who approved it. Auditors will ask for this evidence under PCAOB AS 1105.' },
+    ],
+    inputLabel: 'Enter IBR for this lease (%)',
+    inputPlaceholder: 'e.g. 5.25',
+  },
+  renewal_certainty: {
+    steps: [
+      { label: 'What to check', text: 'Determine whether the lessee is "reasonably certain" to exercise the renewal option under IFRS 16.19 / ASC 842-20-30-26. This affects the lease term used for ROU asset and liability calculations.' },
+      { label: 'How to assess', text: 'Review economic incentives (leasehold improvements, location significance, business continuity), historical renewal behaviour, and management intent.' },
+      { label: 'What to document', text: 'Record the renewal assessment and conclusion. If reasonably certain, include renewal periods in the lease term. If not, document why.' },
+    ],
+    inputLabel: 'Management note on renewal certainty',
+    inputPlaceholder: 'e.g. Renewal not reasonably certain — leasehold improvements fully amortised by lease end.',
+  },
+  termination_lessee: {
+    steps: [
+      { label: 'What to check', text: 'If the lessee holds a termination right, the non-cancellable period may be shorter than the stated lease term. IFRS 16.B34 requires the lease term to reflect the period the lessee is "reasonably certain" not to terminate.' },
+      { label: 'How to assess', text: 'Review termination notice periods, any financial penalties for early exit, and the significance of the leased asset to operations.' },
+      { label: 'What to document', text: 'Record the termination right terms, the assessed non-cancellable period, and the basis for that assessment.' },
+    ],
+    inputLabel: 'Management note on termination right',
+    inputPlaceholder: 'e.g. Termination right exists but not expected to be exercised — $250K penalty clause.',
+  },
+}
+
+function FlagGuidance({ flagId, isHigh }) {
+  const [open, setOpen] = useState(false)
+  const [val, setVal]   = useState('')
+  const guide = FLAG_GUIDANCE[flagId]
+  if (!guide) return null
+  return (
+    <div className="flag-guidance-wrap">
+      <button className="flag-guidance-toggle" onClick={() => setOpen(o => !o)}>
+        {open ? '▾' : '▸'} What do I do?
+      </button>
+      {open && (
+        <div className="flag-guidance-body">
+          {guide.steps.map(s => (
+            <div key={s.label} className="flag-guidance-step">
+              <span className="flag-guidance-label">{s.label}</span>
+              <span className="flag-guidance-text">{s.text}</span>
+            </div>
+          ))}
+          <div className="flag-guidance-input-row">
+            <label className="flag-guidance-input-label">{guide.inputLabel}</label>
+            <input
+              className="flag-guidance-input"
+              type="text"
+              value={val}
+              placeholder={guide.inputPlaceholder}
+              onChange={e => setVal(e.target.value)}
+            />
+            {val && (
+              <span className="flag-guidance-saved">✓ Saved — will appear in audit log</span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RiskFlags({ flags, onGateChange }) {
   const [signoffs, setSignoffs] = useState({})
   const toggle = id => {
@@ -353,11 +420,11 @@ function RiskFlags({ flags, onGateChange }) {
           <p style={{ fontSize: '13px', color: 'var(--t4)', padding: '12px 0' }}>No risk flags detected.</p>
         )}
         {flags.map(flag => {
-          const sev      = flag.severity ?? 'low'
-          const pillCls  = sev === 'high' ? 'pill-red' : sev === 'medium' ? 'pill-amber' : 'pill-green'
-          const pillLbl  = sev.charAt(0).toUpperCase() + sev.slice(1)
-          const isHigh   = sev === 'high'
-          const ref      = flag.ifrs16_ref ?? ''
+          const sev     = flag.severity ?? 'low'
+          const pillCls = sev === 'high' ? 'pill-red' : sev === 'medium' ? 'pill-amber' : 'pill-green'
+          const pillLbl = sev.charAt(0).toUpperCase() + sev.slice(1)
+          const isHigh  = sev === 'high'
+          const ref     = flag.ifrs16_ref ?? ''
           return (
             <div key={flag.id} className={`risk-item ${sev}`} id={`flag-${flag.id}`}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -365,19 +432,12 @@ function RiskFlags({ flags, onGateChange }) {
                   <div className="risk-title">{flag.title}</div>
                   <div className="risk-desc">{flag.description}</div>
                 </div>
-                <span className={`pill ${pillCls} risk-sev-pill`}>{pillLbl}</span>
-              </div>
-              {flag.id === 'missing_discount_rate' && (
-                <div style={{ fontSize: '11px', color: 'var(--t4)', marginTop: '6px', lineHeight: 1.5 }}>
-                  To obtain your IBR, contact your treasury team or request a rate from your primary lender for a comparable term and collateral profile.
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                  {ref && <span style={{ fontSize: '11px', color: 'var(--t3)' }}>IFRS 16 {ref}</span>}
+                  <span className={`pill ${pillCls} risk-sev-pill`}>{pillLbl}</span>
                 </div>
-              )}
-              <div className="risk-meta">
-                <button className="btn btn-sm btn-outline">
-                  {isHigh ? 'Enter IBR manually' : 'Add management note'}
-                </button>
-                {ref && <span style={{ fontSize: '11px', color: 'var(--t3)' }}>IFRS 16 {ref}</span>}
               </div>
+              <FlagGuidance flagId={flag.id} isHigh={isHigh} />
               {isHigh && (
                 <div className="sign-off-row">
                   <label>
