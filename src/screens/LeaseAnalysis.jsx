@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, Pencil, Check, Download, Mail, RefreshCw,
   Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
-  FileText, Loader, ScanText, Brain, ShieldCheck,
+  FileText, Loader, ScanText, Brain, ShieldCheck, Lock,
 } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
-import { MOCK_ANALYSIS, FIELD_LABELS } from '../utils/constants.js'
+import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
 import { track } from '../utils/track.js'
 
 const QUIPS = [
@@ -27,10 +27,10 @@ const QUIPS = [
 ]
 
 const LOADING_STEPS = [
-  { icon: FileText, label: 'Reading contract structure' },
-  { icon: ScanText, label: 'Extracting IFRS 16 fields'  },
-  { icon: Brain,    label: 'Scoring risk factors'        },
-  { icon: Sparkles, label: 'Running AI workflow'         },
+  { icon: FileText, label: 'Identifying lease type and parties'                   },
+  { icon: ScanText, label: 'Finding commencement date, rent schedule, and renewals' },
+  { icon: Brain,    label: 'Scoring risk against IFRS 16 §§ 19, 26, B34'          },
+  { icon: Sparkles, label: 'Generating your audit-ready report'                   },
 ]
 
 function AnalysisLoader({ file, progress }) {
@@ -155,18 +155,41 @@ function MetricGrid({ fields, data }) {
 function TermsGrid({ fields, termsMissing = [] }) {
   const [editMode, setEditMode]     = useState(false)
   const [edits, setEdits]           = useState({})
+  const [saveConfirm, setSaveConfirm] = useState(false)
 
   const rows = Object.entries(fields).map(([key, raw]) => {
     const f       = typeof raw === 'object' && raw !== null ? raw : { value: raw }
     const missing = f.value === null || f.value === undefined || f.value === ''
     const conf    = f.confidence ?? (missing ? 0 : 1)
     const confCls = missing ? 'conf-low' : conf >= 0.85 ? 'conf-high' : 'conf-med'
+    const uncertain = !missing && conf > 0 && conf < 0.85
     const label   = FIELD_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     const clause  = f.source_clause ?? ''
     const edited  = edits[key]
 
-    return { key, missing, confCls, label, clause, value: f.value, edited }
+    return { key, missing, confCls, uncertain, label, clause, value: f.value, edited, conf, rawField: f }
   })
+
+  const handleSave = () => {
+    Object.entries(edits).forEach(([key, corrected_value]) => {
+      const f = fields[key]
+      const original_value = typeof f === 'object' && f !== null ? f.value : f
+      if (corrected_value !== original_value) {
+        track('field_edited', {
+          key,
+          original_value: original_value ?? null,
+          corrected_value,
+          confidence: (typeof f === 'object' && f !== null ? f.confidence : null) ?? 0,
+          source_clause: (typeof f === 'object' && f !== null ? f.source_clause : null) ?? '',
+        })
+      }
+    })
+    setEditMode(false)
+    if (Object.keys(edits).length > 0) {
+      setSaveConfirm(true)
+      setTimeout(() => setSaveConfirm(false), 3000)
+    }
+  }
 
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '20px' }}>
@@ -174,13 +197,25 @@ function TermsGrid({ fields, termsMissing = [] }) {
         <div className="card-title" style={{ margin: 0 }}>Extracted Lease Terms</div>
         <button
           className="btn btn-outline btn-sm"
-          onClick={() => setEditMode(m => !m)}
+          onClick={() => editMode ? handleSave() : setEditMode(true)}
           style={editMode ? { background: 'var(--brand)', color: '#fff', borderColor: 'var(--brand)' } : { color: 'var(--t4)', borderColor: 'rgba(255,255,255,.18)' }}
         >
           {editMode ? <><Check size={12} /> Save edits</> : <><Pencil size={12} /> Edit terms</>}
         </button>
       </div>
-      {rows.map(({ key, missing, confCls, label, clause, value, edited }) => (
+      <div style={{ padding: '8px 18px 6px', borderBottom: '1px solid var(--divider, rgba(255,255,255,.06))', display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <span style={{ fontSize: '11px', color: 'var(--t3)' }}>Confidence:</span>
+        {[
+          { cls: 'conf-high', label: 'High confidence' },
+          { cls: 'conf-med',  label: 'Verify recommended' },
+          { cls: 'conf-low',  label: 'Not found' },
+        ].map(({ cls, label }) => (
+          <span key={cls} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--t3)' }}>
+            <span className={`confidence-dot ${cls}`} style={{ flexShrink: 0 }} />{label}
+          </span>
+        ))}
+      </div>
+      {rows.map(({ key, missing, confCls, uncertain, label, clause, value, edited, rawField }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
             <span className={`confidence-dot ${confCls}`} />
@@ -195,7 +230,16 @@ function TermsGrid({ fields, termsMissing = [] }) {
               />
             ) : edited ? (
               <span style={{ color: 'var(--brand)', fontWeight: 700 }}>{edited}<span className="manually-verified-badge">Edited</span></span>
-            ) : missing ? 'Not found in contract' : value}
+            ) : missing ? (
+              <span style={{ fontSize: '12px', color: 'var(--amber)', lineHeight: 1.5 }}>
+                {FIELD_HINTS[key] ?? 'Not found — please verify manually'}
+              </span>
+            ) : value}
+            {uncertain && !editMode && (
+              <div className="conf-chip">
+                AI uncertain — verify against {clause || 'source contract'}
+              </div>
+            )}
           </div>
           {clause ? (
             <div className="term-clause" style={missing ? { color: 'var(--amber)' } : {}}>
@@ -205,6 +249,12 @@ function TermsGrid({ fields, termsMissing = [] }) {
           ) : <div />}
         </div>
       ))}
+      {saveConfirm && (
+        <div style={{ padding: '10px 18px', fontSize: '12px', color: 'var(--green)', borderTop: '1px solid var(--divider, rgba(255,255,255,.06))' }}>
+          <CircleCheck size={12} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          Correction saved — helps improve future extractions.
+        </div>
+      )}
     </div>
   )
 }
@@ -311,10 +361,13 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
     setGateOpen(highFlags.length === 0 || allSigned)
   }
 
+  const exportLocked = highFlags.length > 0 && !gateOpen
+  const lockTitle = `Resolve ${highFlags.length} high-risk flag${highFlags.length !== 1 ? 's' : ''} to unlock`
+
   const stdMeta   = STANDARD_META[analysisIntent] ?? STANDARD_META.ifrs16_compliance
   const badgeCls  = isDemo ? 's2-data-badge--demo' : isLiveData ? 's2-data-badge--live' : 's2-data-badge--fallback'
   const badgeIcon = isDemo ? <FlaskConical size={12} /> : isLiveData ? <CircleCheck size={12} /> : <CircleAlert size={12} />
-  const badgeTxt  = isDemo ? 'Demo data' : isLiveData ? 'Live extraction' : 'Demo fallback'
+  const badgeTxt  = isDemo ? 'Demo data' : isLiveData ? 'Live extraction' : 'Live extraction failed — showing sample data'
 
   const switchStandard = () => {
     if (!selectedFile) return
@@ -335,8 +388,17 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
             <span className="breadcrumb-current">{filename}</span>
           </div>
           <div className="s2-subheader-meta">
-            <span className={`s2-data-badge ${badgeCls}`} title={isDemo ? 'Showing placeholder data' : isLiveData ? 'Live AI extraction' : 'Demo fallback'}>
+            <span className={`s2-data-badge ${badgeCls}`} title={isDemo ? 'Showing placeholder data' : isLiveData ? 'Live AI extraction' : 'Live extraction failed'}>
               {badgeIcon} {badgeTxt}
+              {!isDemo && !isLiveData && (
+                <button
+                  className="btn btn-sm btn-outline"
+                  style={{ marginLeft: '8px', padding: '1px 8px', fontSize: '11px' }}
+                  onClick={() => handleReanalyzeAs(analysisIntent)}
+                >
+                  Retry
+                </button>
+              )}
             </span>
             <span className="s2-standard-badge"><ShieldCheck size={11} /> {stdMeta.label}</span>
             <span className="s2-subheader-ts">Analyzed {dtStr}</span>
@@ -346,8 +408,13 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
             <RefreshCw size={12} /> Re-analyze
           </button>
-          <button className="btn btn-outline btn-sm" onClick={() => track('report_exported', { format: 'pdf', type: 'extraction' })}>
-            <Download size={12} /> Export PDF
+          <button
+            className="btn btn-outline btn-sm"
+            disabled={exportLocked}
+            title={exportLocked ? lockTitle : undefined}
+            onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'extraction' })}
+          >
+            {exportLocked ? <Lock size={12} /> : <Download size={12} />} Export PDF
           </button>
           {selectedFile && (
             <button
@@ -390,6 +457,16 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
                   <span className="pill pill-brand">{stdMeta.label} compliant</span>
                   {riskFlags.length > 0 && <span className="pill pill-gray">{riskFlags.length} flag{riskFlags.length !== 1 ? 's' : ''} to review</span>}
                 </div>
+                {(() => {
+                  const eq = getExtractionQuality(termsFound.length, totalFields, fields)
+                  return (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px', fontSize: '12px', color: 'var(--t3)' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: eq.color, display: 'inline-block', flexShrink: 0 }} />
+                      <span style={{ color: eq.color, fontWeight: 600 }}>{eq.level}</span>
+                      <span style={{ color: 'var(--t3)' }}>extraction · {eq.detail.split(' — ')[1]}</span>
+                    </div>
+                  )
+                })()}
               </div>
               <MetricGrid fields={fields} data={data} />
             </div>
@@ -408,6 +485,20 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
 
           {/* Risk flags */}
           <RiskFlags flags={riskFlags} onGateChange={onGateChange} />
+
+          {/* Completion banner */}
+          {gateOpen && highFlags.length > 0 && (
+            <div className="completion-banner">
+              <CircleCheck size={16} />
+              <span>All risks acknowledged — report is ready to export.</span>
+              <button className="btn btn-sm btn-primary" onClick={() => track('report_exported', { format: 'pdf', type: 'banner' })}>
+                <Download size={12} /> Export PDF
+              </button>
+              <button className="btn btn-sm btn-outline" onClick={() => track('report_sent', { method: 'email', source: 'banner' })}>
+                <Mail size={12} /> Send to auditor
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -415,8 +506,24 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <div className="sidebar-section">
             <div className="sidebar-section-title">Actions</div>
             <div className="action-list">
-              <button className="action-btn" aria-label="Export report to PDF"><Download size={14} aria-hidden="true" /> Export to PDF</button>
-              <button className="action-btn" aria-label="Send report to auditor"><Mail size={14} aria-hidden="true" /> Send to auditor</button>
+              <button
+                className="action-btn"
+                aria-label="Export report to PDF"
+                disabled={exportLocked}
+                title={exportLocked ? lockTitle : undefined}
+                onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'sidebar' })}
+              >
+                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Download size={14} aria-hidden="true" />} Export to PDF
+              </button>
+              <button
+                className="action-btn"
+                aria-label="Send report to auditor"
+                disabled={exportLocked}
+                title={exportLocked ? lockTitle : undefined}
+                onClick={() => !exportLocked && track('report_sent', { method: 'email' })}
+              >
+                {exportLocked ? <Lock size={14} aria-hidden="true" /> : <Mail size={14} aria-hidden="true" />} Send to auditor
+              </button>
               <button className="action-btn" aria-label="Re-run lease extraction"><RefreshCw size={14} aria-hidden="true" /> Re-run extraction</button>
             </div>
           </div>

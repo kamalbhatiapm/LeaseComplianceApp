@@ -46,6 +46,16 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
 
   const pctColor = p => p >= 90 ? 'var(--ink-3)' : p >= 75 ? 'var(--amber)' : 'var(--red)'
 
+  const contractTypeHint = file => {
+    if (!file) return null
+    const n = file.name.toLowerCase()
+    const type = /office|commercial|market|retail/.test(n) ? 'commercial property'
+               : /residential|apartment/.test(n) ? 'residential'
+               : 'property'
+    const standard = analysisIntent === 'ifrs16_compliance' ? 'IFRS 16' : 'ASC 842'
+    return `Looks like a ${type} lease — ${standard} extraction ready`
+  }
+
   return (
     <div style={{ background: 'var(--white)', minHeight: '100vh', paddingTop: '53px' }}>
       <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
@@ -115,6 +125,11 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
                           ? `${(selectedFile.size / 1024).toFixed(0)} KB · Ready to analyze`
                           : 'Drag & drop or click to browse'}
                       </div>
+                      {selectedFile && contractTypeHint(selectedFile) && (
+                        <div className="upload-hint">
+                          {contractTypeHint(selectedFile)}
+                        </div>
+                      )}
                       {!selectedFile && (
                         <div className="upload-types">
                           {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
