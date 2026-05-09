@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import Dashboard from './screens/Dashboard.jsx'
 import LeaseAnalysis from './screens/LeaseAnalysis.jsx'
+import AuditTrail from './screens/AuditTrail.jsx'
 import Playbooks from './screens/Playbooks.jsx'
 import Toast from './components/Toast.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
@@ -28,6 +29,7 @@ export default function App() {
   const [progress, setProgress]           = useState({ step: 0, label: '', pct: 0 })
   const [navLocked, setNavLocked]         = useState(false)
   const [analysisIntent, setAnalysisIntent] = useState('ifrs16_compliance')
+  const [fieldEdits, setFieldEdits]         = useState({})
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
   const dropPending                        = useRef(false)
 
@@ -203,6 +205,7 @@ export default function App() {
     selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick, handleReanalyzeAs,
     isAnalyzing, analysisData, isLiveData, progress, navLocked,
     analysisIntent, setAnalysisIntent,
+    fieldEdits, setFieldEdits,
     showToast, dismissToast, theme, toggleTheme,
   }
 
@@ -214,6 +217,7 @@ export default function App() {
       <Routes>
         <Route path="/"          element={<Dashboard      {...sharedProps} />} />
         <Route path="/leases"    element={<LeaseAnalysis  {...sharedProps} isAnalyzing={isAnalyzing} progress={progress} />} />
+        <Route path="/audit"     element={<AuditTrail     {...sharedProps} />} />
         <Route path="/playbooks" element={<Playbooks      navLocked={navLocked} theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="*"          element={<Navigate to="/" replace />} />
       </Routes>
