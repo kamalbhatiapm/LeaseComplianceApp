@@ -1,78 +1,53 @@
 {
-  "name": "LegalGraph — IFRS 16 Extraction (v2)",
+  "name": "claude workflow",
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "7d90ba9a-649b-468e-95b5-0984450b83d8",
-        "responseMode": "responseNode",
-        "options": {
-          "allowedOrigins": "*"
-        }
+        "operation": "pdf",
+        "binaryPropertyName": "file",
+        "options": {}
       },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [0, 0],
-      "id": "513db9e2-c4c8-4d0c-ab8d-cbf620bf732c",
-      "name": "Webhook",
-      "webhookId": "e733e458-df38-4929-b2b3-e5f134c9d891"
-    },
-    {
-      "parameters": {
-        "jsCode": "// document_text is now extracted client-side by the frontend (PDF.js for PDFs,\n// mammoth for DOCX/DOC, native File.text() for TXT) and sent as plain UTF-8.\n// No base64 decoding needed here — just pass it through.\nconst body = $input.first().json.body ?? $input.first().json;\nconst document_text = body.document_text ?? '(no document text provided)';\nreturn [{ json: { ...body, document_text } }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [220, 0],
-      "id": "a1b2c3d4-1111-4444-aaaa-000000000001",
-      "name": "Decode File Content"
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        -208
+      ],
+      "id": "0d3bc0cd-fca7-4b57-9160-0077d27bbd7d",
+      "name": "Extract from File"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Intent : {{ $json.intent }}\nFile Name : {{ $json.file_name }}\nStandard : {{ $json.standard }}\nContract Text :\n{{ $json.document_text }}",
+        "text": "=Intent : {{ $('Webhook').item.json.body.intent }}\nFile Text : {{ $json.text }}",
         "options": {
-          "systemMessage": "=You are an IFRS 16 lease compliance orchestrator with deep expertise in ASC 842 and IFRS 16 lease accounting standards. You coordinate two specialist agents to extract audit-ready key terms from lease contracts.\n\nOBJECTIVE: Call both tools in sequence and return the raw JSON result from key_term_extraction_agent — nothing else.\n\nSTEP 1 — Call contract_playbook_agent first.\n- Pass contract_type = \"LEASE\" and intent = \"key_term_extraction\".\n- Wait for confirmation that playbook rules are loaded before proceeding.\n- If the agent responds with \"No playbook rules found\", still proceed to Step 2 — the extraction agent will return empty key_terms.\n\nSTEP 2 — Call key_term_extraction_agent.\n- The agent reads playbook rules and contract text from shared memory automatically.\n- Wait for it to return the JSON object before proceeding.\n\nSTEP 3 — Return the JSON exactly as received.\n- Your final response is the raw JSON object from key_term_extraction_agent.\n- Return it as plain text — no markdown fences, no commentary, no wrapper.\n\nEXPECTED OUTPUT SHAPE (for reference — do not modify):\n{\n  \"contract_type\": \"LEASE\",\n  \"parties\": [\"Lessor Name\", \"Lessee Name\"],\n  \"effective_date\": \"2024-01-01\",\n  \"key_terms\": [\n    {\n      \"label\": \"commencement_date\",\n      \"value\": \"1 January 2024\",\n      \"confidence\": 0.97,\n      \"clause_ref\": \"§2.1 — Commencement\",\n      \"source_text\": \"The lease shall commence on 1 January 2024.\"\n    }\n  ]\n}\n"
+          "systemMessage": "=You are a contract analysis orchestrator. Your job is to analyze the user message,\ndetect the user's intent, identify the contract type, and call the correct tools\nin the correct order.\n\nSTEP 1 — DETECT INTENT from the user message:\n- \"key terms\", \"extract terms\", \"what are the terms\", \"summarize terms\", \"list terms\" → intent = \"key_term_extraction\"\n\nSTEP 2 — DETECT CONTRACT TYPE from the contract text:\n\n- \"Non-Disclosure Agreement\", \"NDA\", \"confidential information\", \"disclosing party\", \"receiving party\" \n  → contract_type = \"NDA\"\n\n- \"Master Services Agreement\", \"MSA\", \"statement of work\", \"deliverables\", \"service fees\", \"service provider\" \n  → contract_type = \"MSA\"\n\n- \"Lease Agreement\", \"Lease Contract\", \"Lessor\", \"Lessee\", \"Premises\", \"Rent\", \"Lease Term\", \n  \"Commencement Date\", \"Renewal Option\", \"Right-of-Use Asset\", \"Lease Liability\" \n  → contract_type = \"LEASE\"\n\n- If none match \n  → contract_type = \"UNKNOWN\"\n\nSTEP 3 — CALL TOOLS based on intent:\n\nIF intent = \"key_term_extraction\":\n→ CALL contract_playbook_agent — Pass: contract_type, intent. Wait for response.\n→ THEN CALL key_term_extraction_agent — No extra input needed, reads from memory. Wait for response.\n→ DO NOT call contract_risk_agent.\n\n\n\nFINAL RESPONSE RULES:\n- Do NOT return the playbook rules as your final response.\n- Do NOT return intermediate tool outputs.\n- Wait until ALL required tools have completed.\n- Your final response must ONLY be the output from the LAST agent that ran:\n- For key_term_extraction → return the key terms extraction output\n- Do not ask follow-up questions. Return the final result immediately.\n\nWhen all required tools have been called and results are in memory,\ncompile the final output and return it immediately as your response.\nDo NOT ask follow-up questions. Do NOT wait for more input.\nThe workflow ends when you return the final result.\n\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
-      "position": [460, 0],
-      "id": "a81992e7-27f6-4999-a93b-cf2367eb8fb7",
+      "position": [
+        1824,
+        -208
+      ],
+      "id": "c5dbc4ba-ea1a-4912-a648-674d71fffe8d",
       "name": "Orchestrator Agent"
-    },
-    {
-      "parameters": {
-        "jsCode": "// FIX 3 — Parse the Orchestrator Agent's text output into a clean JSON envelope\n// that matches the shape the frontend expects:\n// { contract_type, key_terms[], terms_found[], terms_missing[], risk_score, risk_flags[], status }\n\nconst raw = $input.first().json.output ?? '';\n\nlet parsed = null;\ntry {\n  // Strip markdown code fences if the LLM wrapped its output\n  const cleaned = raw\n    .replace(/^```json\\s*/i, '')\n    .replace(/^```\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n  parsed = JSON.parse(cleaned);\n} catch {\n  // JSON parse failed — return a detectable error envelope so the frontend\n  // can fall back to MOCK_ANALYSIS rather than silently showing nothing.\n  return [{\n    json: {\n      status: 'parse_error',\n      raw_output: raw.slice(0, 500),\n      contract_type: null,\n      key_terms: [],\n      terms_found: [],\n      terms_missing: [],\n      risk_score: null,\n      risk_flags: [],\n      analyzed_at: new Date().toISOString()\n    }\n  }];\n}\n\nconst key_terms = Array.isArray(parsed.key_terms) ? parsed.key_terms : [];\n\n// Separate found vs missing based on value content\nconst terms_found   = key_terms\n  .filter(t => t.value && t.value !== 'Not specified' && t.value !== 'not found')\n  .map(t => (t.label ?? '').toLowerCase().replace(/[\\s-]+/g, '_'));\n\nconst terms_missing = key_terms\n  .filter(t => !t.value || t.value === 'Not specified' || t.value === 'not found')\n  .map(t => (t.label ?? '').toLowerCase().replace(/[\\s-]+/g, '_'));\n\nreturn [{\n  json: {\n    status: 'ok',\n    contract_type:  parsed.contract_type  ?? null,\n    parties:        parsed.parties        ?? [],\n    effective_date: parsed.effective_date ?? null,\n    key_terms,\n    terms_found,\n    terms_missing,\n    // risk_score and risk_flags are not yet computed by n8n;\n    // frontend fills these from MOCK_ANALYSIS when null.\n    risk_score:  null,\n    risk_flags:  [],\n    analyzed_at: new Date().toISOString()\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [900, 0],
-      "id": "a1b2c3d4-2222-4444-bbbb-000000000002",
-      "name": "Format Response"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [1120, 0],
-      "id": "7732840a-44f4-4df1-8fa5-4fec7589a913",
-      "name": "Respond to Webhook"
     },
     {
       "parameters": {
         "toolDescription": "Fetches the contract playbook rules from the database based on contract type and stores them in shared memory. ALWAYS call this tool FIRST. Pass contract_type and intent.",
         "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
         "options": {
-          "systemMessage": "You are the IFRS 16 Playbook Agent — a specialist in lease accounting standards who retrieves structured extraction rules from the contract playbook database and makes them available to downstream agents via shared memory.\n\nOBJECTIVE: Fetch the correct playbook rules for the given contract type and write a complete, structured summary to shared memory so the Key Term Extraction Agent can use it.\n\nYOUR PROCESS:\n1. Call the fetch_playbook tool with the provided contract_type (always \"LEASE\" for IFRS 16 workflows).\n   - This queries the contract_playbook table and returns rows with: key_term_name, key_term_label, key_term_description, risk_weight.\n\n2. Write ALL retrieved rules to shared memory in exactly this format:\n\n--- PLAYBOOK RULES FOR LEASE ---\nIntent: key_term_extraction\nRules retrieved: [N]\n\n- Rule Name: commencement_date\n  Label: Commencement Date\n  Description: The date on which the lessee obtains the right to use the underlying asset (IFRS 16 §B34).\n  Risk Weight: 0.9\n\n- Rule Name: annual_payment\n  Label: Annual Lease Payment\n  Description: Total fixed payments over the lease term, excluding variable components.\n  Risk Weight: 0.95\n\n[...one block per rule...]\n\n--- END PLAYBOOK RULES ---\n\n3. Respond with: \"Playbook loaded for LEASE. [N] rules stored in memory.\"\n\nGUARDRAILS:\n- Write every rule retrieved — do not filter or summarise.\n- If fetch_playbook returns zero rows, write to memory: \"No playbook rules found for LEASE. Key term extraction cannot proceed.\" Then respond: \"No playbook rules found for LEASE.\"\n- If fetch_playbook errors, write: \"Playbook fetch failed — tool error.\" Then respond: \"Playbook fetch failed.\"\n- Do not extract contract terms. Do not score risk. Do not modify rule definitions.\n"
+          "systemMessage": "You are the Contract Playbook Agent. Your only job is to retrieve the correct \nplaybook rules for the given contract type from the database and write a clear \nstructured summary of those rules into shared memory.\n\nYOUR PROCESS:\n1. Use the fetch_playbook tool to query the contract_playbook table, filtered \n   by the provided contract_type.\n2. Write a structured summary to memory in this format:\n\n--- PLAYBOOK RULES FOR [CONTRACT_TYPE] ---\nIntent: [intent]\nRules retrieved: [count]\n\n- Rule Name: [key_term_name]\n  Label: [key_term_label]\n  Description: [key_term_description]\n  Risk Weight: [risk_weight]\n\n--- END PLAYBOOK RULES ---\n\n3. Respond with: \"Playbook loaded for [contract_type]. [N] rules stored in memory.\"\n\nRULES:\n- Do not extract terms. Do not analyze risk.\n- If no rules found, write: \"No playbook rules found for [contract_type].\"\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agentTool",
       "typeVersion": 3,
-      "position": [352, 416],
-      "id": "e1552913-4a7e-4d17-a333-f475e7140908",
+      "position": [
+        1728,
+        208
+      ],
+      "id": "1c465297-be87-4277-a198-bc96166fa19a",
       "name": "contract_playbook_agent"
     },
     {
@@ -81,19 +56,22 @@
         "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "You are an IFRS 16 lease accounting specialist and key term extraction agent. You read lease contracts and extract specific financial and legal terms required for IFRS 16 compliance reporting — commencement dates, lease terms, payment schedules, discount rates, renewal options, and related clauses.\n\nOBJECTIVE: For every rule in the playbook loaded into shared memory, find and extract the corresponding value from the contract text. Return a single valid JSON object with all extracted terms.\n\nYOUR PROCESS:\n1. Read shared memory and locate:\n   a. The PLAYBOOK RULES block (written by the Playbook Agent) — this is your extraction checklist.\n   b. The contract text (provided in the conversation context).\n   If the playbook block is missing or empty, return the JSON with an empty key_terms array.\n\n2. For EACH rule in the playbook, search the contract text for the value described in that rule's Description field.\n   - Use the rule's Description to understand what to look for (e.g., \"date on which lessee obtains right to use asset\").\n   - Quote verbatim from the contract wherever possible.\n   - Assign confidence based on how clearly the value is stated:\n     * 0.95–1.0: explicitly stated (\"commences on 1 January 2024\")\n     * 0.75–0.94: clearly implied or calculable (\"three-year term starting Q1 2024\")\n     * 0.50–0.74: uncertain — multiple interpretations possible\n     * 0.0: not found in contract\n\n3. Return ONLY this JSON object — no markdown, no preamble, no explanation:\n{\n  \"contract_type\": \"LEASE\",\n  \"parties\": [\"Lessor Legal Name\", \"Lessee Legal Name\"],\n  \"effective_date\": \"YYYY-MM-DD or null\",\n  \"key_terms\": [\n    {\n      \"label\": \"commencement_date\",\n      \"value\": \"1 January 2024\",\n      \"confidence\": 0.97,\n      \"clause_ref\": \"§2.1 — Commencement Date\",\n      \"source_text\": \"The lease shall commence on 1 January 2024 upon delivery of the premises.\"\n    },\n    {\n      \"label\": \"annual_payment\",\n      \"value\": \"Not specified\",\n      \"confidence\": 0.0,\n      \"clause_ref\": null,\n      \"source_text\": null\n    }\n  ]\n}\n\nGUARDRAILS:\n- Include one entry per playbook rule — do not skip rules, do not add rules not in the playbook.\n- Set value to \"Not specified\" and confidence to 0.0 for any term not found in the contract.\n- source_text must be a verbatim quote from the contract, not a paraphrase. Use null if not found.\n- clause_ref format: \"§X.X — Section Title\" or null if no section reference exists.\n- Do not infer values beyond what is written. When uncertain, lower the confidence score rather than guessing.\n- Do not score risk, flag issues, or add commentary. Return JSON only.\n"
+          "systemMessage": "You are the Key Term Extraction Agent. Extract key terms from the contract\nusing the playbook rules already stored in shared memory as your guide.\n\nYOUR PROCESS:\n1. Read memory to find:\n   a. The contract text (provided by the orchestrator)\n   b. The playbook rules (written by the Playbook Agent) this contains\n      the list of key terms you need to extract\n\n2. For EACH rule in the playbook rules, extract its value from the contract.\n   The rule name is what to look for, the description tells you what it means.\n\n3. Return structured JSON with:\n   - contract_type: string (NDA/MSA/Lease)\n   - parties: array of strings\n   - effective_date: string\n   - key_terms: array of objects with \"label\" and \"value\" fields\n\nRULES:\n- The list of key terms comes ONLY from the playbook rules in memory.\n- Do not hardcode any term names use whatever terms the Playbook Agent loaded.\n- Do not add terms that are not in the playbook.\n- Do not score or flag risks.\n- If a term is not found in the contract use \"Not specified\" as the value.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agentTool",
       "typeVersion": 3,
-      "position": [1152, 208],
-      "id": "ce234991-e645-4534-82c2-7a2e91b1354c",
+      "position": [
+        2528,
+        0
+      ],
+      "id": "551c01d5-c16a-40b3-90cb-3f0ea458b719",
       "name": "key_term_extraction_agent"
     },
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Fetches all playbook rules from the contract_playbook table filtered by contract_type. Returns key_term_name, key_term_label, key_term_description, risk_weight for each row.",
+        "toolDescription": "Fetches all playbook rules from the contract_playbook table filtered by contract_type. Returns key_term_name, key_term_label, key_term_description, risk_weight for each row.\n\n",
         "operation": "getAll",
         "tableId": "contract_playbook",
         "returnAll": true,
@@ -109,26 +87,32 @@
       },
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
-      "position": [496, 720],
-      "id": "b440e677-7fb3-469f-bdb0-68af2f7cb14e",
+      "position": [
+        1872,
+        512
+      ],
+      "id": "1aac9e3c-aa3b-4b42-ac07-c5ffcb0753e9",
       "name": "fetch_playbook",
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
-          "name": "Lease Compliance Reporting"
+          "id": "2vIl6TlS1FtBkjDw",
+          "name": "Supabase account"
         }
       }
     },
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ ($('Webhook').item.json.body?.file_name ?? 'session') + '_' + ($('Webhook').item.json.body?.analyzed_at ?? 'default') }}",
+        "sessionKey": "={{ \"test_session\" }}",
         "contextWindowLength": 50
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
-      "position": [736, 800],
-      "id": "e10a817e-03df-446d-b74b-71134482a0ad",
+      "position": [
+        2160,
+        432
+      ],
+      "id": "1777ee37-93b8-4976-afb7-22963c792f2d",
       "name": "Simple Memory"
     },
     {
@@ -144,57 +128,59 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
-      "position": [-240, 416],
-      "id": "37f791e9-55f6-44ad-bb35-00a01fd06d20",
+      "position": [
+        1136,
+        208
+      ],
+      "id": "59af4b0b-08d9-466e-8cd4-1cd3e9558fbd",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "OPENAI_CREDENTIAL_ID",
-          "name": "OpenAi account"
+          "id": "OvfrR3fXJdPnR6rp",
+          "name": "OpenAI account 3"
         }
       }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7d90ba9a-649b-468e-95b5-0984450b83d8",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1376,
+        -208
+      ],
+      "id": "12ebe510-6617-4aec-aecd-2fcfdd3d2849",
+      "name": "Webhook",
+      "webhookId": "e733e458-df38-4929-b2b3-e5f134c9d891"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2624,
+        -208
+      ],
+      "id": "358f577c-2260-483b-b013-9644abb1c564",
+      "name": "Respond to Webhook"
     }
   ],
   "pinData": {},
   "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Decode File Content",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Decode File Content": {
+    "Extract from File": {
       "main": [
         [
           {
             "node": "Orchestrator Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Orchestrator Agent": {
-      "main": [
-        [
-          {
-            "node": "Format Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Response": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
             "type": "main",
             "index": 0
           }
@@ -275,13 +261,40 @@
           }
         ]
       ]
+    },
+    "Orchestrator Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "versionId": "284cd6f0-33e6-57f0-c9f7-2g9e9bc857gg",
-  "id": "OZ3ZFPr3JALBuijU",
+  "versionId": "0db95a03-b0e7-47b2-bce4-5e254ef86e69",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1ee21dfc80f315ed993e85c8dc97508d1c1d4e0b598766bf138052c558ce125b"
+  },
+  "id": "nkyPo5fQ9rzf1dqb",
   "tags": []
 }
