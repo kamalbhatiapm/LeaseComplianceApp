@@ -101,6 +101,7 @@ export default function App() {
   }, [])
 
   async function runAnalysis(intentOverride) {
+    if (!selectedFile) return
     setIsAnalyzing(true)
     setNavLocked(true)
 
