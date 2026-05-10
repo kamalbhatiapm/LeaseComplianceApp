@@ -7,7 +7,6 @@ import Playbooks from './screens/Playbooks.jsx'
 import Toast from './components/Toast.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
 import { MOCK_ANALYSIS } from './utils/constants.js'
-import { fileToBase64 } from './utils/fileToBase64.js'
 import { track } from './utils/track.js'
 
 const WEBHOOK_URL   = import.meta.env.VITE_WEBHOOK_URL   ?? ''
@@ -154,24 +153,21 @@ export default function App() {
         setTimeout(dismissToast, 9000)
       }, MAX_MS)
 
-      const file_content = await fileToBase64(selectedFile)
-
-      const payload = {
-        file_name:    selectedFile.name,
-        file_type:    selectedFile.type || 'application/octet-stream',
-        file_content,
-        standard:     'IFRS16',
-        intent:       intentOverride ?? analysisIntent,
-        analyzed_at:  new Date().toISOString(),
-      }
+      const analyzedAt = new Date().toISOString()
+      const payload = new FormData()
+      payload.append('file', selectedFile, selectedFile.name)
+      payload.append('file_name', selectedFile.name)
+      payload.append('file_type', selectedFile.type || 'application/octet-stream')
+      payload.append('standard', 'IFRS16')
+      payload.append('intent', intentOverride ?? analysisIntent)
+      payload.append('analyzed_at', analyzedAt)
 
       try {
         const controller = new AbortController()
         const tid = setTimeout(() => controller.abort(), MAX_MS - 5000)
         const res = await fetch(WEBHOOK_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload),
+          body: payload,
           signal: controller.signal,
         })
         webhookOk = res.ok
