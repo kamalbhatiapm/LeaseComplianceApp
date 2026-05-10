@@ -107,6 +107,7 @@ export default function App() {
     setNavLocked(true)
 
     const MIN_MS   = 45000   // always show loading for at least 45 s
+    const MAX_MS   = 180000  // safety cap at 3 min
     const startMs  = Date.now()
 
     const step = async (n, label, pct, ms) => {
@@ -124,18 +125,35 @@ export default function App() {
 
     let webhookOk    = false
     let responseData = null
+    let errorReason  = null
 
     if (WEBHOOK_URL) {
-      // Hard safety cap at 50 s — always clears loading no matter what
+      // Heartbeat: slowly nudge progress 90→97% while waiting for webhook
+      // so the UI never looks frozen during the ~80 s AI processing window.
+      let heartbeatPct = 91
+      const heartbeat = setInterval(() => {
+        heartbeatPct = Math.min(97, heartbeatPct + 0.8)
+        const label = heartbeatPct < 94
+          ? 'AI agents processing contract…'
+          : heartbeatPct < 96
+            ? 'Almost there — building your report…'
+            : 'Finalising extraction…'
+        setProgress({ step: 6, label, pct: Math.round(heartbeatPct) })
+      }, 3000)
+
+      // Hard safety cap at 3 min — always clears loading no matter what
       let safetyFired = false
       const safetyTimer = setTimeout(() => {
         safetyFired = true
+        clearInterval(heartbeat)
         setProgress({ step: 6, label: 'Extraction complete', pct: 100, done: true })
         setAnalysisData(MOCK_ANALYSIS)
         setIsLiveData(false)
         setIsAnalyzing(false)
         setNavLocked(false)
-      }, 50000)
+        showToast('warning', 'Analysis timed out', 'Showing sample data — the AI workflow took longer than 3 minutes. Try again with a shorter document.')
+        setTimeout(dismissToast, 9000)
+      }, MAX_MS)
 
       // Extract plain text client-side so n8n receives readable content
       // instead of a raw base64 blob it cannot parse.
@@ -156,7 +174,7 @@ export default function App() {
 
       try {
         const controller = new AbortController()
-        const tid = setTimeout(() => controller.abort(), 60000)
+        const tid = setTimeout(() => controller.abort(), MAX_MS - 5000)
         const res = await fetch(WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
@@ -164,7 +182,10 @@ export default function App() {
           signal: controller.signal,
         })
         webhookOk = res.ok
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        if (!res.ok) {
+          errorReason = `Service returned ${res.status} — showing sample data`
+          throw new Error(`HTTP ${res.status}`)
+        }
         const text = await res.text()
         clearTimeout(tid)
         try {
@@ -197,11 +218,19 @@ export default function App() {
             }
           }
           responseData = parsed
-        } catch {}
+        } catch {
+          errorReason = 'Unexpected response format — showing sample data'
+        }
       } catch (err) {
         console.error('[LegalGraph] Webhook error:', err.name, err.message)
+        if (!errorReason) {
+          errorReason = err.name === 'AbortError'
+            ? 'Analysis timed out — showing sample data. Try again or upload a shorter document.'
+            : 'Connection error — showing sample data. Check your network and try again.'
+        }
       }
 
+      clearInterval(heartbeat)
       if (safetyFired) return
       clearTimeout(safetyTimer)
     }
@@ -229,6 +258,9 @@ export default function App() {
       const fc = displayData?.terms_found?.length || MOCK_ANALYSIS.terms_found.length
       showToast('success', 'Extraction complete', `${fc} fields extracted · risk score ${displayData?.risk_score ?? '—'}`)
       setTimeout(dismissToast, 7000)
+    } else if (errorReason) {
+      showToast('error', 'Extraction failed', errorReason)
+      setTimeout(dismissToast, 9000)
     }
 
     setIsAnalyzing(false)
