@@ -10,10 +10,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        1600,
-        -208
+        5216,
+        2560
       ],
-      "id": "0d3bc0cd-fca7-4b57-9160-0077d27bbd7d",
+      "id": "4314278b-30d3-42d0-8d35-d35bb48727df",
       "name": "Extract from File"
     },
     {
@@ -27,10 +27,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1824,
-        -208
+        5440,
+        2560
       ],
-      "id": "c5dbc4ba-ea1a-4912-a648-674d71fffe8d",
+      "id": "376a1db1-4bc6-472e-bfe9-d1c34dc2f44e",
       "name": "Orchestrator Agent"
     },
     {
@@ -44,10 +44,10 @@
       "type": "@n8n/n8n-nodes-langchain.agentTool",
       "typeVersion": 3,
       "position": [
-        1728,
-        208
+        5520,
+        2784
       ],
-      "id": "1c465297-be87-4277-a198-bc96166fa19a",
+      "id": "bb4e7bed-40b3-472f-989a-70b67bb495fa",
       "name": "contract_playbook_agent"
     },
     {
@@ -62,10 +62,10 @@
       "type": "@n8n/n8n-nodes-langchain.agentTool",
       "typeVersion": 3,
       "position": [
-        2528,
-        0
+        5824,
+        2784
       ],
-      "id": "551c01d5-c16a-40b3-90cb-3f0ea458b719",
+      "id": "ce79542a-8394-4115-ae0b-3d8f8bcee5a4",
       "name": "key_term_extraction_agent"
     },
     {
@@ -88,40 +88,40 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1872,
-        512
+        5856,
+        2992
       ],
-      "id": "1aac9e3c-aa3b-4b42-ac07-c5ffcb0753e9",
+      "id": "0c9f3dd1-31cd-4963-99ef-1afee8afc205",
       "name": "fetch_playbook",
       "credentials": {
         "supabaseApi": {
-          "id": "2vIl6TlS1FtBkjDw",
-          "name": "Supabase account"
+          "id": "jChMBRrCeudKyisl",
+          "name": "Lease Compliance Reporting"
         }
       }
     },
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ \"test_session\" }}",
+        "sessionKey": "={{ $('Webhook').item.json.body.analyzed_at ?? $now.toISO() }}",
         "contextWindowLength": 50
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        2160,
-        432
+        5616,
+        2976
       ],
-      "id": "1777ee37-93b8-4976-afb7-22963c792f2d",
+      "id": "ee15aec4-8e7d-406d-b8c0-cc1f0dcceabe",
       "name": "Simple Memory"
     },
     {
       "parameters": {
         "model": {
           "__rl": true,
-          "value": "gpt-4o-mini",
+          "value": "gpt-5-mini",
           "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
+          "cachedResultName": "gpt-5-mini"
         },
         "builtInTools": {},
         "options": {}
@@ -129,15 +129,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        1136,
-        208
+        5408,
+        2976
       ],
-      "id": "59af4b0b-08d9-466e-8cd4-1cd3e9558fbd",
+      "id": "2b2b806b-583f-4bf4-a966-f7f7befdc92f",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "OvfrR3fXJdPnR6rp",
-          "name": "OpenAI account 3"
+          "id": "Ud6lfu4FVZ8L1pYz",
+          "name": "OpenAi account"
         }
       }
     },
@@ -153,25 +153,13 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        1376,
-        -208
+        4992,
+        2560
       ],
-      "id": "12ebe510-6617-4aec-aecd-2fcfdd3d2849",
+      "id": "f43f29f9-4c32-452c-9088-fa7fb01265c3",
       "name": "Webhook",
-      "webhookId": "e733e458-df38-4929-b2b3-e5f134c9d891"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Orchestrator Agent returns { output: '<text or JSON string>' }\n// Extract and parse the agent's output into structured JSON for the frontend.\nconst raw = $input.first().json;\nconst outputText = (raw.output ?? JSON.stringify(raw)).trim();\n\nlet parsed;\ntry {\n  // Strip markdown code fences if agent wrapped output in ```json ... ```\n  const clean = outputText.replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/,'');\n  parsed = JSON.parse(clean);\n  // n8n agent tools sometimes wrap in an array\n  if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed;\n} catch {\n  // Agent returned plain text — wrap so frontend can detect and fall back\n  parsed = { output: outputText, parse_error: true };\n}\n\nreturn [{ json: parsed }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2416,
-        -208
-      ],
-      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "name": "Format JSON Response"
+      "webhookId": "845b0fa4-a210-498c-9257-ae9730253ecd",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -180,11 +168,24 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        2816,
-        -208
+        5952,
+        2560
       ],
-      "id": "358f577c-2260-483b-b013-9644abb1c564",
+      "id": "8d1d2d6a-64fe-4277-8128-c89229b3c86b",
       "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst outputText = (raw.output ?? JSON.stringify(raw)).trim();\n\nlet parsed;\ntry {\n  const clean = outputText.replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/, '');\n  parsed = JSON.parse(clean);\n  if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed;\n} catch {\n  parsed = { output: outputText, parse_error: true };\n}\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5776,
+        2560
+      ],
+      "id": "2a041f3c-db74-4a45-9684-0dcebc0f57e5",
+      "name": "Code in JavaScript"
     }
   ],
   "pinData": {},
@@ -279,18 +280,7 @@
       "main": [
         [
           {
-            "node": "Format JSON Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format JSON Response": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -307,18 +297,32 @@
           }
         ]
       ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "any",
+    "availableInMCP": true
   },
-  "versionId": "0db95a03-b0e7-47b2-bce4-5e254ef86e69",
+  "versionId": "7e81f14f-746d-4e73-9f3e-7b7a41f70a98",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "1ee21dfc80f315ed993e85c8dc97508d1c1d4e0b598766bf138052c558ce125b"
+    "instanceId": "b4a40aff06825395115fea7dd13e44d323c57aa8926575ab214be4610f8b1ad1"
   },
-  "id": "nkyPo5fQ9rzf1dqb",
+  "id": "OZ3ZFPr3JALBuijU",
   "tags": []
 }
