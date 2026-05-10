@@ -8,7 +8,6 @@ import Toast from './components/Toast.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
 import { MOCK_ANALYSIS } from './utils/constants.js'
 import { fileToBase64 } from './utils/fileToBase64.js'
-import { extractText } from './utils/extractText.js'
 import { track } from './utils/track.js'
 
 const WEBHOOK_URL   = import.meta.env.VITE_WEBHOOK_URL   ?? ''
@@ -155,21 +154,15 @@ export default function App() {
         setTimeout(dismissToast, 9000)
       }, MAX_MS)
 
-      // Extract plain text client-side so n8n receives readable content
-      // instead of a raw base64 blob it cannot parse.
-      // PDF.js handles digital PDFs; mammoth handles DOCX/DOC; TXT reads natively.
-      const document_text = await extractText(selectedFile)
-      if (!document_text) {
-        showToast('warning', 'Limited extraction', 'Could not extract text from this file — results may be limited')
-      }
+      const file_content = await fileToBase64(selectedFile)
 
       const payload = {
-        file_name:     selectedFile.name,
-        file_type:     selectedFile.type || 'application/octet-stream',
-        document_text,
-        standard:      'IFRS16',
-        intent:        intentOverride ?? analysisIntent,
-        analyzed_at:   new Date().toISOString(),
+        file_name:    selectedFile.name,
+        file_type:    selectedFile.type || 'application/octet-stream',
+        file_content,
+        standard:     'IFRS16',
+        intent:       intentOverride ?? analysisIntent,
+        analyzed_at:  new Date().toISOString(),
       }
 
       try {
@@ -191,32 +184,6 @@ export default function App() {
         try {
           let parsed = JSON.parse(text)
           if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed
-          // Normalize n8n response to frontend schema.
-          // n8n currently returns { key_terms[{label, value, confidence, clause_ref}] }
-          // Frontend expects { fields{key: {value, confidence, source_clause}}, terms_found[], … }
-          if (parsed && Array.isArray(parsed.key_terms) && !parsed.fields) {
-            const fields = {}
-            const terms_found = []
-            for (const t of parsed.key_terms) {
-              const key = (t.label ?? '').toLowerCase().replace(/[\s-]+/g, '_')
-              if (!key) continue
-              fields[key] = {
-                value:         t.value         ?? null,
-                confidence:    t.confidence    ?? null,
-                source_clause: t.clause_ref    ?? t.source_clause ?? null,
-                source_text:   t.source_text   ?? null,
-              }
-              if (t.value != null && t.value !== '') terms_found.push(key)
-            }
-            parsed = {
-              ...parsed,
-              fields,
-              terms_found,
-              terms_missing: parsed.terms_missing ?? [],
-              risk_score:    parsed.risk_score    ?? null,
-              risk_flags:    parsed.risk_flags    ?? parsed.flags ?? [],
-            }
-          }
           responseData = parsed
         } catch {
           errorReason = 'Unexpected response format — showing sample data'
