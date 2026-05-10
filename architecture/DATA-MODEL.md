@@ -134,6 +134,9 @@ CREATE POLICY "analyses: own rows only"
 
 #### `analysis_json` shape (n8n response — stored verbatim)
 
+> **Current pipeline state (as of 2026-05-10):** The n8n workflow (Webhook → Extract from File → Orchestrator Agent → Respond to Webhook) returns the Orchestrator Agent's raw text output. The Respond to Webhook node sends this as `{"output": "..."}`. The frontend stores whatever JSON the webhook returns. The structured shape below is the **target schema** for when the pipeline is extended with a Format Response node that maps the Orchestrator output into typed fields. Until then, `analysis_json` may contain `{"output": "<markdown or JSON text>"}` and the frontend falls back to `MOCK_ANALYSIS` for display.
+
+**Target shape (once pipeline returns structured JSON):**
 ```jsonc
 {
   "contract_type": "Commercial Office Lease",
@@ -165,8 +168,17 @@ CREATE POLICY "analyses: own rows only"
     // ... one entry per IFRS 16 field
   },
   "analyzed_at": "2026-05-09T10:00:00.000Z",
-  "model": "gpt-5-mini",                // pipeline model name for PCAOB AS 1105
+  "model": "gpt-4o-mini",               // pipeline model name for PCAOB AS 1105
   "pipeline_version": "1.0"
+}
+```
+
+**Current actual shape (raw Orchestrator output):**
+```jsonc
+{
+  "output": "contract_type: Commercial Office Lease\n\nfields:\n  commencement_date: ..."
+  // Free-text or embedded JSON returned by the Orchestrator Agent
+  // No `fields`, `risk_flags`, or `risk_score` keys at the top level
 }
 ```
 
@@ -438,6 +450,28 @@ Apply in this sequence (each depends on the previous):
 ```
 
 > Step 7 adds the FK after `approvals` is created to avoid a circular dependency at table creation time.
+
+---
+
+## n8n Webhook Upload Contract
+
+The frontend sends lease documents to n8n as `multipart/form-data` (browser `FormData`). No `Content-Type` header is set manually — the browser auto-sets it with the correct boundary.
+
+**Payload fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `file` | binary | Raw file bytes — n8n receives this as `binary.file` (required by Extract from File node) |
+| `file_name` | string | Original filename, e.g. `office-lease-2024.pdf` |
+| `file_type` | string | MIME type, e.g. `application/pdf` (or `application/octet-stream` fallback) |
+| `standard` | string | Always `IFRS16` in current version |
+| `intent` | string | e.g. `ifrs16_compliance` — passed through to the Orchestrator Agent prompt |
+| `analyzed_at` | string | ISO 8601 timestamp set by the frontend at submission time |
+
+The `file` field name must be exactly `file` — the Extract from File node in n8n is configured with `binaryPropertyName: "file"`.
+
+**Supported file types:** `.pdf`, `.doc`, `.docx`, `.txt` (validated client-side; max 50 MB).  
+**Note:** The Extract from File node's PDF mode (`operation: "pdf"`) only processes PDF files. Other types pass through as text.
 
 ---
 
