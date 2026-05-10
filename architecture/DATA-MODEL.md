@@ -337,20 +337,38 @@ CREATE POLICY "account_settings: own row only"
 
 ### `contract_playbook`
 
-Pre-existing table. Read by the n8n `contract_playbook_agent` to apply IFRS 16 / ASC 842 extraction rules. Not written from the frontend in MVP.
+Pre-existing table. Read by the n8n `contract_playbook_agent` to fetch extraction rules for a given contract type. Not written from the frontend in MVP.
 
 ```sql
--- Existing schema (from BACKEND-ARCHITECTURE.md)
+-- Verified schema (confirmed via information_schema.columns 2026-05-10)
 CREATE TABLE contract_playbook (
-  id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name      text NOT NULL,
-  standard  text NOT NULL,    -- 'ifrs16' | 'asc842'
-  rules     jsonb NOT NULL,   -- extraction rules and required fields
-  active    boolean NOT NULL DEFAULT true
+  id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  contract_type        text NOT NULL,             -- 'NDA' | 'MSA' | 'LEASE'
+  key_term_name        text NOT NULL,             -- snake_case field key, e.g. 'commencement_date'
+  key_term_label       text NOT NULL,             -- human-readable label, e.g. 'Commencement Date'
+  key_term_description text NOT NULL,             -- extraction guidance for the AI agent
+  risk_weight          integer NOT NULL,          -- 1–10; higher = more critical for risk scoring
+  created_at           timestamptz NOT NULL DEFAULT now()
 );
 ```
 
-No changes to this table in this plan.
+**LEASE rows (IFRS 16 fields — added 2026-05-10):**
+
+```sql
+INSERT INTO contract_playbook (contract_type, key_term_name, key_term_label, key_term_description, risk_weight) VALUES
+('LEASE', 'commencement_date',  'Commencement Date',   'The date the lease term begins. Required for IFRS 16 lease term calculation and ROU asset recognition.', 10),
+('LEASE', 'expiry_date',        'Expiry Date',         'The date the lease term ends. Required to compute remaining term and lease liability schedule.', 10),
+('LEASE', 'annual_payment',     'Annual Payment',      'Total annual lease payment amount. Required for present value calculation of lease liability under IFRS 16 §26.', 10),
+('LEASE', 'discount_rate',      'Discount Rate (IBR)', 'The interest rate implicit in the lease or the lessee incremental borrowing rate. Required to discount future lease payments. If not in contract, must be entered manually.', 10),
+('LEASE', 'escalation_rate',    'Escalation Rate',     'Annual rent escalation percentage or formula. Affects the lease payment schedule and liability calculation.', 7),
+('LEASE', 'renewal_options',    'Renewal Options',     'Any options to extend the lease term. IFRS 16 §19 requires assessment of whether renewal is reasonably certain.', 8),
+('LEASE', 'termination_rights', 'Termination Rights',  'Conditions under which either party may terminate the lease early. Determines the non-cancellable period under IFRS 16.B34.', 8),
+('LEASE', 'security_deposit',   'Security Deposit',    'Deposit held by the lessor. May need classification as a lease incentive receivable depending on refund terms.', 5),
+('LEASE', 'rou_asset_scope',    'ROU Asset Scope',     'Description of the underlying asset (premises, equipment). Defines the right-of-use asset to be recognised on the balance sheet.', 6),
+('LEASE', 'governing_law',      'Governing Law',       'Jurisdiction whose laws govern the lease agreement. Relevant for cross-border lease accounting treatment.', 3);
+```
+
+> **Note:** The `fetch_playbook` n8n node queries this table filtered by `contract_type`. Each row is one extractable field. The `key_term_description` is the primary signal the `key_term_extraction_agent` uses to locate and extract the value from the contract text.
 
 ---
 

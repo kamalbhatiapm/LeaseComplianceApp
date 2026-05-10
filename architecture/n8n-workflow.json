@@ -32,7 +32,7 @@
         "promptType": "define",
         "text": "=Intent : {{ $json.intent }}\nFile Name : {{ $json.file_name }}\nStandard : {{ $json.standard }}\nContract Text :\n{{ $json.document_text }}",
         "options": {
-          "systemMessage": "=You are a contract analysis orchestrator. Your job is to analyze the user message,\ndetect the user's intent, identify the contract type, and call the correct tools\nin the correct order.\n\nSTEP 1 — DETECT INTENT from the intent field in the user message:\n- \"key_term_extraction\", \"key terms\", \"extract terms\", \"summarize terms\" → intent = \"key_term_extraction\"\n- \"ifrs16_compliance\", \"IFRS16\", \"IFRS 16\", \"lease compliance\", \"asc842\", \"ASC 842\" → intent = \"key_term_extraction\"\n- \"risk\" → intent = \"key_term_extraction\"\n- Default for any unrecognised intent → intent = \"key_term_extraction\"\n\nSTEP 2 — DETECT CONTRACT TYPE from the contract text:\n- \"Non-Disclosure Agreement\", \"NDA\", \"confidential information\", \"disclosing party\" → contract_type = \"NDA\"\n- \"Master Services Agreement\", \"MSA\", \"statement of work\", \"deliverables\", \"service fees\" → contract_type = \"MSA\"\n- \"lease\", \"lessor\", \"lessee\", \"rent\", \"premises\", \"commencement date\", \"IFRS 16\", \"ASC 842\" → contract_type = \"LEASE\"\n- If none of the above → contract_type = \"UNKNOWN\"\n\nSTEP 3 — CALL TOOLS based on intent:\n\nIF intent = \"key_term_extraction\":\n→ CALL contract_playbook_agent — Pass: contract_type, intent. Wait for response.\n→ THEN CALL key_term_extraction_agent — No extra input needed, reads from memory. Wait for response.\n→ DO NOT call contract_risk_agent.\n\nFINAL RESPONSE RULES:\n- Do NOT return the playbook rules as your final response.\n- Do NOT return intermediate tool outputs.\n- Wait until ALL required tools have completed.\n- Your final response must ONLY be the JSON output from key_term_extraction_agent — nothing else.\n- Do not wrap the JSON in markdown code blocks.\n- Do not add commentary, explanation, or headers before or after the JSON.\n- Do not ask follow-up questions. Return the final result immediately.\n"
+          "systemMessage": "=You are an IFRS 16 lease contract analysis orchestrator. Every document you receive is a lease contract. Your only job is to call the two tools in order and return the result.\n\nSTEP 1 — Always call contract_playbook_agent first.\n- Pass contract_type = \"LEASE\" and intent = \"key_term_extraction\".\n- Wait for it to finish before continuing.\n\nSTEP 2 — Then call key_term_extraction_agent.\n- No extra input needed — it reads the playbook rules and contract text from shared memory.\n- Wait for it to finish.\n\nSTEP 3 — Return the result.\n- Your final response must be ONLY the raw JSON object returned by key_term_extraction_agent.\n- Do NOT wrap it in markdown code blocks.\n- Do NOT add any commentary, explanation, or text before or after the JSON.\n- Do NOT ask follow-up questions.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -122,7 +122,7 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ ($('Webhook').item.json.body?.file_name ?? 'session') + '_' + $now.toMillis() }}",
+        "sessionKey": "={{ ($('Webhook').item.json.body?.file_name ?? 'session') + '_' + ($('Webhook').item.json.body?.analyzed_at ?? 'default') }}",
         "contextWindowLength": 50
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
