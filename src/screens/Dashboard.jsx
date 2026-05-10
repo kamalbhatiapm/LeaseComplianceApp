@@ -97,7 +97,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
                 <input
                   ref={fileRef}
                   type="file"
-                  accept=".pdf,.doc,.docx,.txt"
+                  accept=".pdf"
                   style={{ display: 'none' }}
                   onChange={e => { if (e.target.files.length) handleFileSelected(e.target.files[0]) }}
                 />
@@ -132,8 +132,11 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
                       )}
                       {!selectedFile && (
                         <div className="upload-types">
-                          {['PDF', 'DOCX', 'DOC', 'TXT'].map(t => (
-                            <span key={t} className="upload-type-tag">{t}</span>
+                          <span className="upload-type-tag">PDF</span>
+                          {['DOCX', 'DOC', 'TXT'].map(t => (
+                            <span key={t} className="upload-type-tag upload-type-tag--soon" title="Coming soon">
+                              {t}
+                            </span>
                           ))}
                         </div>
                       )}
