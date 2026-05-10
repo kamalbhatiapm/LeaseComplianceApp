@@ -423,6 +423,28 @@ nav {
   border-radius: 7px; font-size: 12px; padding: 4px 10px;
   font-weight: 500; letter-spacing: .01em;
 }
+.upload-type-tag--soon {
+  opacity: 0.4;
+  cursor: default;
+  position: relative;
+}
+.upload-type-tag--soon::after {
+  content: 'Coming soon';
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.85);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.upload-type-tag--soon:hover::after { opacity: 1; }
 .upload-progress-label { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 14px; line-height: 1.5; }
 
 /* Intent selector — Apple segmented control */

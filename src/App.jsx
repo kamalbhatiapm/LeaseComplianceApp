@@ -48,11 +48,11 @@ export default function App() {
   const sleep = ms => new Promise(r => setTimeout(r, ms))
 
   const validateAndSetFile = (file) => {
-    const ALLOWED = new Set(['.pdf', '.doc', '.docx', '.txt'])
+    const ALLOWED = new Set(['.pdf'])
     const MAX_BYTES = 50 * 1024 * 1024
     const ext = '.' + file.name.split('.').pop().toLowerCase()
     if (!ALLOWED.has(ext)) {
-      showToast('error', 'Unsupported file type', `"${ext}" is not supported. Please upload a PDF, DOC, DOCX, or TXT file.`)
+      showToast('error', 'Unsupported file type', `"${ext}" is not supported. Please upload a PDF file.`)
       setTimeout(dismissToast, 6000)
       return false
     }
@@ -101,6 +101,7 @@ export default function App() {
   }, [])
 
   async function runAnalysis(intentOverride) {
+    if (!selectedFile) return
     setIsAnalyzing(true)
     setNavLocked(true)
 
