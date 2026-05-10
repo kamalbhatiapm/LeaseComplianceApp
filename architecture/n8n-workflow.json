@@ -162,12 +162,25 @@
     },
     {
       "parameters": {
+        "jsCode": "// Orchestrator Agent returns { output: '<text or JSON string>' }\n// Extract and parse the agent's output into structured JSON for the frontend.\nconst raw = $input.first().json;\nconst outputText = (raw.output ?? JSON.stringify(raw)).trim();\n\nlet parsed;\ntry {\n  // Strip markdown code fences if agent wrapped output in ```json ... ```\n  const clean = outputText.replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/,'');\n  parsed = JSON.parse(clean);\n  // n8n agent tools sometimes wrap in an array\n  if (Array.isArray(parsed)) parsed = parsed[0] ?? parsed;\n} catch {\n  // Agent returned plain text — wrap so frontend can detect and fall back\n  parsed = { output: outputText, parse_error: true };\n}\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2416,
+        -208
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Format JSON Response"
+    },
+    {
+      "parameters": {
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        2624,
+        2816,
         -208
       ],
       "id": "358f577c-2260-483b-b013-9644abb1c564",
@@ -263,6 +276,17 @@
       ]
     },
     "Orchestrator Agent": {
+      "main": [
+        [
+          {
+            "node": "Format JSON Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format JSON Response": {
       "main": [
         [
           {
