@@ -32,7 +32,9 @@ export default function App() {
   const [toast, setToast]                 = useState(null)
   const [progress, setProgress]           = useState({ step: 0, label: '', pct: 0 })
   const [navLocked, setNavLocked]         = useState(false)
-  const [analysisIntent, setAnalysisIntent] = useState('ifrs16_compliance')
+  const [analysisIntent, setAnalysisIntent] = useState(
+    () => localStorage.getItem('lg-intent') ?? 'ifrs16_compliance'
+  )
   const [fieldEdits, setFieldEdits]         = useState({})
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
   const dropPending                        = useRef(false)
@@ -250,6 +252,7 @@ export default function App() {
     try {
       localStorage.setItem('lg-analysis', JSON.stringify(displayData))
       localStorage.setItem('lg-is-live', String(liveFlag))
+      localStorage.setItem('lg-intent', analysisIntent)
     } catch { /* non-fatal */ }
     saveAnalysis({
       fileName:     selectedFile?.name ?? null,
