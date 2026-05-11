@@ -8,6 +8,7 @@ import Toast from './components/Toast.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
 import { MOCK_ANALYSIS } from './utils/constants.js'
 import { track } from './utils/track.js'
+import { saveAnalysis, loadLatestAnalysis } from './utils/supabase.js'
 
 const WEBHOOK_URL   = import.meta.env.VITE_WEBHOOK_URL   ?? ''
 const SUPABASE_URL  = import.meta.env.VITE_SUPABASE_URL  ?? ''
@@ -42,6 +43,30 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('lg-theme', theme)
   }, [theme])
+
+  // Hydrate from Supabase on mount — overwrites localStorage cache if server has newer data
+  useEffect(() => {
+    loadLatestAnalysis().then(row => {
+      if (!row) return
+      const data = {
+        contract_type: row.contract_type,
+        terms_found:   row.terms_found,
+        terms_missing: row.terms_missing,
+        fields:        row.fields,
+        risk_flags:    row.risk_flags,
+        key_terms:     row.key_terms,
+        risk_score:    row.risk_score,
+        analyzed_at:   row.analyzed_at,
+      }
+      setAnalysisData(data)
+      setIsLiveData(row.is_live_data ?? false)
+      if (row.intent) setAnalysisIntent(row.intent)
+      try {
+        localStorage.setItem('lg-analysis', JSON.stringify(data))
+        localStorage.setItem('lg-is-live', String(row.is_live_data ?? false))
+      } catch { /* non-fatal */ }
+    })
+  }, [])
 
   const toggleTheme = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), [])
 
@@ -222,11 +247,19 @@ export default function App() {
     const liveFlag = webhookOk && !!responseData
     setAnalysisData(displayData)
     setIsLiveData(liveFlag)
+
+    // Persist — Supabase primary, localStorage fallback
     try {
       localStorage.setItem('lg-analysis', JSON.stringify(displayData))
       localStorage.setItem('lg-is-live', String(liveFlag))
       localStorage.setItem('lg-intent', analysisIntent)
-    } catch { /* storage full — non-fatal */ }
+    } catch { /* non-fatal */ }
+    saveAnalysis({
+      fileName:     selectedFile?.name ?? null,
+      analysisData: displayData,
+      isLiveData:   liveFlag,
+      intent:       analysisIntent,
+    })
 
     track('analysis_complete', {
       webhook_ok: webhookOk,
