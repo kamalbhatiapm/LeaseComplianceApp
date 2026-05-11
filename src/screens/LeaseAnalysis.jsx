@@ -346,6 +346,78 @@ const FLAG_GUIDANCE = {
     inputLabel: 'Enter IBR for this lease (%)',
     inputPlaceholder: 'e.g. 5.25',
   },
+  missing_expiry_date: {
+    steps: [
+      { label: 'What it is', text: 'The date the lease term ends. Required to calculate remaining lease term, ROU asset, and lease liability under IFRS 16.' },
+      { label: 'How to find it', text: 'Check the lease agreement for the stated expiry or end date. If only a term length is given (e.g. "5 years"), calculate from the commencement date.' },
+      { label: 'What auditors need', text: 'Document the expiry date and the source (clause reference). If derived, show the calculation.' },
+    ],
+    inputLabel: 'Enter lease expiry date',
+    inputPlaceholder: 'e.g. 31 December 2028',
+  },
+  missing_termination_rights: {
+    steps: [
+      { label: 'What to check', text: 'If the lessee holds a termination right, the non-cancellable period may be shorter than the stated lease term. IFRS 16.B34 requires the lease term to reflect the period the lessee is "reasonably certain" not to terminate.' },
+      { label: 'How to assess', text: 'Review termination notice periods, any financial penalties for early exit, and the significance of the leased asset to operations.' },
+      { label: 'What to document', text: 'Record the termination right terms, the assessed non-cancellable period, and the basis for that assessment.' },
+    ],
+    inputLabel: 'Management note on termination right',
+    inputPlaceholder: 'e.g. Termination right exists but not expected to be exercised — $250K penalty clause.',
+  },
+  missing_escalation_rate: {
+    steps: [
+      { label: 'What it is', text: 'The rate at which rent increases each year. Under IFRS 16, variable payments linked to an index or rate must be included in lease liability calculations.' },
+      { label: 'How to find it', text: 'Check the rent review clause in the lease. It may be a fixed % (e.g. 3.5% p.a.), CPI-linked, or market review. If rent is fixed with no escalation, document that explicitly.' },
+      { label: 'What auditors need', text: 'Document whether escalation applies, the rate or index used, and how it affects the payment schedule.' },
+    ],
+    inputLabel: 'Enter escalation rate or note (e.g. fixed rent)',
+    inputPlaceholder: 'e.g. 3.5% per annum on each anniversary',
+  },
+  missing_security_deposit: {
+    steps: [
+      { label: 'What it is', text: 'An upfront payment held by the lessor as security. Under IFRS 16, security deposits are a separate financial asset — not included in lease payments.' },
+      { label: 'How to find it', text: 'Check the lease schedule, side letter, or bond/bank guarantee clause. The amount is often stated as a multiple of monthly rent.' },
+      { label: 'What auditors need', text: 'Document the deposit amount, whether it is refundable, and how it is classified on the balance sheet.' },
+    ],
+    inputLabel: 'Enter security deposit amount',
+    inputPlaceholder: 'e.g. AUD 30,000 (2 months rent)',
+  },
+  missing_governing_law: {
+    steps: [
+      { label: 'What it is', text: 'The jurisdiction whose laws govern the lease agreement. Relevant for dispute resolution and determining applicable statutory lease protections.' },
+      { label: 'How to find it', text: 'Look for a "Governing Law" or "Jurisdiction" clause, typically near the end of the agreement.' },
+      { label: 'What to document', text: 'Record the governing jurisdiction. Note any statutory protections (e.g. retail leasing legislation) that may affect the lease terms.' },
+    ],
+    inputLabel: 'Enter governing law / jurisdiction',
+    inputPlaceholder: 'e.g. New South Wales, Australia',
+  },
+  missing_commencement_date: {
+    steps: [
+      { label: 'What it is', text: 'The date the lease term begins and the lessee obtains control of the asset. This is the measurement date for the ROU asset and lease liability under IFRS 16.' },
+      { label: 'How to find it', text: 'Check the lease for "Commencement Date", "Start Date", or "Possession Date". It may differ from the execution date.' },
+      { label: 'What auditors need', text: 'Document the commencement date with its clause reference. This anchors all subsequent IFRS 16 calculations.' },
+    ],
+    inputLabel: 'Enter lease commencement date',
+    inputPlaceholder: 'e.g. 1 January 2024',
+  },
+  missing_annual_payment: {
+    steps: [
+      { label: 'What it is', text: 'The total annual rent payable. Required to calculate the present value of future lease payments under IFRS 16.' },
+      { label: 'How to find it', text: 'Check the rent clause. Annual payment may be stated directly or derivable from a monthly/quarterly amount.' },
+      { label: 'What auditors need', text: 'Document the annual payment amount, payment frequency, and whether GST/VAT is included or excluded.' },
+    ],
+    inputLabel: 'Enter annual payment amount',
+    inputPlaceholder: 'e.g. AUD 180,000 per annum excl. GST',
+  },
+  missing_renewal_options: {
+    steps: [
+      { label: 'What to check', text: 'Determine whether the lessee is "reasonably certain" to exercise the renewal option under IFRS 16.19. This affects the lease term used for ROU asset and liability calculations.' },
+      { label: 'How to assess', text: 'Review economic incentives (leasehold improvements, location significance, business continuity), historical renewal behaviour, and management intent.' },
+      { label: 'What to document', text: 'Record the renewal option terms, the certainty assessment, and the conclusion. If reasonably certain, include renewal periods in the lease term.' },
+    ],
+    inputLabel: 'Management note on renewal option',
+    inputPlaceholder: 'e.g. Renewal not reasonably certain — leasehold improvements fully amortised by lease end.',
+  },
   renewal_certainty: {
     steps: [
       { label: 'What to check', text: 'Determine whether the lessee is "reasonably certain" to exercise the renewal option under IFRS 16.19 / ASC 842-20-30-26. This affects the lease term used for ROU asset and liability calculations.' },
