@@ -16,7 +16,7 @@ With **PCAOB AS 1105 (effective December 2025)** requiring full data lineage, AI
 
 **LegalGraph solves this in three steps:**
 
-1. **Upload** — drop a lease contract (PDF, DOCX, or TXT) into the app
+1. **Upload** — drop a lease contract PDF into the app (DOCX / TXT support coming soon)
 2. **Extract** — AI pulls all IFRS 16 / ASC 842 fields directly from the contract text, flags missing data and risks with per-field confidence scores, and links every finding back to the source clause
 3. **Report** — generate a structured, auditor-ready compliance report in one click — with a full clause-level audit trail that satisfies PCAOB AS 1105 requirements
 
@@ -90,6 +90,7 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 | File | Description |
 |------|-------------|
 | `SAMPLE-LEASE.docx` | Realistic 7-year commercial office lease engineered to exercise every IFRS 16 field, with discount rate intentionally absent |
+| `sample-lease-ifrs16.pdf` | PDF version of the test lease — use this for end-to-end testing since the app currently accepts PDF only |
 
 ### Evals
 
@@ -152,7 +153,7 @@ The app POSTs to an n8n webhook on analysis completion. The URL is a **test webh
 
 1. Open the app (`npm run dev` or the Netlify URL)
 2. On the Dashboard, click **Choose file** or drag-and-drop
-3. Select `SAMPLE-LEASE.docx` from this repo
+3. Select `sample-lease-ifrs16.pdf` from this repo (PDF only; DOCX support coming soon)
 
 The upload panel shows the filename and file size. The button changes to **Analyze Contract**.
 
@@ -284,6 +285,8 @@ Respond to Webhook  ──── returns structured JSON payload to the UI
 
 Import `architecture/n8n-workflow.json` to your n8n instance to get the full workflow definition.
 
+> **Note on prompt size:** The `key_term_extraction_agent` system message is intentionally concise to stay under Cloudflare n8n Cloud's 100-second response limit. The prompt includes a full 10-field LEASE example to ensure correct key naming — do not expand it without benchmarking inference time first.
+
 ---
 
 ## Webhook integration notes
@@ -382,7 +385,7 @@ Netlify runs `npm run build` (Vite), publishes `dist/`, and applies the security
 
 1. Change `VITE_WEBHOOK_URL` from `/webhook-test/…` to `/webhook/…` — the always-on endpoint
 2. Wire `VITE_POSTHOG_KEY` to your PostHog project for L1/L2 metric instrumentation
-3. Complete BUG-009 (Supabase persistence) to unlock persistent portfolio history, quarterly re-entry dashboard, and CFO sign-off flow
+3. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the Netlify dashboard and trigger **Deploy without cache** (Supabase persistence is implemented — env vars enable it)
 
 ---
 
