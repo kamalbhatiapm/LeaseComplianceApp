@@ -7,9 +7,9 @@
 
 ## Phase 0 — Foundation (Weeks 1–3)
 
-- [ ] **Task 1** — J9: IBR guidance copy on discount rate flag *(Small · no deps · P0)*
+- [x] **Task 1** — J9: IBR guidance copy on discount rate flag *(shipped — FLAG_GUIDANCE covers all 11 n8n flag IDs)*
 - [ ] **Task 2** — PostHog instrumentation *(Small · no deps · P0)*
-- [ ] **Task 3** — BUG-009: Supabase schema + persistence layer *(Medium · P0 — gates 5 tasks)*
+- [x] **Task 3** — BUG-009: Supabase schema + persistence layer *(shipped — supabase.js + lease_analyses table + RLS policies)*
 - [ ] **Task 4** — BUG-006: Clause PDF viewer with real source text *(Small–Medium · coordinate n8n · P0)*
 
 **Checkpoint:** Phase 0 complete → all build clean → PostHog receiving events → Supabase row inserted → IBR guidance live
