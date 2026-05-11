@@ -22,12 +22,18 @@ export default function App() {
   const [consentGiven, setConsentGiven]   = useState(false)
   const [showConsent, setShowConsent]     = useState(false)
   const [isAnalyzing, setIsAnalyzing]     = useState(false)
-  const [analysisData, setAnalysisData]   = useState(null)
-  const [isLiveData, setIsLiveData]       = useState(false)
+  const [analysisData, setAnalysisData]   = useState(() => {
+    try { return JSON.parse(localStorage.getItem('lg-analysis') ?? 'null') } catch { return null }
+  })
+  const [isLiveData, setIsLiveData]       = useState(
+    () => localStorage.getItem('lg-is-live') === 'true'
+  )
   const [toast, setToast]                 = useState(null)
   const [progress, setProgress]           = useState({ step: 0, label: '', pct: 0 })
   const [navLocked, setNavLocked]         = useState(false)
-  const [analysisIntent, setAnalysisIntent] = useState('ifrs16_compliance')
+  const [analysisIntent, setAnalysisIntent] = useState(
+    () => localStorage.getItem('lg-intent') ?? 'ifrs16_compliance'
+  )
   const [fieldEdits, setFieldEdits]         = useState({})
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
   const dropPending                        = useRef(false)
@@ -62,6 +68,10 @@ export default function App() {
       return false
     }
     setSelectedFile(file)
+    setAnalysisData(null)
+    setIsLiveData(false)
+    localStorage.removeItem('lg-analysis')
+    localStorage.removeItem('lg-is-live')
     track('upload_started', { file_name: file.name, file_size_kb: Math.round(file.size / 1024) })
     return true
   }
@@ -209,8 +219,14 @@ export default function App() {
     setProgress({ step: 6, label: 'Extraction complete', pct: 100, done: true })
 
     const displayData = responseData ?? MOCK_ANALYSIS
+    const liveFlag = webhookOk && !!responseData
     setAnalysisData(displayData)
-    setIsLiveData(webhookOk && !!responseData)
+    setIsLiveData(liveFlag)
+    try {
+      localStorage.setItem('lg-analysis', JSON.stringify(displayData))
+      localStorage.setItem('lg-is-live', String(liveFlag))
+      localStorage.setItem('lg-intent', analysisIntent)
+    } catch { /* storage full — non-fatal */ }
 
     track('analysis_complete', {
       webhook_ok: webhookOk,
