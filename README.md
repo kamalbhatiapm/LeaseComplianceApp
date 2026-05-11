@@ -231,7 +231,7 @@ The UX is built around five trust dimensions for AI-assisted compliance tooling:
 
 ## What the sample contract covers
 
-`SAMPLE-LEASE.docx` is a 15-section commercial office lease at 555 Market St, San Francisco — engineered to exercise every IFRS 16 extraction field:
+`sample-lease-ifrs16.pdf` (and its source `SAMPLE-LEASE.docx`) is a 15-section commercial office lease at 555 Market St, San Francisco — engineered to exercise every IFRS 16 extraction field. **Use the PDF for end-to-end testing** — the app currently accepts PDF only.
 
 | IFRS 16 Field | Location | Value |
 |---|---|---|
