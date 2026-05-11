@@ -20,7 +20,9 @@ if (WEBHOOK_URL.startsWith('__') || !WEBHOOK_URL) {
 
 export default function App() {
   const [selectedFile, setSelectedFile]   = useState(null)
-  const [consentGiven, setConsentGiven]   = useState(false)
+  const [consentGiven, setConsentGiven]   = useState(
+    () => localStorage.getItem('lg-consent') === 'true'
+  )
   const [showConsent, setShowConsent]     = useState(false)
   const [isAnalyzing, setIsAnalyzing]     = useState(false)
   const [analysisData, setAnalysisData]   = useState(() => {
@@ -131,6 +133,7 @@ export default function App() {
 
   const grantConsent = useCallback(() => {
     setConsentGiven(true)
+    localStorage.setItem('lg-consent', 'true')
     setShowConsent(false)
     runAnalysis()
   }, [])
