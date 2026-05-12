@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { supabase } from '../utils/supabase.js'
 import '../styles/auth.css'
 
@@ -45,6 +46,11 @@ export default function Auth() {
 
   return (
     <div className="auth-page">
+      <Link to="/" className="auth-back">
+        <ArrowLeft size={14} />
+        Back to home
+      </Link>
+
       <div className="auth-card">
         <Link to="/" className="auth-logo">LegalGraph<sup>®</sup></Link>
         <p className="auth-tagline">AI-powered lease compliance</p>
