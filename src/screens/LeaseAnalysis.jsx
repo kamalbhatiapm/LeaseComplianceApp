@@ -115,9 +115,25 @@ function getRiskMeta(score) {
   return               { level: 'High',   color: 'var(--red)',   pillCls: 'pill-red',   pct: score }
 }
 
-function MetricGrid({ fields, data }) {
-  const get = key => { const f = fields[key]; return f ? (typeof f === 'object' ? f.value : f) : null }
+function MetricGrid({ fields, data, edits = {} }) {
+  const get = key => edits[key] ?? (fields[key] ? (typeof fields[key] === 'object' ? fields[key].value : fields[key]) : null)
+
+  // Lease Duration — computed from start/end dates
+  const start = get('commencement_date')
   const expiry = get('expiry_date')
+  let duration = '—', durationSub = ''
+  if (start && expiry) {
+    const ms = new Date(expiry) - new Date(start)
+    if (!isNaN(ms) && ms > 0) {
+      const totalMonths = Math.round(ms / (1000 * 60 * 60 * 24 * 30.4375))
+      const yrs = Math.floor(totalMonths / 12)
+      const mos = totalMonths % 12
+      duration = mos === 0 ? `${yrs} yr${yrs !== 1 ? 's' : ''}` : `${yrs} yr${yrs !== 1 ? 's' : ''} ${mos} mo`
+      durationSub = `${new Date(start).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} – ${new Date(expiry).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
+    }
+  }
+
+  // Remaining term
   let remaining = '—', expirySub = ''
   if (expiry) {
     const d = new Date(expiry)
@@ -125,18 +141,25 @@ function MetricGrid({ fields, data }) {
     if (!isNaN(yrs) && yrs > 0) remaining = `≈${yrs.toFixed(1)} yrs`
     expirySub = `Expires ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
   }
-  const discountRaw = get('discount_rate')
-  const rouRaw      = get('rou_asset_value') ?? data.rou_asset_value
-  const liabRaw     = get('lease_liability')  ?? data.lease_liability
-  const fmt = v => {
-    const n = typeof v === 'string' ? parseFloat(v.replace(/[^0-9.]/g, '')) : Number(v)
-    return isNaN(n) ? String(v) : `$${n.toLocaleString()}`
+
+  const annualRentRaw = get('annual_payment') ?? get('annual_payment_usd')
+  const discountRaw   = get('discount_rate')
+  const rentPeriod    = /month|\/mo|p\.m\./i.test(annualRentRaw ?? '') ? 'Per month' : 'Per annum'
+
+  // Extract just the dollar/numeric amount from verbose rent strings
+  const extractAmount = raw => {
+    if (!raw) return null
+    // Match patterns like "$29,000", "AUD 15,000", "£12,500", "€10,000 per month" etc.
+    const m = String(raw).match(/([A-Z]{0,3}\s*[$£€]?\s*[\d,]+(?:\.\d+)?(?:\s*(?:per month|\/mo|p\.m\.|per annum|\/yr|p\.a\.))?)/i)
+    return m ? m[1].trim() : String(raw).slice(0, 20)
   }
+  const annualRent = extractAmount(annualRentRaw)
+
   const cards = [
-    { label: 'ROU Asset Value',  val: rouRaw  ? fmt(rouRaw)  : '$2.18M', sub: 'Right-of-use asset',            flagged: !rouRaw },
-    { label: 'Lease Liability',  val: liabRaw ? fmt(liabRaw) : '$1.94M', sub: 'Present value',                 flagged: false },
-    { label: 'Discount Rate',    val: discountRaw,                         sub: discountRaw ? 'IBR applied' : 'Manual input required', flagged: !discountRaw },
-    { label: 'Remaining Term',   val: remaining,                           sub: expirySub || 'Expires Dec 31, 2028', flagged: false },
+    { label: 'Lease Duration',  val: duration,    sub: durationSub || 'Enter expiry date via Edit terms ↓',   flagged: duration === '—' },
+    { label: 'Annual Base Rent',val: annualRent,   sub: annualRent ? rentPeriod : 'Not extracted',             flagged: !annualRent },
+    { label: 'Remaining Term',  val: remaining,    sub: expirySub || 'Enter expiry date via Edit terms ↓',     flagged: remaining === '—' },
+    { label: 'Borrowing Rate',  val: discountRaw,  sub: discountRaw ? '' : 'Manual input required', flagged: !discountRaw },
   ]
   return (
     <div className="metric-grid">
@@ -243,9 +266,42 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
     return { key, missing, confCls, uncertain, label, clause, clauseText, value: f.value, edited, conf, rawField: f }
   })
 
+  // Compute lease duration from commencement + expiry dates if both present
+  const computedDurationRow = (() => {
+    if ('lease_term_years' in fields) return null // pipeline already returned it
+    const start = fields.commencement_date?.value ?? fields.commencement_date
+    const end   = fields.expiry_date?.value       ?? fields.expiry_date
+    if (!start || !end) return null
+    const ms    = new Date(end) - new Date(start)
+    if (isNaN(ms) || ms <= 0) return null
+    const totalMonths = Math.round(ms / (1000 * 60 * 60 * 24 * 30.4375))
+    const years  = Math.floor(totalMonths / 12)
+    const months = totalMonths % 12
+    const display = months === 0
+      ? `${years} year${years !== 1 ? 's' : ''}`
+      : `${years} year${years !== 1 ? 's' : ''} ${months} month${months !== 1 ? 's' : ''}`
+    return {
+      key: 'lease_term_years', label: 'Lease Duration', missing: false,
+      confCls: 'conf-high', uncertain: false, conf: 1,
+      clause: '', clauseText: null, edited: undefined,
+      value: display, rawField: { value: display, confidence: 1 },
+      computed: true,
+    }
+  })()
+
+  const rowsWithDuration = computedDurationRow
+    ? (() => {
+        const idx = rows.findIndex(r => r.key === 'expiry_date')
+        if (idx === -1) return [...rows, computedDurationRow]
+        const out = [...rows]
+        out.splice(idx + 1, 0, computedDurationRow)
+        return out
+      })()
+    : rows
+
   const sortedRows = [
-    ...rows.filter(r => !r.missing && r.conf >= 0.85),
-    ...rows.filter(r =>  r.missing || r.conf <  0.85),
+    ...rowsWithDuration.filter(r => !r.missing && r.conf >= 0.85),
+    ...rowsWithDuration.filter(r =>  r.missing || r.conf <  0.85),
   ]
 
   const handleSave = () => {
@@ -285,10 +341,10 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
       <div style={{ padding: '8px 18px 6px', borderBottom: '1px solid var(--divider, rgba(255,255,255,.06))', display: 'flex', gap: '16px', alignItems: 'center' }}>
         <span style={{ fontSize: '11px', color: 'var(--t3)' }}>Confidence:</span>
         {[
-          { cls: 'conf-high', label: 'Verified' },
-          { cls: 'conf-med',  label: 'Needs Review' },
-        ].map(({ cls, label }) => (
-          <span key={cls} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--t3)' }}>
+          { cls: 'conf-high', label: 'Verified',     tip: 'AI confidence ≥ 85% — value matches a clearly labelled clause' },
+          { cls: 'conf-med',  label: 'Needs Review', tip: 'AI confidence < 85% or field not found — verify against original contract' },
+        ].map(({ cls, label, tip }) => (
+          <span key={cls} title={tip} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--t3)', cursor: 'help' }}>
             <span className={`confidence-dot ${cls}`} style={{ flexShrink: 0 }} />{label}
           </span>
         ))}
@@ -298,14 +354,18 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
         <span>Extracted Value</span>
         <span>Source Clause</span>
       </div>
-      {sortedRows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited }) => (
+      {sortedRows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited, computed }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
-            <span className={`confidence-dot ${confCls}`} />
+            <span
+              className={`confidence-dot ${confCls}`}
+              title={confCls === 'conf-high' ? 'Verified — AI confidence ≥ 85%' : missing ? 'Not found in contract' : 'Needs Review — AI confidence < 85%'}
+            />
             {label}
+            {computed && <span style={{ fontSize: '10px', opacity: .45, marginLeft: '5px', fontStyle: 'italic' }}>calculated</span>}
           </div>
           <div className="term-val" style={missing ? { color: 'var(--amber)' } : {}}>
-            {editMode ? (
+            {editMode && !computed ? (
               <input
                 className="term-val-edit"
                 defaultValue={edited ?? (missing ? '' : value)}
@@ -626,7 +686,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           </div>
         </div>
         <div className="s2-subheader-actions">
-          <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
+          <button className="btn btn-outline btn-sm" onClick={() => { track('reanalyze', { intent: analysisIntent }); handleReanalyzeAs(analysisIntent) }}>
             <RefreshCw size={12} /> Re-analyze
           </button>
           {selectedFile && (
@@ -681,7 +741,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
                   )
                 })()}
               </div>
-              <MetricGrid fields={fields} data={data} />
+              <MetricGrid fields={fields} data={data} edits={fieldEdits ?? {}} />
             </div>
           </div>
 
