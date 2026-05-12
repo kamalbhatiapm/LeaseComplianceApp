@@ -1326,6 +1326,16 @@ nav {
   .nav-inner { padding: 0 14px; border-radius: 14px; }
   .nav-links { display: none; }
   .s3-grid { grid-template-columns: 1fr; }
+  .s3-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 16px; }
+  .s3-body { padding: 24px 16px; }
+  .pb-stack { gap: 20px; }
+  .pb-card-header { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px 20px 16px; }
+  .pb-card-header-right { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; }
+  .pb-rules-grid { grid-template-columns: 1fr; }
+  .pb-rule { padding: 14px 20px; border-right: none !important; }
+  .pb-rule:nth-last-child(-n+2) { border-bottom: 1px solid rgba(255,255,255,.05); }
+  .pb-rule:last-child { border-bottom: none; }
+  .pb-card-footer { padding: 12px 20px; }
 
   /* Tablet: hide less-critical columns */
   .lease-table th:nth-child(3),
