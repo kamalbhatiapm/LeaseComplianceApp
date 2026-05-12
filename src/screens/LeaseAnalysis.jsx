@@ -5,7 +5,7 @@ import {
   Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
   FileText, Loader, ScanText, Brain, ShieldCheck, Lock, X, ExternalLink,
 } from 'lucide-react'
-import Nav from '../components/Nav.jsx'
+import Nav from '../components/AppNav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
 import { track } from '../utils/track.js'
 

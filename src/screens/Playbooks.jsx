@@ -3,7 +3,7 @@ import {
   CalendarDays, CreditCard, Percent, RefreshCw, Building2,
   GitBranch, DollarSign, TrendingDown, BarChart3, Clock,
 } from 'lucide-react'
-import Nav from '../components/Nav.jsx'
+import Nav from '../components/AppNav.jsx'
 
 const PLAYBOOKS = [
   {

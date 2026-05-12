@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText, FileCheck, Plus, MoreHorizontal, BarChart2 } from 'lucide-react'
-import Nav from '../components/Nav.jsx'
+import Nav from '../components/AppNav.jsx'
 import ProgressPanel from '../components/ProgressPanel.jsx'
 
 const LEASES = [
