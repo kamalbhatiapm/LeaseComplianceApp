@@ -158,7 +158,7 @@ function MetricGrid({ fields, data, edits = {} }) {
     { label: 'Lease Duration',  val: duration,    sub: durationSub || 'From commencement to expiry',          flagged: duration === '—' },
     { label: 'Annual Base Rent',val: annualRent,   sub: annualRent ? 'Base rent per annum' : 'Not extracted',  flagged: !annualRent },
     { label: 'Remaining Term',  val: remaining,    sub: expirySub || 'Expiry date not found',                  flagged: remaining === '—' },
-    { label: 'Discount Rate',   val: discountRaw,  sub: discountRaw ? 'IBR applied' : 'Manual input required', flagged: !discountRaw },
+    { label: 'Borrowing Rate',  val: discountRaw,  sub: discountRaw ? '' : 'Manual input required', flagged: !discountRaw },
   ]
   return (
     <div className="metric-grid">
