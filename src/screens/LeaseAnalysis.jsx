@@ -682,7 +682,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
             </span>
             <span className="s2-standard-badge"><ShieldCheck size={11} /> {stdMeta.label}</span>
             <span className="s2-subheader-ts">Analyzed {dtStr}</span>
-            <span className="s2-legal-disclaimer">AI-assisted · requires human review · not legal or financial advice</span>
+            <span className="s2-legal-disclaimer">Requires human review · not legal or financial advice</span>
           </div>
         </div>
         <div className="s2-subheader-actions">
