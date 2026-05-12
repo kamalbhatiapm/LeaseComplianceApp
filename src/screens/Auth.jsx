@@ -52,7 +52,7 @@ export default function Auth() {
       </Link>
 
       <div className="auth-card">
-        <Link to="/" className="auth-logo">LegalGraph<sup>®</sup></Link>
+        <Link to="/" className="auth-logo">LegalGraph<sup aria-hidden="true">®</sup></Link>
         <p className="auth-tagline">AI-powered lease compliance</p>
 
         <h1 className="auth-heading">

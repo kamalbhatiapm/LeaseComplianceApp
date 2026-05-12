@@ -32,7 +32,7 @@ export default function Landing() {
       {/* ── Nav ── */}
       <div className="lp-nav" ref={lpNavRef}>
         <div className="lp-nav-inner">
-          <div className="lp-nav-logo">LegalGraph<sup>®</sup></div>
+          <div className="lp-nav-logo">LegalGraph<sup aria-hidden="true">®</sup></div>
           <div className="lp-nav-links">
             <a href="#how-it-works">How it works</a>
             <a href="#who-its-for">Who it's for</a>
@@ -83,7 +83,7 @@ export default function Landing() {
 
             {/* UI Mock */}
             <div className="lp-hero-mock">
-              <div className="lp-mock-topbar">
+              <div className="lp-mock-topbar" aria-hidden="true">
                 <div className="lp-mock-dot lp-mock-dot-r"></div>
                 <div className="lp-mock-dot lp-mock-dot-y"></div>
                 <div className="lp-mock-dot lp-mock-dot-g"></div>
@@ -387,7 +387,7 @@ export default function Landing() {
       {/* ── Footer ── */}
       <footer className="lp-footer">
         <div className="lp-footer-inner">
-          <div className="lp-footer-logo">LegalGraph<sup>®</sup></div>
+          <div className="lp-footer-logo">LegalGraph<sup aria-hidden="true">®</sup></div>
           <div className="lp-footer-tagline">AI-assisted, human-reviewed lease compliance</div>
           <div className="lp-footer-links">
             <a href="#">Privacy</a>
