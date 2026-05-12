@@ -208,10 +208,17 @@ function ClauseDrawer({ clause, onClose }) {
               <span>{clause.ref}</span>
               <ExternalLink size={12} style={{ flexShrink: 0, opacity: 0.5 }} />
             </div>
-            <div className="clause-drawer-note">
-              This clause was identified by the AI as the source for the extracted value.
-              Open the contract PDF to verify the full clause text.
-            </div>
+          </div>
+
+          <div className="clause-drawer-section">
+            <div className="clause-drawer-label">Source Text</div>
+            {clause.clauseText ? (
+              <blockquote className="clause-drawer-quote">{clause.clauseText}</blockquote>
+            ) : (
+              <div className="clause-drawer-note">
+                Clause text not available — open the contract PDF and refer to {clause.ref}.
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -231,10 +238,11 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits }) {
     const confCls = missing ? 'conf-low' : conf >= 0.85 ? 'conf-high' : 'conf-med'
     const uncertain = !missing && conf > 0 && conf < 0.85
     const label   = FIELD_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-    const clause  = f.source_clause ?? ''
-    const edited  = edits[key]
+    const clause      = f.source_clause ?? ''
+    const clauseText  = f.clause_text ?? null
+    const edited      = edits[key]
 
-    return { key, missing, confCls, uncertain, label, clause, value: f.value, edited, conf, rawField: f }
+    return { key, missing, confCls, uncertain, label, clause, clauseText, value: f.value, edited, conf, rawField: f }
   })
 
   const handleSave = () => {
@@ -317,7 +325,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits }) {
             <button
               className="term-clause term-clause-link"
               style={missing ? { color: 'var(--amber)' } : {}}
-              onClick={() => setActiveClause({ ref: clause, fieldLabel: label, value: edited ?? value, conf, missing })}
+              onClick={() => setActiveClause({ ref: clause, clauseText, fieldLabel: label, value: edited ?? value, conf, missing })}
             >
               {missing ? <AlertTriangle size={12} /> : <Paperclip size={12} />}
               {clause}
