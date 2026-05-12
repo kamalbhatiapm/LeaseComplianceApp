@@ -33,9 +33,8 @@ const PLAYBOOKS = [
 ]
 
 const COMING_SOON = [
-  { title: 'NDA / Confidentiality Agreement', badge: 'Contract' },
-  { title: 'Service Agreement', badge: 'Contract' },
-  { title: 'Employment Contract', badge: 'HR' },
+  { title: 'GASB 87 — Government Leases', badge: 'GASB 87' },
+  { title: 'HKFRS 16 — Hong Kong Leases', badge: 'HKFRS 16' },
 ]
 
 export default function Playbooks({ navLocked, theme, toggleTheme }) {
