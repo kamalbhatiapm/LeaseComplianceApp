@@ -546,7 +546,7 @@ function FlagGuidance({ flagId, isHigh }) {
   )
 }
 
-function RiskFlags({ flags, onGateChange }) {
+function RiskFlags({ flags, onGateChange, stdLabel = 'IFRS 16' }) {
   const [signoffs, setSignoffs] = useState({})
   const toggle = id => {
     const next = { ...signoffs, [id]: !signoffs[id] }
@@ -576,7 +576,7 @@ function RiskFlags({ flags, onGateChange }) {
                   <div className="risk-desc">{flag.description}</div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                  {ref && <span style={{ fontSize: '11px', color: 'var(--t3)' }}>IFRS 16 {ref}</span>}
+                  {ref && <span style={{ fontSize: '11px', color: 'var(--t3)' }}>{stdLabel} {ref}</span>}
                   <span className={`pill ${pillCls} risk-sev-pill`}>{pillLbl}</span>
                 </div>
               </div>
@@ -756,7 +756,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <TermsGrid fields={fields} termsMissing={termsMissing} edits={fieldEdits ?? {}} setEdits={setFieldEdits ?? (() => {})} analysisRowId={analysisRowId} onSaveEdits={updateFieldEdits} />
 
           {/* Risk flags */}
-          <RiskFlags flags={riskFlags} onGateChange={onGateChange} />
+          <RiskFlags flags={riskFlags} onGateChange={onGateChange} stdLabel={stdMeta.label} />
 
           {/* Completion banner */}
           {gateOpen && highFlags.length > 0 && (
