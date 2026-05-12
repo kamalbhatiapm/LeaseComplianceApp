@@ -1519,7 +1519,7 @@ nav {
   display: flex; align-items: center; justify-content: flex-end;
 }
 .field-feedback-btns {
-  display: flex; gap: 4px; opacity: 0; transition: opacity .15s;
+  display: flex; gap: 4px; opacity: 0.35; transition: opacity .15s;
 }
 .term-row:hover .field-feedback-btns { opacity: 1; }
 .field-feedback-btn {
