@@ -178,11 +178,13 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
                     : row.edited !== undefined ? 'adt-row-edited'
                     : i % 2 === 0 ? 'adt-row-even' : ''
                   }>
-                    <td className="adt-field-name">
-                      {(row.missing || row.relFlag?.severity === 'high') && (
-                        <AlertTriangle size={11} className="adt-row-warn-icon" />
-                      )}
-                      {row.label}
+                    <td>
+                      <div className="adt-field-name">
+                        {(row.missing || row.relFlag?.severity === 'high') && (
+                          <AlertTriangle size={11} className="adt-row-warn-icon" />
+                        )}
+                        {row.label}
+                      </div>
                     </td>
                     <td className="adt-clause-cell">
                       {row.clause
@@ -200,9 +202,11 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
                         <span className="adt-hint">{FIELD_HINTS[row.key] ?? 'Not found — please verify manually'}</span>
                       ) : row.value}
                     </td>
-                    <td className="adt-conf-cell">
-                      <span className={`confidence-dot ${row.confCls}`} style={{ width: '7px', height: '7px' }} />
-                      <span className="adt-conf-pct">{row.conf > 0 ? `${Math.round(row.conf * 100)}%` : '—'}</span>
+                    <td>
+                      <div className="adt-conf-cell">
+                        <span className={`confidence-dot ${row.confCls}`} style={{ width: '7px', height: '7px' }} />
+                        <span className="adt-conf-pct">{row.conf > 0 ? `${Math.round(row.conf * 100)}%` : '—'}</span>
+                      </div>
                     </td>
                     <td>
                       <span className={`adt-status-pill ${row.edited !== undefined ? 'adt-pill-edited' : row.missing ? 'adt-pill-missing' : 'adt-pill-ok'}`}>

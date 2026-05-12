@@ -1734,7 +1734,7 @@ nav {
 
 .adt-field-name {
   font-weight: 600;
-  color: #111827 !important;
+  color: #111827;
   white-space: nowrap;
   display: flex;
   align-items: center;
