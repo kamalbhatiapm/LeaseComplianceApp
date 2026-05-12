@@ -40,7 +40,7 @@ export default function Landing({ user }) {
           </div>
           <div className="lp-nav-right">
             {user
-              ? <button className="lp-btn lp-btn-ghost" onClick={() => navRef('/app')}>Go to app →</button>
+              ? <button className="lp-btn lp-btn-ghost" onClick={() => navRef('/app')}>Dashboard →</button>
               : <button className="lp-btn lp-btn-ghost" onClick={() => navRef('/signin')}>Sign in</button>
             }
             <a href="#demo" className="lp-btn lp-btn-primary">Request demo</a>
@@ -62,7 +62,7 @@ export default function Landing({ user }) {
             <a href="#pricing"      onClick={closeMenu}>Pricing</a>
             <div className="lp-mobile-menu-ctas">
               {user
-                ? <button className="lp-btn lp-btn-ghost" style={{width:'100%',justifyContent:'center'}} onClick={() => { closeMenu(); navRef('/app') }}>Go to app →</button>
+                ? <button className="lp-btn lp-btn-ghost" style={{width:'100%',justifyContent:'center'}} onClick={() => { closeMenu(); navRef('/app') }}>Dashboard →</button>
                 : <button className="lp-btn lp-btn-ghost" style={{width:'100%',justifyContent:'center'}} onClick={() => { closeMenu(); navRef('/signin') }}>Sign in</button>
               }
               <a href="#demo" className="lp-btn lp-btn-primary" style={{width:'100%',justifyContent:'center'}} onClick={closeMenu}>Request demo</a>
@@ -404,7 +404,7 @@ export default function Landing({ user }) {
               style={{fontSize:'13px',padding:'4px 14px'}}
               onClick={() => navRef(user ? '/app' : '/signin')}
             >
-              {user ? 'Go to app →' : 'Launch app →'}
+              {user ? 'Dashboard →' : 'Launch app →'}
             </button>
           </div>
           <p className="lp-footer-disclaimer">AI-assisted — requires human review — not legal or financial advice</p>
