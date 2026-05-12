@@ -18,7 +18,7 @@ const STANDARD_META = {
   asc842_compliance: { label: 'ASC 842' },
 }
 
-export default function AuditTrail({ selectedFile, analysisData, navLocked, theme, toggleTheme, analysisIntent, fieldEdits = {} }) {
+export default function AuditTrail({ selectedFile, analysisData, navLocked, theme, toggleTheme, analysisIntent, fieldEdits = {}, user }) {
   const navigate  = useNavigate()
   const data      = analysisData ?? MOCK_ANALYSIS
   const isDemo    = !analysisData
@@ -70,7 +70,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
 
   return (
     <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
-      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} className="no-print" />
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} user={user} className="no-print" />
       <main id="main-content">
 
         {/* Screen-only toolbar */}

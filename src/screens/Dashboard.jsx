@@ -16,7 +16,7 @@ const INTENTS = [
   { value: 'asc842_compliance',  label: 'ASC 842 Compliance Report',  short: 'ASC 842',  desc: 'Extract key terms, score risk flags, and generate an audit-ready report under ASC 842 (US GAAP)' },
 ]
 
-export default function Dashboard({ selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent }) {
+export default function Dashboard({ selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick, isAnalyzing, progress, navLocked, theme, toggleTheme, analysisIntent, setAnalysisIntent, user }) {
   const fileRef   = useRef(null)
   const zoneRef   = useRef(null)
   const navigate  = useNavigate()
@@ -58,7 +58,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
 
   return (
     <div style={{ background: 'var(--white)', minHeight: '100vh', paddingTop: '53px' }}>
-      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} user={user} />
       <main id="main-content">
 
       {/* Hero — full section is the drop target */}
