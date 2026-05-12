@@ -345,9 +345,9 @@
   border-radius: 20px; padding: 36px 32px; transition: border-color .2s;
 }
 .lp-pricing-card.featured {
-  border-color: var(--brand);
-  background: rgba(0,113,227,.07);
-  box-shadow: 0 0 0 1px var(--brand);
+  border-color: #2d6fa8;
+  background: rgba(45,111,168,.07);
+  box-shadow: 0 0 0 1px #2d6fa8;
 }
 .lp-pricing-tier { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-soft); margin-bottom: 8px; }
 .lp-pricing-price { font-size: 36px; font-weight: 800; letter-spacing: -.04em; margin-bottom: 4px; }
