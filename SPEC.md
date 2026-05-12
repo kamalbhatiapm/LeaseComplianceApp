@@ -68,7 +68,7 @@ LeaseComplianceApp/
 │   │   ├── AppNav.jsx           # Top navigation (renamed from Nav.jsx); avatar dropdown with sign-out; locked during analysis
 │   │   ├── ProgressPanel.jsx    # Analysis loading steps
 │   │   ├── Toast.jsx            # Transient notifications
-│   │   └── ConsentModal.jsx     # GDPR + Anthropic API disclosure (fires once ever; persisted to localStorage)
+│   │   └── ConsentModal.jsx     # GDPR + AI model disclosure (OpenAI GPT-5 mini); fires once per user account; key: lg-consent-{uid}
 │   ├── utils/
 │   │   ├── constants.js         # MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality
 │   │   ├── supabase.js          # Supabase client, saveAnalysis, loadLatestAnalysis, getSession, signOut, onAuthStateChange
@@ -122,7 +122,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 |---|---|---|---|
 | **Full PDF export** | P0 | Partial | `window.print()` ships. Needs: cover page with AI disclosure, clause inline text, flag resolution log, PCAOB AS 1105 statement. |
 | **Dashboard "Ready / Needs Attention" counter** | P1 | Not started | Requires BUG-009. Show: X ready · Y need attention · Z not yet analysed. |
-| **Once-per-session consent** | P1 | Done | Shipped as permanent localStorage (`lg-consent` key). Consent fires only on first-ever use. See OQ #3 — resolved by product decision. |
+| **Once-per-session consent** | P1 | Done | Shipped as permanent per-user localStorage (`lg-consent-{uid}` key). Consent fires only on first-ever use per account. Sign-out clears cached analysis data. See OQ #3 — resolved by product decision. |
 | **Per-field confidence from n8n** | P1 | Partial | UI dots are live. Real scores from n8n pipeline not yet wired. |
 | **J10: CFO email sign-off flow** | P1 | Not started | "Request internal review" → email → one-click approval → logged in audit trail + cover page. |
 
@@ -156,7 +156,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 - Demo fallback badge → Retry CTA (calls `handleReanalyzeAs(analysisIntent)`)
 - CSS-only hover tooltips on locked export buttons
 - Dark/light theme toggle (persisted to localStorage)
-- Consent modal (Anthropic Claude API disclosure) — persisted to localStorage; fires once ever
+- Consent modal (OpenAI GPT-5 mini AI model disclosure) — persisted per-user to `lg-consent-{uid}`; fires once per account; cleared on sign-out
 - Contract preview hint on Dashboard after file select (detects lease type from filename)
 - Field edit tracking: `track('field_edited', { key, original_value, corrected_value, confidence, source_clause })` + transient "Correction saved" confirmation
 - Confidence legend (green/amber/red dots) in TermsGrid header
@@ -189,7 +189,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 ### Backend / Integration
 - **n8n webhook** (`VITE_WEBHOOK_URL`): receives base64-encoded PDF + metadata; returns structured JSON (fields, risk_flags, terms_found, etc.)
 - **Supabase** (`VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`): persistent storage for analysis history, portfolio state, resolved flags, IBR values, user sessions
-- **Anthropic Claude API**: invoked inside n8n workflow (not directly from frontend); must be named in consent modal per J6/Jennifer requirement
+- **OpenAI GPT-5 mini** (via n8n): invoked inside n8n workflow (not directly from frontend); must be named in consent modal per J6/Jennifer requirement and PCAOB AS 1105
 - **Analytics: Supabase `user_events` table** — route `track()` stub to insert rows (event_name, properties jsonb, session_id, created_at). IBR flag resolution rate and Phase 4 drop-off are measurable with SQL on this table — no third-party tool needed at beta scale. Add PostHog when session replay or A/B testing is required (>50 accounts).
 
 ### AI Pipeline Architecture (n8n workflow)
@@ -342,8 +342,8 @@ HITL is required by PCAOB AS 1105: AI-generated financial outputs must have docu
 
 ### Always Do
 - Show `MOCK_ANALYSIS` demo data on any webhook failure — never an empty or broken state
-- Fire consent modal before first-ever analysis (persisted to `lg-consent` in localStorage — not per-session)
-- Name "Anthropic Claude API" explicitly in consent modal
+- Fire consent modal before first-ever analysis (persisted to `lg-consent-{uid}` in localStorage — per user account, not shared across accounts on shared devices)
+- Name "OpenAI GPT-5 mini via n8n" explicitly in consent modal and AuditTrail PCAOB disclosure block
 - Show "Not legal advice" disclaimer on every analysis screen
 - Display "AI-assisted, human-reviewed" on every exported report
 - Enforce High-flag export gate at 100% — no bypass, no exceptions
@@ -355,7 +355,7 @@ HITL is required by PCAOB AS 1105: AI-generated financial outputs must have docu
 - **Changing consent modal language or data retention copy** — Jennifer-facing; legal sign-off required
 - **Wiring IBR auto-fill from any data source** — creates financial advice liability
 - **Adding any feature that reads or stores raw contract text outside Supabase** — data governance concern
-- **Changing consent persistence behaviour** — currently permanent localStorage (`lg-consent`); any weakening requires legal sign-off
+- **Changing consent persistence behaviour** — currently permanent per-user localStorage (`lg-consent-{uid}`); any weakening requires legal sign-off
 - **Shipping new Supabase tables** — confirm RLS policies are enabled before launch
 
 ### Never Do
@@ -421,7 +421,7 @@ The PRD lists 6 assumptions. These are how each gets validated in beta — not j
 |---|---|---|---|
 | 1 | IBR guidance copy: exact rate methodology to recommend for IFRS 16.26? Needs legal review. | PM + Legal | T-3 weeks from GA |
 | 2 | Ship IFRS 16 only at GA, or both IFRS 16 + ASC 842? Eng estimate: +2 weeks for ASC 842. | Eng Lead + CFO | T-4 weeks from GA |
-| 3 | ~~Once-per-session consent: does GDPR require per-analysis or is session-level sufficient?~~ **Resolved by product decision** — shipped as permanent localStorage (`lg-consent`). Legal should confirm this approach is acceptable; no GA blocker. | Legal | Confirm before GA |
+| 3 | ~~Once-per-session consent: does GDPR require per-analysis or is session-level sufficient?~~ **Resolved by product decision** — shipped as permanent per-user localStorage (`lg-consent-{uid}`). Consent is now scoped to the authenticated user's UID; cleared on sign-out. Legal should confirm this approach is GDPR-acceptable; no GA blocker. | Legal | Confirm before GA |
 | 4 | PDF export: do auditors prefer inline clause text in PDF, or structured JSON/CSV for audit tools? | PM (auditor interview) | Beta week 1 |
 | 5 | CFO approval link: should it expire after 72 hours for security? | Eng Lead + Legal | T-2 weeks from GA |
 

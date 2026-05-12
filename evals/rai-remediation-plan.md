@@ -13,9 +13,10 @@ Each open RAI gap is classified as:
 
 ## RAI-P0 — Must fix before regulated deployment
 
-### H3 · Human sign-off on high-severity flags `UI`
+### H3 · Human sign-off on high-severity flags `UI` ✅ DONE (v1)
 
 **Gap:** No reviewer field or acknowledgement checkbox on high flags. "Generate IFRS 16 Report" can be triggered with unresolved high flags.  
+**Status:** Export gate ships. All High-severity flags must be acknowledged before Export PDF / Send to auditor buttons unlock. Completion banner shows after all High flags resolved.  
 **Fix location:** UI only.
 
 ```html
@@ -40,9 +41,10 @@ function updateReportButton() {
 
 ---
 
-### S2 · Hard gate on "Generate IFRS 16 Report" `UI`
+### S2 · Hard gate on "Generate IFRS 16 Report" `UI` ✅ DONE (v1)
 
 **Gap:** The button is present and clickable even when discount rate is missing (high flag).  
+**Status:** Export buttons are disabled (Lock icon + tooltip) when any High flag is unresolved. Gate enforced at 100% — no bypass.  
 **Fix location:** UI only — disable the button until all high-severity flags have been signed off.
 
 ```js
@@ -114,9 +116,10 @@ Return: "jurisdiction": "<detected>", "jurisdiction_review_required": true/false
 
 ---
 
-### T3 · Per-field confidence scores `Both — Pipeline primary`
+### T3 · Per-field confidence scores `Both — Pipeline primary` ⚠ PARTIAL (v1)
 
 **Gap:** All 8 found fields show the same green dot. No numeric per-field confidence.  
+**Status:** UI half-done. Uncertainty chips (amber inline "AI uncertain — verify against §X.X") now appear for any field with confidence < 0.85. Confidence legend (green/amber/red dots) shown in Terms Grid header. Pipeline must still return real per-field confidence for this to work with live data — currently only MOCK_ANALYSIS values are used.  
 **Fix location:** Pipeline first (model must return it), then UI renders it.
 
 **Prompt change (n8n agent):**
@@ -293,10 +296,11 @@ silently pick one. Instead:
 
 ---
 
-### H1 · Manual field override `UI`
+### H1 · Manual field override `UI` ✅ DONE (v1)
 
 **Gap:** "Edit extracted terms" button is non-functional mockup.  
-**Fix location:** UI only — no pipeline change needed. Overridden values should be stored locally (localStorage or Supabase) and flagged as "manually verified."
+**Status:** Edit-in-place ships. Overridden values show "Edited" pill with original strikethrough. Edits tracked via `track('field_edited', { key, original_value, corrected_value, confidence, source_clause })` and persisted to Supabase.  
+**Fix location:** UI only — no pipeline change needed.
 
 ---
 
@@ -377,7 +381,7 @@ To resolve T3, E2, S3, R1, E3, H2, and F3, the n8n webhook response should be ex
   },
 
   "extraction_metadata": {
-    "model": "claude-sonnet-4-6",
+    "model": "gpt-5-mini",
     "prompt_version": "ifrs16-v1.2",
     "extracted_at": "...",
     "document_language": "en",
