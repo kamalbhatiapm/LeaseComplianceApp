@@ -433,7 +433,7 @@ nav {
   background-clip: text;
 }
 .s1-sub {
-  font-size: 17px; color: rgba(255,255,255,.6);
+  font-size: 17px; color: rgba(255,255,255,.75);
   line-height: 1.65; max-width: 460px; margin-bottom: 32px;
   letter-spacing: -.01em;
 }
@@ -442,7 +442,7 @@ nav {
   font-size: 34px; font-weight: 700;
   color: var(--accent-on-dark); letter-spacing: -.04em;
 }
-.s1-stat-label { font-size: 13px; color: rgba(255,255,255,.7); margin-top: 3px; letter-spacing: -.01em; }
+.s1-stat-label { font-size: 13px; color: rgba(255,255,255,.8); margin-top: 3px; letter-spacing: -.01em; }
 
 .s1-upload-panel { width: 400px; flex-shrink: 0; }
 .upload-zone {
@@ -542,7 +542,7 @@ nav {
   transition: opacity .15s;
 }
 .upload-type-tag--soon:hover::after { opacity: 1; }
-.upload-progress-label { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 14px; line-height: 1.5; }
+.upload-progress-label { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 14px; line-height: 1.5; }
 
 /* Intent selector — Apple segmented control */
 .intent-select-wrap {
@@ -550,7 +550,7 @@ nav {
 }
 .intent-label {
   display: block; font-size: 12px; font-weight: 600; letter-spacing: .05em;
-  text-transform: uppercase; color: rgba(255,255,255,.52); margin-bottom: 9px;
+  text-transform: uppercase; color: rgba(255,255,255,.72); margin-bottom: 9px;
 }
 .intent-segmented {
   display: flex; gap: 0;
@@ -562,7 +562,7 @@ nav {
   flex: 1; border: none; cursor: pointer; font-family: inherit;
   font-size: 14px; font-weight: 500; letter-spacing: -.01em;
   padding: 9px 12px; border-radius: 9px;
-  color: rgba(255,255,255,.5);
+  color: rgba(255,255,255,.7);
   background: transparent;
   transition: color .18s ease, background .18s ease, box-shadow .18s ease;
   white-space: nowrap;
@@ -577,7 +577,7 @@ nav {
   box-shadow: 0 1px 3px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
 }
 .intent-desc {
-  font-size: 13px; color: rgba(255,255,255,.5); margin-top: 8px;
+  font-size: 13px; color: rgba(255,255,255,.72); margin-top: 8px;
   line-height: 1.45; padding: 0 1px;
 }
 
@@ -664,13 +664,13 @@ nav {
 }
 .s2-subheader-left { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .s2-subheader-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.s2-subheader-ts       { font-size: 11px; color: var(--t4); white-space: nowrap; }
-.s2-legal-disclaimer   { font-size: 10px; color: var(--t4); font-style: italic; opacity: 0.7; }
+.s2-subheader-ts       { font-size: 12px; color: var(--t2); white-space: nowrap; }
+.s2-legal-disclaimer   { font-size: 12px; color: rgba(255,255,255,.65); font-style: italic; }
 .s2-subheader-divider { width: 1px; height: 20px; background: rgba(255,255,255,.15); flex-shrink: 0; }
 .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; color: rgba(255,255,255,.7); }
 .breadcrumb a { color: var(--accent-on-dark); cursor: pointer; font-weight: 500; text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; }
-.breadcrumb-sep { color: rgba(255,255,255,.45); }
+.breadcrumb-sep { color: rgba(255,255,255,.65); }
 .breadcrumb-current { color: #fff; font-weight: 600; letter-spacing: -.01em; }
 
 .s2-layout { display: flex; min-height: 640px; }
