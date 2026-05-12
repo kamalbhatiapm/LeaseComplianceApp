@@ -1480,7 +1480,7 @@ nav {
   border-radius: 0 6px 6px 0;
   font-size: 13px;
   line-height: 1.65;
-  color: var(--ink-2, var(--t2));
+  color: var(--t2);
   font-style: italic;
 }
 
