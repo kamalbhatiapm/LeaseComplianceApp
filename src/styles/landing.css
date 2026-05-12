@@ -233,7 +233,13 @@
   margin-bottom: 16px;
 }
 .lp-section-sub {
-  font-size: 17px; color: var(--t2); max-width: 560px; line-height: 1.65;
+  font-size: 18px;
+  color: rgba(255,255,255,.5);
+  max-width: 520px;
+  line-height: 1.65;
+  margin-top: 6px;
+  font-weight: 400;
+  letter-spacing: .01em;
 }
 .lp-section-header { margin-bottom: 56px; }
 
