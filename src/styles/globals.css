@@ -1728,7 +1728,7 @@ nav {
 }
 .adt-ledger tr:last-child td { border-bottom: none; }
 .adt-row-even td { background: #fafafa; }
-.adt-row-missing td { background: #fffbeb !important; }
+.adt-row-missing td { background: rgba(255, 159, 10, 0.04) !important; }
 .adt-row-edited  td { background: #eff6ff !important; }
 .adt-ledger tr:hover td { background: #f0f9ff !important; }
 
