@@ -39,7 +39,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
     const f       = typeof raw === 'object' && raw !== null ? raw : { value: raw }
     const missing = f.value === null || f.value === undefined || f.value === ''
     const conf    = f.confidence ?? (missing ? 0 : 1)
-    const confCls = missing ? 'conf-low' : conf >= 0.85 ? 'conf-high' : 'conf-med'
+    const confCls = !missing && conf >= 0.85 ? 'conf-high' : 'conf-med'
     const label   = FIELD_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     const clause  = f.source_clause ?? ''
     const edited  = fieldEdits[key]
