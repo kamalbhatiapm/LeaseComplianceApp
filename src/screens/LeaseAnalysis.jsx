@@ -10,7 +10,7 @@ import {
 import Nav from '../components/AppNav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
 import { track } from '../utils/track.js'
-import { saveFeedback } from '../utils/supabase.js'
+import { saveFeedback, loadFeedback } from '../utils/supabase.js'
 
 const QUIPS = [
   "Translating 'hereinafter referred to as' into English…",
@@ -254,6 +254,13 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
   const [saveConfirm, setSaveConfirm]   = useState(false)
   const [activeClause, setActiveClause] = useState(null)
   const [fieldFeedback, setFieldFeedback] = useState({}) // { [key]: 'up' | 'down' }
+
+  useEffect(() => {
+    if (!analysisRowId) return
+    loadFeedback(analysisRowId).then(({ fields }) => {
+      if (Object.keys(fields).length > 0) setFieldFeedback(fields)
+    })
+  }, [analysisRowId])
 
   const submitFieldFeedback = (key, verdict, row) => {
     if (fieldFeedback[key]) return
@@ -593,6 +600,13 @@ function FlagGuidance({ flagId, isHigh }) {
 function RiskFlags({ flags, onGateChange, stdLabel = 'IFRS 16', analysisRowId }) {
   const [signoffs, setSignoffs]         = useState({})
   const [flagFeedback, setFlagFeedback] = useState({}) // { [id]: 'relevant' | 'not_relevant' }
+
+  useEffect(() => {
+    if (!analysisRowId) return
+    loadFeedback(analysisRowId).then(({ flags }) => {
+      if (Object.keys(flags).length > 0) setFlagFeedback(flags)
+    })
+  }, [analysisRowId])
 
   const toggle = id => {
     const next = { ...signoffs, [id]: !signoffs[id] }

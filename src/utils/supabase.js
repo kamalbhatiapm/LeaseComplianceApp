@@ -72,6 +72,22 @@ export async function saveFeedback({ analysisId, type, key, verdict, value, conf
   if (error) console.error('[LegalGraph] Supabase feedback save error:', error.message)
 }
 
+export async function loadFeedback(analysisId) {
+  if (!supabase || !analysisId) return { fields: {}, flags: {} }
+  const { data, error } = await supabase
+    .from('feedback')
+    .select('type, key, verdict')
+    .eq('analysis_id', analysisId)
+  if (error || !data) return { fields: {}, flags: {} }
+  const fields = {}
+  const flags = {}
+  for (const row of data) {
+    if (row.type === 'field') fields[row.key] = row.verdict
+    else if (row.type === 'flag') flags[row.key] = row.verdict
+  }
+  return { fields, flags }
+}
+
 export async function loadLatestAnalysis() {
   if (!supabase) return null
   const { data, error } = await supabase
