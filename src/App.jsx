@@ -37,7 +37,9 @@ export default function App() {
   const [analysisIntent, setAnalysisIntent] = useState(
     () => localStorage.getItem('lg-intent') ?? 'ifrs16_compliance'
   )
-  const [fieldEdits, setFieldEdits]         = useState({})
+  const [fieldEdits, setFieldEdits]         = useState(
+    () => { try { return JSON.parse(localStorage.getItem('lg-field-edits') ?? '{}') } catch { return {} } }
+  )
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
   const dropPending                        = useRef(false)
 
@@ -45,6 +47,10 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('lg-theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    try { localStorage.setItem('lg-field-edits', JSON.stringify(fieldEdits)) } catch { /* non-fatal */ }
+  }, [fieldEdits])
 
   // Hydrate from Supabase on mount — overwrites localStorage cache if server has newer data
   useEffect(() => {
@@ -97,8 +103,10 @@ export default function App() {
     setSelectedFile(file)
     setAnalysisData(null)
     setIsLiveData(false)
+    setFieldEdits({})
     localStorage.removeItem('lg-analysis')
     localStorage.removeItem('lg-is-live')
+    localStorage.removeItem('lg-field-edits')
     track('upload_started', { file_name: file.name, file_size_kb: Math.round(file.size / 1024) })
     return true
   }
