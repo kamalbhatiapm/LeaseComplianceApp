@@ -75,8 +75,8 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
             <div className="s1-kicker">IFRS 16 / ASC 842 Compliance Suite</div>
             <div className="s1-headline">Audit-ready lease<br />reports in minutes,<br />not hours.</div>
             <div className="s1-sub">
-              Upload a contract and LegalGraph extracts every IFRS 16 and ASC 842 field automatically — commencement dates,
-              payment schedules, discount rates, renewal options — with a clause-level audit trail auditors can verify on the spot.
+              Upload a contract and LegalGraph extracts IFRS 16 and ASC 842 fields in under 2 minutes — commencement dates,
+              payment schedules, borrowing rates, renewal options — each linked to the exact clause, then export a PCAOB AS 1105-compliant audit report in one click.
             </div>
             <div className="s1-stats">
               <div><div className="s1-stat-val">94%</div><div className="s1-stat-label">Extraction accuracy</div></div>

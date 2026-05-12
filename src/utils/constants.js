@@ -48,7 +48,7 @@ export const FIELD_LABELS = {
   premises_sqft:       'Premises (sq ft)',
   premises_floor:      'Floor',
   governing_law:       'Governing Law',
-  discount_rate:       'Discount Rate',
+  discount_rate:       'Borrowing Rate',
   lease_liability:     'Lease Liability',
 }
 
@@ -77,8 +77,8 @@ export const MOCK_ANALYSIS = {
   risk_flags: [
     {
       id: 'missing_discount_rate', severity: 'high',
-      title: 'Discount rate missing',
-      description: 'IFRS 16 requires a discount rate to calculate present value of lease payments and ROU asset. The contract does not specify one. Report generation is blocked until resolved.',
+      title: 'Borrowing rate missing',
+      description: 'IFRS 16 requires a borrowing rate to calculate present value of lease payments and ROU asset. The contract does not specify one. Report generation is blocked until resolved.',
       ifrs16_ref: '§26', field: 'discount_rate',
     },
     {

@@ -394,7 +394,7 @@ export default function Landing({ user }) {
       <footer className="lp-footer">
         <div className="lp-footer-inner">
           <div className="lp-footer-logo">LegalGraph<sup aria-hidden="true">®</sup></div>
-          <div className="lp-footer-tagline">AI-assisted, human-reviewed lease compliance</div>
+          <div className="lp-footer-tagline">Human-reviewed lease compliance</div>
           <div className="lp-footer-links">
             <a href="#">Privacy</a>
             <a href="#">Terms</a>
@@ -407,7 +407,7 @@ export default function Landing({ user }) {
               {user ? 'Dashboard →' : 'Launch app →'}
             </button>
           </div>
-          <p className="lp-footer-disclaimer">AI-assisted — requires human review — not legal or financial advice</p>
+          <p className="lp-footer-disclaimer">Requires human review · not legal or financial advice</p>
           <p className="lp-footer-copy">© 2026 LegalGraph. All rights reserved.</p>
         </div>
       </footer>
