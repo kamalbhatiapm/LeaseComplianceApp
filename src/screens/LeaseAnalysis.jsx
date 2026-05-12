@@ -371,7 +371,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
         <span>Field</span>
         <span>Extracted Value</span>
         <span>Source Clause</span>
-        <span />
+        <span>Feedback</span>
       </div>
       {sortedRows.map((row) => {
         const { key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited, computed } = row
