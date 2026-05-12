@@ -44,7 +44,7 @@ npm run lint
 **Environment variables (`.env`):**
 ```
 VITE_WEBHOOK_URL=        # n8n webhook endpoint for AI extraction
-VITE_SUPABASE_URL=       # Supabase project URL
+VITE_SUPABASE_URL=       # Supabase project URL (also used for analytics via user_events table)
 VITE_SUPABASE_ANON_KEY=  # Supabase anon key (public)
 ```
 
@@ -101,7 +101,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 | **BUG-009: Persistent storage (Supabase)** | P0 | Done | `src/utils/supabase.js` — `saveAnalysis` / `loadLatestAnalysis`. `lease_analyses` table + RLS anon insert/select policies. App.jsx hydrates from Supabase on mount; writes on every analysis. localStorage is the fallback cache. |
 | **BUG-006: Clause PDF viewer** | P0 | Partial | Drawer opens from source clause tag (shipped). Needs full clause text + page reference from n8n pipeline. |
 | **J9: IBR guidance copy** | P0 | Done | `FLAG_GUIDANCE` in `LeaseAnalysis.jsx` covers all 11 n8n flag IDs with 3-step resolution guidance + IBR input fields (expanded from 3 legacy IDs). |
-| **Event tracking — PostHog** | P0 | Not started | Wire `track()` to PostHog before Week 10 beta invites. Priority signals: IBR flag resolution rate + Phase 4 drop-off. These two gate the GA decision. `VITE_POSTHOG_KEY` in `.env`. |
+| **Event tracking — Supabase `user_events`** | P1 | Not started | Deferred to Phase 2. Route `track()` to a `user_events` table (event_name, properties jsonb, session_id, created_at). Key signals: IBR resolution rate + Phase 4 drop-off. Wire before 10+ active accounts so GA decision has data. Add PostHog only if session replay or feature flags are needed. |
 
 ### Phase 1 — Core Compliance Workflow (Weeks 4–7)
 
@@ -120,6 +120,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 | Journey D: First-lease onboarding | P1 | Not started | First-time prompt: "Start with a simple fixed-rent lease." Post-extraction: "Resolve 2 flags and generate your first report." |
 | J8: Session progress tracker | P1 | Not started | Requires BUG-009. "X of Y leases complete · ~Z min remaining." |
 | Company-level IBR storage + carry-forward | P1 | Not started | Enter once, pre-populate on all leases. Suggest last quarter's rate in next cycle. |
+| **Event tracking — Supabase `user_events`** | P1 | Not started | Route `track()` to a `user_events` table. Wire before 10+ active accounts so GA decision has data on IBR resolution rate + Phase 4 drop-off. |
 
 ### Already Shipped (Current State)
 
@@ -172,7 +173,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 - **n8n webhook** (`VITE_WEBHOOK_URL`): receives base64-encoded PDF + metadata; returns structured JSON (fields, risk_flags, terms_found, etc.)
 - **Supabase** (`VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`): persistent storage for analysis history, portfolio state, resolved flags, IBR values, user sessions
 - **Anthropic Claude API**: invoked inside n8n workflow (not directly from frontend); must be named in consent modal per J6/Jennifer requirement
-- **Analytics: PostHog** — instrument before first beta invite. IBR flag resolution rate and Phase 4 drop-off are the two signals that gate the GA decision. Add `VITE_POSTHOG_KEY` to `.env`.
+- **Analytics: Supabase `user_events` table** — route `track()` stub to insert rows (event_name, properties jsonb, session_id, created_at). IBR flag resolution rate and Phase 4 drop-off are measurable with SQL on this table — no third-party tool needed at beta scale. Add PostHog when session replay or A/B testing is required (>50 accounts).
 
 ### AI Pipeline Architecture (n8n workflow)
 The n8n workflow must implement the following to prevent clause hallucination — the top G2 complaint against Trullion and the documented failure mode in AI compliance tools (Springer Nature, 2025):
@@ -392,7 +393,7 @@ The PRD lists 6 assumptions. These are how each gets validated in beta — not j
 | Auditors accept with clause trail | Medium | Direct auditor interview in beta week 1 (not just Rachel's report submission) |
 | 94% accuracy holds for IFRS 16 fields | Medium | Run `node evals/run-evals.cjs --payload` against every beta contract; publish results |
 | IFRS 16 right priority over ASC 842 | Medium | Survey beta accounts on standard used; confirm with CFO |
-| IBR guidance copy reduces abandonment | Medium | PostHog: IBR flag resolution rate before vs. after J9 ships |
+| IBR guidance copy reduces abandonment | Medium | SQL on `user_events` once event tracking ships (Phase 2); until then, validate via direct beta user interviews |
 | Customers upload all leases (not a sample) | Low | Track uploads per account vs. known portfolio size; follow up if <50% of portfolio uploaded |
 
 ---
