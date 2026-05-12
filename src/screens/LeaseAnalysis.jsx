@@ -5,6 +5,7 @@ import {
   Sparkles, Pencil, Check, FileDown, Send, RefreshCw,
   AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
   FileText, Loader, ScanText, Brain, ShieldCheck, Lock, X, ExternalLink,
+  ThumbsUp, ThumbsDown,
 } from 'lucide-react'
 import Nav from '../components/AppNav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
@@ -251,6 +252,20 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
   const [editMode, setEditMode]         = useState(false)
   const [saveConfirm, setSaveConfirm]   = useState(false)
   const [activeClause, setActiveClause] = useState(null)
+  const [fieldFeedback, setFieldFeedback] = useState({}) // { [key]: 'up' | 'down' }
+
+  const submitFieldFeedback = (key, verdict, row) => {
+    if (fieldFeedback[key]) return
+    setFieldFeedback(prev => ({ ...prev, [key]: verdict }))
+    track('field_feedback', {
+      key,
+      verdict,
+      value: row.edited ?? row.value ?? null,
+      confidence: row.conf,
+      source_clause: row.clause,
+    })
+    if (verdict === 'down') setEditMode(true)
+  }
 
   const rows = Object.entries(fields).map(([key, raw]) => {
     const f       = typeof raw === 'object' && raw !== null ? raw : { value: raw }
@@ -353,8 +368,12 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
         <span>Field</span>
         <span>Extracted Value</span>
         <span>Source Clause</span>
+        <span />
       </div>
-      {sortedRows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited, computed }) => (
+      {sortedRows.map((row) => {
+        const { key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited, computed } = row
+        const fb = fieldFeedback[key]
+        return (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
             <span
@@ -394,8 +413,30 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
               {clause}
             </button>
           ) : <div />}
+          <div className="field-feedback-cell">
+            {fb ? (
+              <span className={`field-feedback-done field-feedback-done--${fb}`}>
+                {fb === 'up' ? <ThumbsUp size={11} /> : <ThumbsDown size={11} />}
+                {fb === 'up' ? 'Correct' : 'Flagged'}
+              </span>
+            ) : !editMode && !missing && !computed ? (
+              <div className="field-feedback-btns">
+                <button
+                  className="field-feedback-btn"
+                  title="Extraction looks correct"
+                  onClick={() => submitFieldFeedback(key, 'up', row)}
+                ><ThumbsUp size={12} /></button>
+                <button
+                  className="field-feedback-btn field-feedback-btn--down"
+                  title="Extraction looks wrong — opens edit mode"
+                  onClick={() => submitFieldFeedback(key, 'down', row)}
+                ><ThumbsDown size={12} /></button>
+              </div>
+            ) : null}
+          </div>
         </div>
-      ))}
+        )
+      })}
       {saveConfirm && (
         <div style={{ padding: '10px 18px', fontSize: '12px', color: 'var(--green)', borderTop: '1px solid var(--divider, rgba(255,255,255,.06))' }}>
           <CircleCheck size={12} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
@@ -547,12 +588,20 @@ function FlagGuidance({ flagId, isHigh }) {
 }
 
 function RiskFlags({ flags, onGateChange, stdLabel = 'IFRS 16' }) {
-  const [signoffs, setSignoffs] = useState({})
+  const [signoffs, setSignoffs]       = useState({})
+  const [flagFeedback, setFlagFeedback] = useState({}) // { [id]: 'relevant' | 'not_relevant' }
+
   const toggle = id => {
     const next = { ...signoffs, [id]: !signoffs[id] }
     setSignoffs(next)
     onGateChange(next)
     track('flag_resolved', { flag_id: id, resolved: next[id] })
+  }
+
+  const submitFlagFeedback = (id, verdict) => {
+    if (flagFeedback[id]) return
+    setFlagFeedback(prev => ({ ...prev, [id]: verdict }))
+    track('flag_feedback', { flag_id: id, verdict })
   }
 
   return (
@@ -579,6 +628,21 @@ function RiskFlags({ flags, onGateChange, stdLabel = 'IFRS 16' }) {
                   {ref && <span style={{ fontSize: '11px', color: 'var(--t3)' }}>{stdLabel} {ref}</span>}
                   <span className={`pill ${pillCls} risk-sev-pill`}>{pillLbl}</span>
                 </div>
+              </div>
+              <div className="flag-feedback-row">
+                {flagFeedback[flag.id] ? (
+                  <span className={`flag-feedback-done flag-feedback-done--${flagFeedback[flag.id] === 'relevant' ? 'up' : 'down'}`}>
+                    {flagFeedback[flag.id] === 'relevant'
+                      ? <><ThumbsUp size={11} /> Marked relevant</>
+                      : <><ThumbsDown size={11} /> Marked not relevant</>}
+                  </span>
+                ) : (
+                  <>
+                    <span className="flag-feedback-label">Was this flag helpful?</span>
+                    <button className="field-feedback-btn" title="Yes, this flag is relevant" onClick={() => submitFlagFeedback(flag.id, 'relevant')}><ThumbsUp size={12} /></button>
+                    <button className="field-feedback-btn field-feedback-btn--down" title="No, this flag is not relevant" onClick={() => submitFlagFeedback(flag.id, 'not_relevant')}><ThumbsDown size={12} /></button>
+                  </>
+                )}
               </div>
               <FlagGuidance flagId={flag.id} isHigh={isHigh} />
               {isHigh && (
