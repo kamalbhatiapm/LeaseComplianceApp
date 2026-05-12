@@ -1,10 +1,11 @@
 # LegalGraph — Lease Compliance App: MVP Specification
 
-**Version:** 1.1  
-**Date:** 2026-05-09  
+**Version:** 1.2  
+**Date:** 2026-05-11  
 **Grounded in:** PRD v2.0 · TRUST-UX-PLAN.md · Project Evaluation (stress-test, May 2026) · User personas: Rachel (Compliance Lead), Jennifer (GC/CFO), David (Senior Associate), External Auditor  
 **Status:** Active  
-**Changelog v1.1:** Added MOAT section (§11), AI pipeline architecture (§5), analytics provider + kill criteria, Why Agentic AI rationale (§1), beta validation plan per assumption
+**Changelog v1.1:** Added MOAT section (§11), AI pipeline architecture (§5), analytics provider + kill criteria, Why Agentic AI rationale (§1), beta validation plan per assumption  
+**Changelog v1.2:** BUG-009 + J9 marked done; PDF-only upload; consent → permanent localStorage (OQ #3 resolved); webhook body → FormData; safety timeout → 3 min; T.R.U.S.T framework items added; FLAG_GUIDANCE noted; supabase.js added to project structure; gateOpen removed from state; pre-BUG-009 labels updated
 
 ---
 
@@ -64,11 +65,12 @@ LeaseComplianceApp/
 │   │   ├── Nav.jsx              # Top navigation; locked during analysis
 │   │   ├── ProgressPanel.jsx    # Analysis loading steps
 │   │   ├── Toast.jsx            # Transient notifications
-│   │   └── ConsentModal.jsx     # GDPR + Anthropic API disclosure (fires once per session)
+│   │   └── ConsentModal.jsx     # GDPR + Anthropic API disclosure (fires once ever; persisted to localStorage)
 │   ├── utils/
 │   │   ├── constants.js         # MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality
+│   │   ├── supabase.js          # Supabase client, saveAnalysis, loadLatestAnalysis
 │   │   ├── track.js             # Analytics event stub (track(event, props))
-│   │   └── fileToBase64.js      # File → base64 for webhook payload
+│   │   └── fileToBase64.js      # File → base64 (legacy; webhook now uses FormData)
 │   ├── styles/
 │   │   └── globals.css          # All CSS; CSS custom properties for theming
 │   └── App.jsx                  # Router, state, webhook call, shared props
@@ -96,9 +98,9 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 
 | Feature | Priority | Status | Notes |
 |---|---|---|---|
-| **BUG-009: Persistent storage (Supabase)** | P0 | Not started | Unblocks 7+ features. User's analysis history, resolved flags, IBR, portfolio status all depend on this. |
+| **BUG-009: Persistent storage (Supabase)** | P0 | Done | `src/utils/supabase.js` — `saveAnalysis` / `loadLatestAnalysis`. `lease_analyses` table + RLS anon insert/select policies. App.jsx hydrates from Supabase on mount; writes on every analysis. localStorage is the fallback cache. |
 | **BUG-006: Clause PDF viewer** | P0 | Partial | Drawer opens from source clause tag (shipped). Needs full clause text + page reference from n8n pipeline. |
-| **J9: IBR guidance copy** | P0 | Not started | Copy-only change. No engineering. Guidance block on every "Discount rate missing — High" flag. |
+| **J9: IBR guidance copy** | P0 | Done | `FLAG_GUIDANCE` in `LeaseAnalysis.jsx` covers all 11 n8n flag IDs with 3-step resolution guidance + IBR input fields (expanded from 3 legacy IDs). |
 | **Event tracking — PostHog** | P0 | Not started | Wire `track()` to PostHog before Week 10 beta invites. Priority signals: IBR flag resolution rate + Phase 4 drop-off. These two gate the GA decision. `VITE_POSTHOG_KEY` in `.env`. |
 
 ### Phase 1 — Core Compliance Workflow (Weeks 4–7)
@@ -107,7 +109,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 |---|---|---|---|
 | **Full PDF export** | P0 | Partial | `window.print()` ships. Needs: cover page with AI disclosure, clause inline text, flag resolution log, PCAOB AS 1105 statement. |
 | **Dashboard "Ready / Needs Attention" counter** | P1 | Not started | Requires BUG-009. Show: X ready · Y need attention · Z not yet analysed. |
-| **Once-per-session consent** | P1 | Not started | Legal sign-off required first (GDPR question — see Open Questions). |
+| **Once-per-session consent** | P1 | Done | Shipped as permanent localStorage (`lg-consent` key). Consent fires only on first-ever use. See OQ #3 — resolved by product decision. |
 | **Per-field confidence from n8n** | P1 | Partial | UI dots are live. Real scores from n8n pipeline not yet wired. |
 | **J10: CFO email sign-off flow** | P1 | Not started | "Request internal review" → email → one-click approval → logged in audit trail + cover page. |
 
@@ -121,20 +123,26 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 
 ### Already Shipped (Current State)
 
-- Upload flow (PDF/DOCX/DOC/TXT, 50MB cap, drag-drop)
-- n8n webhook integration with 45s minimum display + 50s safety timeout
+- Upload flow (PDF only, 50MB cap, drag-drop; DOCX/DOC/TXT shown as "Coming soon")
+- n8n webhook integration with 45s minimum display + 3-minute (180s) safety timeout
 - IFRS 16 / ASC 842 field extraction with MOCK_ANALYSIS fallback
+- Supabase persistence — `saveAnalysis` / `loadLatestAnalysis`; localStorage fallback cache (BUG-009 ✅)
 - Terms grid: edit-in-place, confidence dots, FIELD_HINTS on missing fields, uncertainty chips (conf < 0.85)
 - Risk flags: severity (High/Medium/Low), sign-off gate (High blocks export)
+- FLAG_GUIDANCE: 11 n8n flag IDs with 3-step resolution guidance + IBR input fields (J9 ✅)
 - Completion banner after all High flags acknowledged
 - Clause source drawer (right-side slide-in)
 - Score ring: risk score + level label + "/100 · lower is better"
-- Extraction quality indicator (Strong/Fair/Weak)
+- Extraction quality indicator (Strong/Fair/Weak) — separate from risk score
 - Audit trail: dedicated `/audit` route, formal document layout, print stylesheet
-- Demo fallback badge + Retry CTA
+- Demo fallback badge → Retry CTA (calls `handleReanalyzeAs(analysisIntent)`)
 - CSS-only hover tooltips on locked export buttons
 - Dark/light theme toggle (persisted to localStorage)
-- Consent modal (Anthropic Claude API disclosure)
+- Consent modal (Anthropic Claude API disclosure) — persisted to localStorage; fires once ever
+- Contract preview hint on Dashboard after file select (detects lease type from filename)
+- Field edit tracking: `track('field_edited', { key, original_value, corrected_value, confidence, source_clause })` + transient "Correction saved" confirmation
+- Confidence legend (green/amber/red dots) in TermsGrid header
+- Outcome-focused loading step labels (e.g. "Finding commencement date, rent schedule, and renewals")
 
 ### Out of Scope (V1 GA)
 
@@ -181,22 +189,24 @@ This architecture means every extracted value is traceable to a specific clause 
 ### Data Flow
 ```
 User uploads PDF
-    → App.jsx encodes to base64
-    → POST to n8n VITE_WEBHOOK_URL (text/plain body, JSON stringified)
-    → n8n calls Claude API → returns structured analysis JSON
-    → App.jsx stores result in Supabase (BUG-009)
-    → LeaseAnalysis renders from Supabase + real-time state
-    → Edits, sign-offs, flag resolutions persisted to Supabase
-    → /audit renders from same persisted record
+    → App.jsx POSTs FormData (file + file_name, file_type, standard, intent, analyzed_at)
+    → POST to n8n VITE_WEBHOOK_URL (multipart/form-data)
+    → n8n Extract from File → Orchestrator Agent → key_term_extraction_agent
+    → Returns structured analysis JSON
+    → App.jsx saves to Supabase (saveAnalysis) + localStorage cache
+    → LeaseAnalysis renders from App.jsx state (hydrated from Supabase on mount)
+    → Edits, sign-offs, flag resolutions in App.jsx state (Supabase write on save)
+    → /audit renders from same state
     → window.print() generates PDF from /audit route
 ```
 
-### State (Current — pre-BUG-009)
+### State (Current — Supabase primary, localStorage fallback)
 All state lives in `App.jsx` and is passed via props:
 - `selectedFile`, `analysisData`, `fieldEdits`, `analysisIntent`
-- `isAnalyzing`, `progress`, `navLocked`, `gateOpen`
+- `isAnalyzing`, `progress`, `navLocked`
+- `isLiveData` — true when result comes from a successful webhook response
 
-Post-BUG-009: analysis records move to Supabase; `App.jsx` state becomes a session cache.
+On mount: `loadLatestAnalysis()` hydrates from Supabase asynchronously, overwriting localStorage cache if server has newer data. `analysisData` and `isLiveData` are also seeded from localStorage synchronously for instant restore on page refresh.
 
 ---
 
@@ -223,9 +233,10 @@ Post-BUG-009: analysis records move to Supabase; `App.jsx` state becomes a sessi
 - BEM-like class naming for new sections: `prefix-block`, `prefix-block__element`, `prefix-block--modifier`
 
 ### API / Webhook
-- Webhook body: `Content-Type: text/plain`, JSON-stringified payload
-- 60s fetch timeout via `AbortController`; 50s safety timer clears loading state regardless
+- Webhook body: `FormData` (multipart/form-data) — `file`, `file_name`, `file_type`, `standard`, `intent`, `analyzed_at`
+- 3-minute (175s) fetch timeout via `AbortController`; 3-minute (180s) hard safety timer clears loading state regardless
 - Always fall back to `MOCK_ANALYSIS` on webhook failure — never show an empty/broken state to the user
+- n8n `key_term_extraction_agent` prompt is intentionally concise — Cloudflare n8n Cloud has a 100s hard response limit; do not expand the system message without benchmarking inference time
 
 ### Supabase (BUG-009)
 - Use Supabase JS client; anon key only on the frontend
@@ -288,8 +299,10 @@ HITL is required by PCAOB AS 1105: AI-generated financial outputs must have docu
 - Export gate: High flag present → buttons disabled → flag resolved → buttons enabled
 - Field edit: value changed → `track('field_edited')` called with correct args → diff rendered
 
+**Primary test file:** `sample-lease-ifrs16.pdf` — 4-page commercial lease (Sydney CBD, AUD 180k/year, 5-year term) with all 10 IFRS 16 fields present. Use this for end-to-end testing; `SAMPLE-LEASE.docx` remains in the repo as the source document.
+
 ### Manual QA Checklist (required before each deploy)
-- [ ] Upload a PDF → analysis completes (or gracefully falls back to MOCK_ANALYSIS)
+- [ ] Upload `sample-lease-ifrs16.pdf` → analysis completes (or gracefully falls back to MOCK_ANALYSIS)
 - [ ] High-severity flag present → Export PDF and Send to auditor buttons show lock + tooltip
 - [ ] Resolve all High flags → completion banner appears, export unlocks
 - [ ] Edit a field → "Edited" pill shows, original strikethrough shown
@@ -311,20 +324,20 @@ HITL is required by PCAOB AS 1105: AI-generated financial outputs must have docu
 
 ### Always Do
 - Show `MOCK_ANALYSIS` demo data on any webhook failure — never an empty or broken state
-- Fire consent modal before every new analysis session (once-per-session after J8 fix)
+- Fire consent modal before first-ever analysis (persisted to `lg-consent` in localStorage — not per-session)
 - Name "Anthropic Claude API" explicitly in consent modal
 - Show "Not legal advice" disclaimer on every analysis screen
 - Display "AI-assisted, human-reviewed" on every exported report
 - Enforce High-flag export gate at 100% — no bypass, no exceptions
 - Log every field edit with original value, corrected value, confidence, and timestamp
-- Validate file type and size on the frontend before upload (PDF/DOCX/DOC/TXT, 50MB max)
+- Validate file type (PDF only) and size (50MB max) on the frontend before upload
 
 ### Ask First (confirm before implementing)
 - **Removing or weakening the export gate** — this is a guardrail metric and a legal/compliance decision
 - **Changing consent modal language or data retention copy** — Jennifer-facing; legal sign-off required
 - **Wiring IBR auto-fill from any data source** — creates financial advice liability
 - **Adding any feature that reads or stores raw contract text outside Supabase** — data governance concern
-- **Once-per-session consent rollout** — GDPR determination pending (Open Question #3)
+- **Changing consent persistence behaviour** — currently permanent localStorage (`lg-consent`); any weakening requires legal sign-off
 - **Shipping new Supabase tables** — confirm RLS policies are enabled before launch
 
 ### Never Do
@@ -390,7 +403,7 @@ The PRD lists 6 assumptions. These are how each gets validated in beta — not j
 |---|---|---|---|
 | 1 | IBR guidance copy: exact rate methodology to recommend for IFRS 16.26? Needs legal review. | PM + Legal | T-3 weeks from GA |
 | 2 | Ship IFRS 16 only at GA, or both IFRS 16 + ASC 842? Eng estimate: +2 weeks for ASC 842. | Eng Lead + CFO | T-4 weeks from GA |
-| 3 | Once-per-session consent: does GDPR require per-analysis or is session-level sufficient? | Legal | T-3 weeks from GA |
+| 3 | ~~Once-per-session consent: does GDPR require per-analysis or is session-level sufficient?~~ **Resolved by product decision** — shipped as permanent localStorage (`lg-consent`). Legal should confirm this approach is acceptable; no GA blocker. | Legal | Confirm before GA |
 | 4 | PDF export: do auditors prefer inline clause text in PDF, or structured JSON/CSV for audit tools? | PM (auditor interview) | Beta week 1 |
 | 5 | CFO approval link: should it expire after 72 hours for security? | Eng Lead + Legal | T-2 weeks from GA |
 
