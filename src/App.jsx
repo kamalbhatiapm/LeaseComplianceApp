@@ -325,7 +325,7 @@ export default function App() {
       {toast && <Toast toast={toast} onDismiss={dismissToast} />}
       {showConsent && <ConsentModal onGrant={grantConsent} onDeny={() => setShowConsent(false)} />}
       <Routes>
-        <Route path="/"       element={<Landing />} />
+        <Route path="/"       element={<Landing user={user} />} />
         <Route path="/signin" element={user ? <Navigate to="/app" replace /> : <Auth />} />
         <Route path="/app"       element={<ProtectedRoute user={user} authReady={authReady}><Dashboard      {...sharedProps} /></ProtectedRoute>} />
         <Route path="/leases"    element={<ProtectedRoute user={user} authReady={authReady}><LeaseAnalysis  {...sharedProps} isAnalyzing={isAnalyzing} progress={progress} /></ProtectedRoute>} />
