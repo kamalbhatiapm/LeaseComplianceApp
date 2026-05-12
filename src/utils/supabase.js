@@ -19,9 +19,19 @@ export async function saveAnalysis({ fileName, analysisData, isLiveData, intent 
     key_terms:     analysisData.key_terms ?? [],
     is_live_data:  isLiveData,
     analyzed_at:   analysisData.analyzed_at ?? new Date().toISOString(),
+    field_edits:   {},
   }).select().single()
   if (error) console.error('[LegalGraph] Supabase save error:', error.message)
   return data ?? null
+}
+
+export async function updateFieldEdits(rowId, fieldEdits) {
+  if (!supabase || !rowId) return
+  const { error } = await supabase
+    .from('lease_analyses')
+    .update({ field_edits: fieldEdits })
+    .eq('id', rowId)
+  if (error) console.error('[LegalGraph] Supabase field_edits update error:', error.message)
 }
 
 export async function loadLatestAnalysis() {

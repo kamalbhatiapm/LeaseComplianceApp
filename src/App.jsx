@@ -8,7 +8,7 @@ import Toast from './components/Toast.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
 import { MOCK_ANALYSIS } from './utils/constants.js'
 import { track } from './utils/track.js'
-import { saveAnalysis, loadLatestAnalysis } from './utils/supabase.js'
+import { saveAnalysis, loadLatestAnalysis, updateFieldEdits } from './utils/supabase.js'
 
 const WEBHOOK_URL   = import.meta.env.VITE_WEBHOOK_URL   ?? ''
 const SUPABASE_URL  = import.meta.env.VITE_SUPABASE_URL  ?? ''
@@ -37,9 +37,8 @@ export default function App() {
   const [analysisIntent, setAnalysisIntent] = useState(
     () => localStorage.getItem('lg-intent') ?? 'ifrs16_compliance'
   )
-  const [fieldEdits, setFieldEdits]         = useState(
-    () => { try { return JSON.parse(localStorage.getItem('lg-field-edits') ?? '{}') } catch { return {} } }
-  )
+  const [fieldEdits, setFieldEdits]         = useState({})
+  const [analysisRowId, setAnalysisRowId]   = useState(null)
   const [theme, setTheme]                 = useState(() => localStorage.getItem('lg-theme') ?? 'dark')
   const dropPending                        = useRef(false)
 
@@ -47,10 +46,6 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('lg-theme', theme)
   }, [theme])
-
-  useEffect(() => {
-    try { localStorage.setItem('lg-field-edits', JSON.stringify(fieldEdits)) } catch { /* non-fatal */ }
-  }, [fieldEdits])
 
   // Hydrate from Supabase on mount — overwrites localStorage cache if server has newer data
   useEffect(() => {
@@ -69,6 +64,8 @@ export default function App() {
       setAnalysisData(data)
       setIsLiveData(row.is_live_data ?? false)
       if (row.intent) setAnalysisIntent(row.intent)
+      if (row.id) setAnalysisRowId(row.id)
+      if (row.field_edits && Object.keys(row.field_edits).length > 0) setFieldEdits(row.field_edits)
       try {
         localStorage.setItem('lg-analysis', JSON.stringify(data))
         localStorage.setItem('lg-is-live', String(row.is_live_data ?? false))
@@ -104,9 +101,9 @@ export default function App() {
     setAnalysisData(null)
     setIsLiveData(false)
     setFieldEdits({})
+    setAnalysisRowId(null)
     localStorage.removeItem('lg-analysis')
     localStorage.removeItem('lg-is-live')
-    localStorage.removeItem('lg-field-edits')
     track('upload_started', { file_name: file.name, file_size_kb: Math.round(file.size / 1024) })
     return true
   }
@@ -270,7 +267,7 @@ export default function App() {
       analysisData: displayData,
       isLiveData:   liveFlag,
       intent:       analysisIntent,
-    })
+    }).then(row => { if (row?.id) setAnalysisRowId(row.id) })
 
     track('analysis_complete', {
       webhook_ok: webhookOk,
@@ -295,7 +292,7 @@ export default function App() {
     selectedFile, handleFileSelected, handleFileDrop, handleAnalyzeClick, handleReanalyzeAs,
     isAnalyzing, analysisData, isLiveData, progress, navLocked,
     analysisIntent, setAnalysisIntent,
-    fieldEdits, setFieldEdits,
+    fieldEdits, setFieldEdits, analysisRowId, updateFieldEdits,
     showToast, dismissToast, theme, toggleTheme,
   }
 
