@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useCallback, useEffect, useRef } from 'react'
+import Landing from './screens/Landing.jsx'
 import Dashboard from './screens/Dashboard.jsx'
 import LeaseAnalysis from './screens/LeaseAnalysis.jsx'
 import AuditTrail from './screens/AuditTrail.jsx'
@@ -302,7 +303,8 @@ export default function App() {
       {toast && <Toast toast={toast} onDismiss={dismissToast} />}
       {showConsent && <ConsentModal onGrant={grantConsent} onDeny={() => setShowConsent(false)} />}
       <Routes>
-        <Route path="/"          element={<Dashboard      {...sharedProps} />} />
+        <Route path="/"          element={<Landing />} />
+        <Route path="/app"       element={<Dashboard      {...sharedProps} />} />
         <Route path="/leases"    element={<LeaseAnalysis  {...sharedProps} isAnalyzing={isAnalyzing} progress={progress} />} />
         <Route path="/audit"     element={<AuditTrail     {...sharedProps} />} />
         <Route path="/playbooks" element={<Playbooks      navLocked={navLocked} theme={theme} toggleTheme={toggleTheme} />} />
