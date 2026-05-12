@@ -105,7 +105,7 @@ nav {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
 }
 .nav-link.disabled { opacity: .25; cursor: not-allowed; pointer-events: none; }
-.nav-end { display: flex; align-items: center; gap: 8px; margin-left: 20px; }
+.nav-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
 /* Hamburger — hidden on desktop */
 .nav-hamburger {
