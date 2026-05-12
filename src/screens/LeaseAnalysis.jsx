@@ -226,7 +226,7 @@ function ClauseDrawer({ clause, onClose }) {
   )
 }
 
-function TermsGrid({ fields, termsMissing = [], edits, setEdits }) {
+function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, onSaveEdits }) {
   const [editMode, setEditMode]         = useState(false)
   const [saveConfirm, setSaveConfirm]   = useState(false)
   const [activeClause, setActiveClause] = useState(null)
@@ -261,6 +261,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits }) {
     })
     setEditMode(false)
     if (Object.keys(edits).length > 0) {
+      onSaveEdits?.(analysisRowId, edits)
       setSaveConfirm(true)
       setTimeout(() => setSaveConfirm(false), 3000)
     }
@@ -544,7 +545,7 @@ const STANDARD_META = {
   asc842_compliance: { label: 'ASC 842', short: 'ASC 842', other: 'IFRS 16', otherValue: 'ifrs16_compliance' },
 }
 
-export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme, analysisIntent, setAnalysisIntent, handleReanalyzeAs, fieldEdits, setFieldEdits }) {
+export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme, analysisIntent, setAnalysisIntent, handleReanalyzeAs, fieldEdits, setFieldEdits, analysisRowId, updateFieldEdits }) {
   if (isAnalyzing) {
     return (
       <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
@@ -705,7 +706,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           )}
 
           {/* Terms */}
-          <TermsGrid fields={fields} termsMissing={termsMissing} edits={fieldEdits ?? {}} setEdits={setFieldEdits ?? (() => {})} />
+          <TermsGrid fields={fields} termsMissing={termsMissing} edits={fieldEdits ?? {}} setEdits={setFieldEdits ?? (() => {})} analysisRowId={analysisRowId} onSaveEdits={updateFieldEdits} />
 
           {/* Risk flags */}
           <RiskFlags flags={riskFlags} onGateChange={onGateChange} />
