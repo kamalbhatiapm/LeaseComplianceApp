@@ -1,4 +1,4 @@
-import { BookOpen, Scale, FileText, Plus } from 'lucide-react'
+import { BookOpen, Scale, FileText, Plus, Clock } from 'lucide-react'
 import Nav from '../components/Nav.jsx'
 
 const PLAYBOOKS = [
@@ -30,20 +30,12 @@ const PLAYBOOKS = [
       { label: 'Variable lease costs',  desc: 'Index-linked escalations, usage-based charges' },
     ],
   },
-  {
-    title: 'NDA / Confidentiality Agreement',
-    meta: 'Version 1.1 · Updated Jan 2026',
-    badge: 'Contract',
-    badgeCls: 'badge-ifrs',
-    stats: [{ val: 6, label: 'Required fields' }, { val: 8, label: 'Risk rules' }, { val: 2, label: 'Subtypes' }],
-    rules: [
-      { label: 'Parties',              desc: 'Disclosing and receiving party identification' },
-      { label: 'Confidential info',    desc: 'Definition scope, carve-outs, exclusions' },
-      { label: 'Term',                 desc: 'Duration, survival clauses post-expiry' },
-      { label: 'Governing law',        desc: 'Jurisdiction, dispute resolution mechanism' },
-      { label: 'Permitted disclosure', desc: 'Affiliates, legal advisors, required disclosures' },
-    ],
-  },
+]
+
+const COMING_SOON = [
+  { title: 'NDA / Confidentiality Agreement', badge: 'Contract' },
+  { title: 'Service Agreement', badge: 'Contract' },
+  { title: 'Employment Contract', badge: 'HR' },
 ]
 
 export default function Playbooks({ navLocked, theme, toggleTheme }) {
@@ -98,6 +90,23 @@ export default function Playbooks({ navLocked, theme, toggleTheme }) {
               <div className="playbook-card-footer">
                 <button className="btn btn-secondary btn-sm"><FileText size={12} /> View rules</button>
                 <button className="btn btn-outline btn-sm">Edit</button>
+              </div>
+            </div>
+          ))}
+          {COMING_SOON.map(pb => (
+            <div key={pb.title} className="playbook-card" style={{ opacity: 0.5, pointerEvents: 'none' }}>
+              <div className="playbook-card-header">
+                <div>
+                  <div className="playbook-title">{pb.title}</div>
+                  <div className="playbook-meta">Coming soon</div>
+                </div>
+                <span className="standard-badge" style={{ background: 'var(--surface-2)', color: 'var(--t3)' }}>{pb.badge}</span>
+              </div>
+              <div className="playbook-card-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 0', color: 'var(--t3)', gap: '8px', fontSize: '13px' }}>
+                <Clock size={14} /> More standards coming soon
+              </div>
+              <div className="playbook-card-footer">
+                <button className="btn btn-outline btn-sm" disabled>View rules</button>
               </div>
             </div>
           ))}
