@@ -753,7 +753,7 @@ nav {
 }
 
 .term-row {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  display: grid; grid-template-columns: 1fr 1fr 1fr 72px;
   padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,.06);
   align-items: center; font-size: 14px;
 }
@@ -1501,7 +1501,7 @@ nav {
 
 /* Terms Grid column headers */
 .term-col-headers {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  display: grid; grid-template-columns: 1fr 1fr 1fr 72px;
   padding: 7px 20px;
   border-bottom: 1px solid rgba(255,255,255,.08);
   background: rgba(255,255,255,.03);
@@ -1513,6 +1513,46 @@ nav {
   border-bottom-color: rgba(0,0,0,.07);
   color: var(--ink-3);
 }
+
+/* Field & flag feedback */
+.field-feedback-cell {
+  display: flex; align-items: center; justify-content: flex-end;
+}
+.field-feedback-btns {
+  display: flex; gap: 4px; opacity: 0.7; transition: opacity .15s;
+}
+.term-row:hover .field-feedback-btns { opacity: 1; }
+.field-feedback-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,.12);
+  background: transparent; color: rgba(255,255,255,.4); cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.field-feedback-btn:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.85); border-color: rgba(255,255,255,.25); }
+.field-feedback-btn--down:hover { color: var(--amber); border-color: var(--amber); background: rgba(255,159,10,.08); }
+.field-feedback-done {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; letter-spacing: .02em;
+  padding: 2px 7px; border-radius: 20px;
+}
+.field-feedback-done--up { color: var(--green); background: rgba(52,199,89,.12); }
+.field-feedback-done--down { color: var(--amber); background: rgba(255,159,10,.10); }
+
+.flag-feedback-row {
+  display: flex; align-items: center; gap: 6px; margin-top: 8px;
+}
+.flag-feedback-label { font-size: 11px; color: rgba(255,255,255,.4); }
+.flag-feedback-done {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .field-feedback-btn {
+  border-color: rgba(0,0,0,.1); color: rgba(0,0,0,.3);
+}
+[data-theme="light"] .field-feedback-btn:hover { background: rgba(0,0,0,.05); color: rgba(0,0,0,.7); border-color: rgba(0,0,0,.2); }
+[data-theme="light"] .flag-feedback-label { color: var(--ink-3); }
 
 /* Confidence uncertainty chip */
 .conf-chip {
