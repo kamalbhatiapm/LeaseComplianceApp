@@ -37,9 +37,8 @@
 .lp-btn-primary {
   background: var(--brand); color: #fff;
   padding: 13px 28px;
-  box-shadow: 0 4px 20px rgba(0,113,227,.4);
 }
-.lp-btn-primary:hover { box-shadow: 0 6px 28px rgba(0,113,227,.55); }
+.lp-btn-primary:hover { background: #0064cc; }
 .lp-btn-ghost {
   background: transparent; color: var(--t2);
   padding: 13px 20px; border: 1px solid var(--border);
