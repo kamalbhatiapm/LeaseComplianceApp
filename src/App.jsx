@@ -30,9 +30,7 @@ export default function App() {
   const [user, setUser]                   = useState(null)
   const [authReady, setAuthReady]         = useState(false)
   const [selectedFile, setSelectedFile]   = useState(null)
-  const [consentGiven, setConsentGiven]   = useState(
-    () => localStorage.getItem('lg-consent') === 'true'
-  )
+  const [consentGiven, setConsentGiven]   = useState(false) // resolved after auth ready
   const [showConsent, setShowConsent]     = useState(false)
   const [isAnalyzing, setIsAnalyzing]     = useState(false)
   const [analysisData, setAnalysisData]   = useState(() => {
@@ -60,12 +58,30 @@ export default function App() {
   // Auth state — resolve session on mount, then subscribe to changes
   useEffect(() => {
     getSession().then(session => {
-      setUser(session?.user ?? null)
+      const u = session?.user ?? null
+      setUser(u)
       setAuthReady(true)
+      if (u) setConsentGiven(localStorage.getItem(`lg-consent-${u.id}`) === 'true')
     })
     return onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+      const u = session?.user ?? null
+      setUser(u)
       setAuthReady(true)
+      if (u) {
+        setConsentGiven(localStorage.getItem(`lg-consent-${u.id}`) === 'true')
+      } else {
+        // User signed out — clear sensitive cached data
+        setConsentGiven(false)
+        setAnalysisData(null)
+        setIsLiveData(false)
+        setFieldEdits({})
+        setAnalysisRowId(null)
+        try {
+          localStorage.removeItem('lg-analysis')
+          localStorage.removeItem('lg-is-live')
+          localStorage.removeItem('lg-intent')
+        } catch { /* non-fatal */ }
+      }
     })
   }, [])
 
@@ -160,10 +176,10 @@ export default function App() {
 
   const grantConsent = useCallback(() => {
     setConsentGiven(true)
-    localStorage.setItem('lg-consent', 'true')
+    if (user?.id) localStorage.setItem(`lg-consent-${user.id}`, 'true')
     setShowConsent(false)
     runAnalysis()
-  }, [selectedFile, analysisIntent])
+  }, [selectedFile, analysisIntent, user])
 
   async function runAnalysis(intentOverride) {
     if (!selectedFile) return

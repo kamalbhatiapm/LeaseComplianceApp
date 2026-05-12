@@ -103,10 +103,10 @@ export default function Auth() {
               type="password"
               autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
               required
-              minLength={6}
+              minLength={mode === 'signup' ? 12 : 1}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder={mode === 'signup' ? 'Min. 6 characters' : '••••••••'}
+              placeholder={mode === 'signup' ? 'Min. 12 characters' : '••••••••'}
               disabled={loading}
             />
           </div>

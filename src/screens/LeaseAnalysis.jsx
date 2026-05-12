@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import DOMPurify from 'dompurify'
 import {
   Sparkles, Pencil, Check, FileDown, Send, RefreshCw,
   Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
@@ -475,7 +476,7 @@ function FlagGuidance({ flagId, isHigh }) {
               onChange={e => setVal(e.target.value)}
             />
             {val && (
-              <span className="flag-guidance-saved">✓ Saved — will appear in audit log</span>
+              <span className="flag-guidance-saved">Note will appear in your export</span>
             )}
           </div>
         </div>
@@ -687,7 +688,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           {summary && (
             <div className="card" style={{ marginBottom: '20px' }}>
               <div className="card-title"><Sparkles size={14} /> AI Summary</div>
-              <div className="summary-text" dangerouslySetInnerHTML={{ __html: summary }} />
+              <div className="summary-text" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(summary) }} />
             </div>
           )}
 
