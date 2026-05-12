@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import DOMPurify from 'dompurify'
 import {
   Sparkles, Pencil, Check, FileDown, Send, RefreshCw,
-  Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
+  AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
   FileText, Loader, ScanText, Brain, ShieldCheck, Lock, X, ExternalLink,
 } from 'lucide-react'
 import Nav from '../components/AppNav.jsx'
@@ -171,7 +171,7 @@ function ClauseDrawer({ clause, onClose }) {
       <div className="clause-drawer" role="dialog" aria-label={`Clause detail: ${clause.ref}`}>
         <div className="clause-drawer-header">
           <div className="clause-drawer-title">
-            <Paperclip size={14} />
+            <span className="clause-word-label">Clause</span>
             {clause.ref}
           </div>
           <button className="clause-drawer-close" onClick={onClose} aria-label="Close"><X size={16} /></button>
@@ -243,6 +243,11 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
     return { key, missing, confCls, uncertain, label, clause, clauseText, value: f.value, edited, conf, rawField: f }
   })
 
+  const sortedRows = [
+    ...rows.filter(r => !r.missing && r.conf >= 0.85),
+    ...rows.filter(r =>  r.missing || r.conf <  0.85),
+  ]
+
   const handleSave = () => {
     Object.entries(edits).forEach(([key, corrected_value]) => {
       const f = fields[key]
@@ -293,7 +298,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
         <span>Extracted Value</span>
         <span>Source Clause</span>
       </div>
-      {rows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited }) => (
+      {sortedRows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
             <span className={`confidence-dot ${confCls}`} />
@@ -325,7 +330,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
               style={missing ? { color: 'var(--amber)' } : {}}
               onClick={() => setActiveClause({ ref: clause, clauseText, fieldLabel: label, value: edited ?? value, conf, missing })}
             >
-              {missing ? <AlertTriangle size={12} /> : <Paperclip size={12} />}
+              <span className="clause-word-label">Clause</span>
               {clause}
             </button>
           ) : <div />}

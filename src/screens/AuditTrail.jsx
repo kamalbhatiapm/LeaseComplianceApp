@@ -188,7 +188,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
                     </td>
                     <td className="adt-clause-cell">
                       {row.clause
-                        ? <span className="adt-clause-tag"><Paperclip size={10} />{row.clause}</span>
+                        ? <span className="adt-clause-tag"><span className="clause-word-label">Clause</span>{row.clause}</span>
                         : <span className="adt-empty">—</span>
                       }
                     </td>

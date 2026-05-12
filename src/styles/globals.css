@@ -1564,6 +1564,15 @@ nav {
 [data-theme="light"] .term-clause-link { color: var(--ink-2); text-decoration-color: rgba(0,0,0,.2); }
 [data-theme="light"] .term-clause-link:hover { color: var(--brand); text-decoration-color: var(--brand); }
 
+.clause-word-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .55;
+  margin-right: 1px;
+}
+
 /* Clause drawer backdrop */
 .clause-drawer-backdrop {
   position: fixed; inset: 0; z-index: 200;
