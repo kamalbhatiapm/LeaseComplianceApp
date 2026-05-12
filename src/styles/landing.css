@@ -36,10 +36,10 @@
 }
 .lp-btn:hover { opacity: .88; transform: translateY(-1px); }
 .lp-btn-primary {
-  background: var(--accent-soft); color: #0d1117;
+  background: #3d85c8; color: #fff;
   padding: 13px 28px;
 }
-.lp-btn-primary:hover { background: #a0c4e6; }
+.lp-btn-primary:hover { background: #3478b5; }
 .lp-btn-ghost {
   background: transparent; color: var(--t2);
   padding: 13px 20px; border: 1px solid var(--border);
