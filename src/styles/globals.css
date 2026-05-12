@@ -1728,13 +1728,13 @@ nav {
 }
 .adt-ledger tr:last-child td { border-bottom: none; }
 .adt-row-even td { background: #fafafa; }
-.adt-row-missing td { background: #fffbeb !important; }
+.adt-row-missing td { background: rgba(255, 159, 10, 0.04) !important; }
 .adt-row-edited  td { background: #eff6ff !important; }
 .adt-ledger tr:hover td { background: #f0f9ff !important; }
 
 .adt-field-name {
   font-weight: 600;
-  color: #111827 !important;
+  color: #111827;
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -1876,7 +1876,7 @@ nav {
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
   font-size: 10px;
-  color: #9ca3af;
+  color: #4b5563;
   gap: 16px;
 }
 .adt-doc-footer span:last-child {
@@ -2167,4 +2167,80 @@ nav {
 @media (max-width: 900px) {
   .audit-body { grid-template-columns: 1fr; }
   .audit-right-col { position: static; }
+}
+
+/* ── Print / PDF export ─────────────────────────────────────────────── */
+.audit-print-footer {
+  display: none;
+  text-align: center;
+  font-size: 10px;
+  color: #666;
+  border-top: 1px solid #ddd;
+  padding-top: 8px;
+  margin-top: 40px;
+}
+
+.audit-pcaob-disclosure {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.audit-clause-text-row { display: none; }
+
+.audit-clause-text-cell {
+  font-style: italic;
+  font-size: 11px;
+  color: #555;
+  padding: 2px 12px 8px 32px !important;
+  border-top: none !important;
+}
+
+@media print {
+  .no-print { display: none !important; }
+
+  body, html {
+    background: #fff !important;
+    color: #000 !important;
+    font-family: Georgia, 'Times New Roman', serif !important;
+    font-size: 11pt;
+  }
+
+  .audit-cover { page-break-after: always; }
+  .audit-section { page-break-inside: avoid; }
+
+  .audit-print-footer {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .audit-clause-text-row { display: table-row; }
+
+  * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .risk-badge-high { background: #fee2e2 !important; color: #991b1b !important; }
+  .risk-badge-med  { background: #fef3c7 !important; color: #92400e !important; }
+  .risk-badge-low  { background: #d1fae5 !important; color: #065f46 !important; }
+
+  a { text-decoration: none; color: #000 !important; }
+
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; }
+  th { background: #f0f0f0 !important; font-weight: 700; }
+
+  @page {
+    margin: 1.5cm 2cm;
+    size: A4;
+  }
 }
