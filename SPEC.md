@@ -101,7 +101,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 | **BUG-009: Persistent storage (Supabase)** | P0 | Done | `src/utils/supabase.js` — `saveAnalysis` / `loadLatestAnalysis`. `lease_analyses` table + RLS anon insert/select policies. App.jsx hydrates from Supabase on mount; writes on every analysis. localStorage is the fallback cache. |
 | **BUG-006: Clause PDF viewer** | P0 | Partial | Drawer opens from source clause tag (shipped). Needs full clause text + page reference from n8n pipeline. |
 | **J9: IBR guidance copy** | P0 | Done | `FLAG_GUIDANCE` in `LeaseAnalysis.jsx` covers all 11 n8n flag IDs with 3-step resolution guidance + IBR input fields (expanded from 3 legacy IDs). |
-| **Event tracking — Supabase `user_events`** | P0 | Not started | Route `track()` to a `user_events` table in Supabase (event_name, properties jsonb, session_id, created_at). Priority signals: IBR flag resolution rate + Phase 4 drop-off (analysis_complete → export_clicked). Both are SQL counts — no third-party tool required at this scale. Add PostHog only when session replay or feature flags are needed (>50 accounts). |
+| **Event tracking — Supabase `user_events`** | P1 | Not started | Deferred to Phase 2. Route `track()` to a `user_events` table (event_name, properties jsonb, session_id, created_at). Key signals: IBR resolution rate + Phase 4 drop-off. Wire before 10+ active accounts so GA decision has data. Add PostHog only if session replay or feature flags are needed. |
 
 ### Phase 1 — Core Compliance Workflow (Weeks 4–7)
 
@@ -120,6 +120,7 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 | Journey D: First-lease onboarding | P1 | Not started | First-time prompt: "Start with a simple fixed-rent lease." Post-extraction: "Resolve 2 flags and generate your first report." |
 | J8: Session progress tracker | P1 | Not started | Requires BUG-009. "X of Y leases complete · ~Z min remaining." |
 | Company-level IBR storage + carry-forward | P1 | Not started | Enter once, pre-populate on all leases. Suggest last quarter's rate in next cycle. |
+| **Event tracking — Supabase `user_events`** | P1 | Not started | Route `track()` to a `user_events` table. Wire before 10+ active accounts so GA decision has data on IBR resolution rate + Phase 4 drop-off. |
 
 ### Already Shipped (Current State)
 
@@ -392,7 +393,7 @@ The PRD lists 6 assumptions. These are how each gets validated in beta — not j
 | Auditors accept with clause trail | Medium | Direct auditor interview in beta week 1 (not just Rachel's report submission) |
 | 94% accuracy holds for IFRS 16 fields | Medium | Run `node evals/run-evals.cjs --payload` against every beta contract; publish results |
 | IFRS 16 right priority over ASC 842 | Medium | Survey beta accounts on standard used; confirm with CFO |
-| IBR guidance copy reduces abandonment | Medium | SQL on `user_events`: IBR flag resolution rate before vs. after J9 ships |
+| IBR guidance copy reduces abandonment | Medium | SQL on `user_events` once event tracking ships (Phase 2); until then, validate via direct beta user interviews |
 | Customers upload all leases (not a sample) | Low | Track uploads per account vs. known portfolio size; follow up if <50% of portfolio uploaded |
 
 ---
