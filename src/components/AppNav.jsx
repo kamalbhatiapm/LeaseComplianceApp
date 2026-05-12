@@ -44,7 +44,7 @@ export default function Nav({ locked = false, theme = 'dark', onToggleTheme, use
   return (
     <nav ref={navRef}>
       <div className="nav-inner">
-        <NavLink to="/" className="nav-logo" style={{textDecoration:'none'}}>LegalGraph<sup>®</sup></NavLink>
+        <NavLink to="/" className="nav-logo" style={{textDecoration:'none'}}>LegalGraph<sup aria-hidden="true">®</sup></NavLink>
         <div className="nav-links">
           <NavLink to="/app"       className={cls} end>Dashboard</NavLink>
           <NavLink to="/leases"    className={cls}>Reports</NavLink>

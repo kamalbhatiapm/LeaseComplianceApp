@@ -28,7 +28,7 @@
   --t1:            #ffffff;
   --t2:            rgba(255,255,255,.75);
   --t3:            rgba(255,255,255,.65);
-  --t4:            rgba(255,255,255,.6);
+  --t4:            rgba(255,255,255,.7);
   --radius:        16px;
   --shadow-sm:     0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.05);
   --shadow:        0 2px 24px rgba(0,0,0,.07), 0 8px 40px rgba(0,0,0,.04);
@@ -82,7 +82,7 @@ nav {
   transition: opacity .15s;
 }
 .nav-logo:hover { opacity: .75; }
-.nav-logo sup { font-size: 8px; font-weight: 400; opacity: .5; letter-spacing: .04em; vertical-align: super; }
+.nav-logo sup { font-size: 10px; font-weight: 400; opacity: .55; letter-spacing: .04em; vertical-align: super; }
 .nav-links { display: flex; gap: 1px; flex: 1; justify-content: center; }
 .nav-link {
   background: none;
@@ -139,7 +139,7 @@ nav {
   border-radius: 50%;
   background: linear-gradient(135deg, var(--brand) 0%, #5ac8fa 100%);
   color: #fff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
