@@ -1,11 +1,12 @@
 # LegalGraph — Lease Compliance App: MVP Specification
 
-**Version:** 1.2  
-**Date:** 2026-05-11  
+**Version:** 1.3  
+**Date:** 2026-05-12  
 **Grounded in:** PRD v2.0 · TRUST-UX-PLAN.md · Project Evaluation (stress-test, May 2026) · User personas: Rachel (Compliance Lead), Jennifer (GC/CFO), David (Senior Associate), External Auditor  
 **Status:** Active  
 **Changelog v1.1:** Added MOAT section (§11), AI pipeline architecture (§5), analytics provider + kill criteria, Why Agentic AI rationale (§1), beta validation plan per assumption  
-**Changelog v1.2:** BUG-009 + J9 marked done; PDF-only upload; consent → permanent localStorage (OQ #3 resolved); webhook body → FormData; safety timeout → 3 min; T.R.U.S.T framework items added; FLAG_GUIDANCE noted; supabase.js added to project structure; gateOpen removed from state; pre-BUG-009 labels updated
+**Changelog v1.2:** BUG-009 + J9 marked done; PDF-only upload; consent → permanent localStorage (OQ #3 resolved); webhook body → FormData; safety timeout → 3 min; T.R.U.S.T framework items added; FLAG_GUIDANCE noted; supabase.js added to project structure; gateOpen removed from state; pre-BUG-009 labels updated  
+**Changelog v1.3:** Auth flow added (Auth.jsx, auth.css, Supabase email/password, ProtectedRoute); Landing.jsx marketing page at `/`; `/` route changed from Dashboard to Landing; `/signin` route added; Nav.jsx renamed to AppNav.jsx with avatar dropdown + sign-out; auth helpers added to supabase.js (getSession, signOut, onAuthStateChange); user + authReady state added to App.jsx
 
 ---
 
@@ -57,23 +58,27 @@ LeaseComplianceApp/
 ├── public/
 ├── src/
 │   ├── screens/
+│   │   ├── Landing.jsx          # Marketing landing page (hero, features, social proof, CTA)
+│   │   ├── Auth.jsx             # Sign-in / sign-up / forgot-password (Supabase email+password)
 │   │   ├── Dashboard.jsx        # Upload hero + portfolio table (J3, J8)
 │   │   ├── LeaseAnalysis.jsx    # Score header + terms grid + risk flags + sidebar (J1, J2, J4)
 │   │   ├── AuditTrail.jsx       # Formal document view: extraction ledger + timeline (J10, A1)
 │   │   └── Playbooks.jsx        # Compliance playbooks reference
 │   ├── components/
-│   │   ├── Nav.jsx              # Top navigation; locked during analysis
+│   │   ├── AppNav.jsx           # Top navigation (renamed from Nav.jsx); avatar dropdown with sign-out; locked during analysis
 │   │   ├── ProgressPanel.jsx    # Analysis loading steps
 │   │   ├── Toast.jsx            # Transient notifications
 │   │   └── ConsentModal.jsx     # GDPR + Anthropic API disclosure (fires once ever; persisted to localStorage)
 │   ├── utils/
 │   │   ├── constants.js         # MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality
-│   │   ├── supabase.js          # Supabase client, saveAnalysis, loadLatestAnalysis
+│   │   ├── supabase.js          # Supabase client, saveAnalysis, loadLatestAnalysis, getSession, signOut, onAuthStateChange
 │   │   ├── track.js             # Analytics event stub (track(event, props))
 │   │   └── fileToBase64.js      # File → base64 (legacy; webhook now uses FormData)
 │   ├── styles/
-│   │   └── globals.css          # All CSS; CSS custom properties for theming
-│   └── App.jsx                  # Router, state, webhook call, shared props
+│   │   ├── globals.css          # App CSS; CSS custom properties for theming
+│   │   ├── landing.css          # Landing page styles (self-contained dark theme)
+│   │   └── auth.css             # Auth page styles (self-contained dark theme matching landing)
+│   └── App.jsx                  # Router, state, webhook call, shared props; ProtectedRoute; auth state
 ├── .env                         # Local env vars (not committed)
 ├── SPEC.md                      # This file
 ├── project-context/
@@ -83,10 +88,18 @@ LeaseComplianceApp/
 ```
 
 **Routing (React Router v6):**
-- `/` — Dashboard (upload + portfolio)
-- `/leases` — LeaseAnalysis (results + review)
-- `/audit` — AuditTrail (formal document export)
-- `/playbooks` — Compliance playbooks
+- `/` — Landing (marketing page; all CTAs link to `/signin`)
+- `/signin` — Auth (sign-in / sign-up toggle; redirects to `/app` on success)
+- `/app` — Dashboard (upload + portfolio) — **ProtectedRoute**: redirects to `/signin` if not authenticated
+- `/leases` — LeaseAnalysis (results + review) — **ProtectedRoute**
+- `/audit` — AuditTrail (formal document export) — **ProtectedRoute**
+- `/playbooks` — Compliance playbooks — **ProtectedRoute**
+
+**Auth state (App.jsx):**
+- `user` — Supabase `User` object or `null`
+- `authReady` — boolean; `false` until initial `getSession()` resolves (prevents flash-of-redirect)
+- `ProtectedRoute` — renders `null` while `authReady=false`; redirects to `/signin` when `user=null`
+- `onAuthStateChange` subscription wired in `useEffect` on mount; unsubscribed on unmount
 
 ---
 
@@ -124,6 +137,10 @@ Features are ordered by PRD priority. P0 = GA blocker. P1 = GA required. GA+1 = 
 
 ### Already Shipped (Current State)
 
+- **Landing page** (`/`) — marketing hero, feature sections, social proof, CTA buttons linking to `/signin`
+- **Auth flow** (`/signin`) — Supabase email+password sign-in/sign-up toggle, forgot password (reset email), inline error/success alerts, "Back to home" link, dark theme matching landing
+- **Protected routes** — `/app`, `/leases`, `/audit`, `/playbooks` all require authentication; redirect to `/signin` when unauthenticated
+- **AppNav** — avatar button with dropdown showing user email + sign-out; mobile hamburger drawer with sign-out; initials derived from `user.email`
 - Upload flow (PDF only, 50MB cap, drag-drop; DOCX/DOC/TXT shown as "Coming soon")
 - n8n webhook integration with 45s minimum display + 3-minute (180s) safety timeout
 - IFRS 16 / ASC 842 field extraction with MOCK_ANALYSIS fallback

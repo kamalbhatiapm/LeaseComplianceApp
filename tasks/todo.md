@@ -1,7 +1,17 @@
 # Task List — LegalGraph MVP
 
-> Generated from tasks/plan.md · 2026-05-09
+> Generated from tasks/plan.md · 2026-05-09 · Updated 2026-05-12
 > Status: ⬜ Not started · 🔄 In progress · ✅ Done · ⏸ Blocked · 🔒 Deferred
+
+---
+
+## Auth & Landing (Shipped 2026-05-12)
+
+- [x] **Landing page** — Marketing page at `/` (`Landing.jsx` + `landing.css`); hero, feature sections, social proof, all CTAs → `/signin`
+- [x] **Auth flow** — Sign-in / sign-up / forgot-password at `/signin` (`Auth.jsx` + `auth.css`); Supabase email+password; dark theme matching landing; "Back to home" link
+- [x] **ProtectedRoute** — `/app`, `/leases`, `/audit`, `/playbooks` require auth; redirect to `/signin`; `authReady` prevents flash-of-redirect
+- [x] **AppNav** — Renamed from `Nav.jsx`; avatar dropdown with user email + sign-out; mobile drawer sign-out; initials from `user.email`
+- [x] **supabase.js auth helpers** — `getSession`, `signOut`, `onAuthStateChange`
 
 ---
 
@@ -48,7 +58,6 @@
 
 ## Deferred
 
-- 🔒 Once-per-session consent — blocked on Legal OQ #3 (GDPR)
 - 🔒 Auditor portal — GA+1
 - 🔒 Amendment delta view — GA+1 (needs BUG-009 + 30 days post-GA data)
 - 🔒 Per-field accuracy eval suite — needs n8n `payload.fields` + `payload.risk_flags` (Task 8)

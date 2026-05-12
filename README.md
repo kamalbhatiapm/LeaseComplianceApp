@@ -30,22 +30,26 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 
 | Path | Description |
 |------|-------------|
-| `src/App.jsx` | Root component — React Router v6 routes, Toast provider, ConsentModal gate |
+| `src/App.jsx` | Root component — React Router v6 routes, ProtectedRoute, auth state (user, authReady), Toast provider, ConsentModal gate |
+| `src/screens/Landing.jsx` | Marketing landing page — hero, feature sections, social proof, CTA → `/signin` |
+| `src/screens/Auth.jsx` | Sign-in / sign-up / forgot-password screen (Supabase email+password auth) |
 | `src/screens/Dashboard.jsx` | Upload hero, lease portfolio table, drag-and-drop file picker |
 | `src/screens/LeaseAnalysis.jsx` | Full extraction results: risk score ring, terms grid, risk flags with guidance, sidebar export actions |
 | `src/screens/AuditTrail.jsx` | Per-session audit log: extraction timestamp, model version, field edits, flag resolutions |
 | `src/screens/Playbooks.jsx` | Playbook management — IFRS 16 / ASC 842 rule sets applied to incoming contracts |
 | `src/components/ConsentModal.jsx` | Pre-analysis consent gate: OpenAI API disclosure, data handling, "not legal advice" |
 | `src/components/ProgressPanel.jsx` | 4-step analysis progress panel shown during extraction |
-| `src/components/Nav.jsx` | Top navigation bar |
+| `src/components/AppNav.jsx` | Top navigation bar with avatar dropdown (sign-out) and mobile hamburger drawer |
 | `src/components/Toast.jsx` | Non-blocking toast notifications (replaces all `alert()` calls) |
 | `src/utils/constants.js` | `FIELD_LABELS`, `MOCK_ANALYSIS`, `FIELD_HINTS`, `getExtractionQuality()` |
+| `src/utils/supabase.js` | Supabase client — `saveAnalysis`, `loadLatestAnalysis`, `getSession`, `signOut`, `onAuthStateChange` |
 | `src/utils/track.js` | Analytics event stub — wires to PostHog (`VITE_POSTHOG_KEY`) |
 | `src/utils/fileToBase64.js` | File encoding utility for webhook payload |
-| `src/styles/globals.css` | All CSS — design tokens, components, responsive layout |
+| `src/styles/globals.css` | App CSS — design tokens, components, responsive layout |
+| `src/styles/landing.css` | Landing page styles (self-contained dark theme) |
+| `src/styles/auth.css` | Auth page styles (self-contained dark theme matching landing) |
 | `index.html` | Vite entry point |
 | `vite.config.js` | Vite build config |
-| `APP.html` | Legacy single-file version (pre-React migration; kept for reference) |
 
 ### Configuration
 
@@ -54,7 +58,7 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 | `.env.example` | Required env vars: `VITE_WEBHOOK_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_POSTHOG_KEY` |
 | `netlify.toml` | Netlify build config — build command, publish dir (`dist/`), security headers, SPA redirect |
 | `CLAUDE.md` | Product context and working norms for AI-assisted development |
-| `SPEC.md` | Technical spec v1.1 — AI pipeline architecture, HITL checkpoints, kill criteria, MOAT analysis |
+| `SPEC.md` | Technical spec v1.3 — AI pipeline architecture, HITL checkpoints, kill criteria, MOAT analysis, auth flow |
 
 ### Product docs
 
@@ -149,15 +153,21 @@ The app POSTs to an n8n webhook on analysis completion. The URL is a **test webh
 2. Open the lease compliance workflow (import `architecture/n8n-workflow.json` if needed)
 3. Click **"Listen for test event"** in the Webhook trigger node
 
-### Step 2 — Upload the sample contract
+### Step 2 — Sign in
 
-1. Open the app (`npm run dev` or the Netlify URL)
-2. On the Dashboard, click **Choose file** or drag-and-drop
-3. Select `sample-lease-ifrs16.pdf` from this repo (PDF only; DOCX support coming soon)
+1. Open the app (`npm run dev` or the Netlify URL) — the landing page loads at `/`
+2. Click **Get started** or **Sign in** to reach `/signin`
+3. Create an account (sign-up) or sign in with an existing Supabase email+password account
+4. You'll be redirected to the Dashboard (`/app`)
+
+### Step 3 — Upload the sample contract
+
+1. On the Dashboard, click **Choose file** or drag-and-drop
+2. Select `sample-lease-ifrs16.pdf` from this repo (PDF only; DOCX support coming soon)
 
 The upload panel shows the filename and file size. The button changes to **Analyze Contract**.
 
-### Step 3 — Accept the consent modal
+### Step 4 — Accept the consent modal
 
 On first analysis, a consent modal appears disclosing:
 - **OpenAI API** processes the contract text via the n8n workflow
@@ -166,7 +176,7 @@ On first analysis, a consent modal appears disclosing:
 
 Dismiss to proceed.
 
-### Step 4 — Run the analysis
+### Step 5 — Run the analysis
 
 Click **Analyze Contract**. The 4-step progress panel animates:
 
@@ -177,7 +187,7 @@ Click **Analyze Contract**. The 4-step progress panel animates:
 | Scoring risk against IFRS 16 §§ 19, 26, B34 | Calculates risk score |
 | Generating your audit-ready report | POSTs payload to n8n webhook |
 
-### Step 5 — Verify the webhook payload
+### Step 6 — Verify the webhook payload
 
 When analysis completes, the app fires a POST to `VITE_WEBHOOK_URL`. The exact payload shape:
 
@@ -202,7 +212,7 @@ When analysis completes, the app fires a POST to `VITE_WEBHOOK_URL`. The exact p
 
 A **green toast** appears bottom-right confirming delivery.
 
-### Step 6 — Review the results
+### Step 7 — Review the results
 
 The LeaseAnalysis screen shows the full extraction output:
 - Risk score: **62 / 100 · Medium**
