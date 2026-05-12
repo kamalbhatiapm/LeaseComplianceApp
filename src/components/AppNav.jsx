@@ -1,14 +1,19 @@
-import { NavLink } from 'react-router-dom'
-import { Sun, Moon } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { Sun, Moon, LogOut } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
+import { signOut } from '../utils/supabase.js'
 
-export default function Nav({ locked = false, theme = 'dark', onToggleTheme }) {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const navRef = useRef(null)
+export default function Nav({ locked = false, theme = 'dark', onToggleTheme, user }) {
+  const [menuOpen, setMenuOpen]     = useState(false)
+  const [avatarOpen, setAvatarOpen] = useState(false)
+  const navRef    = useRef(null)
+  const avatarRef = useRef(null)
+  const navigate  = useNavigate()
 
   const cls = ({ isActive }) =>
     'nav-link' + (isActive ? ' active' : '') + (locked ? ' disabled' : '')
 
+  // Close hamburger on outside click
   useEffect(() => {
     if (!menuOpen) return
     const close = (e) => { if (!navRef.current?.contains(e.target)) setMenuOpen(false) }
@@ -16,7 +21,25 @@ export default function Nav({ locked = false, theme = 'dark', onToggleTheme }) {
     return () => document.removeEventListener('click', close)
   }, [menuOpen])
 
+  // Close avatar dropdown on outside click
+  useEffect(() => {
+    if (!avatarOpen) return
+    const close = (e) => { if (!avatarRef.current?.contains(e.target)) setAvatarOpen(false) }
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [avatarOpen])
+
   const closeMenu = () => setMenuOpen(false)
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/')
+  }
+
+  // Derive initials from email
+  const initials = user?.email
+    ? user.email.slice(0, 2).toUpperCase()
+    : 'RC'
 
   return (
     <nav ref={navRef}>
@@ -40,7 +63,30 @@ export default function Nav({ locked = false, theme = 'dark', onToggleTheme }) {
                 : <Moon size={15} aria-hidden="true" />}
             </button>
           )}
-          <div className="avatar">RC</div>
+
+          {/* Avatar + dropdown */}
+          <div className="nav-avatar-wrap" ref={avatarRef}>
+            <button
+              className="avatar"
+              onClick={() => setAvatarOpen(o => !o)}
+              title={user?.email ?? ''}
+              aria-label="Account menu"
+            >
+              {initials}
+            </button>
+            {avatarOpen && (
+              <div className="nav-avatar-dropdown">
+                {user?.email && (
+                  <div className="nav-avatar-email">{user.email}</div>
+                )}
+                <button className="nav-avatar-signout" onClick={handleSignOut}>
+                  <LogOut size={13} />
+                  Sign out
+                </button>
+              </div>
+            )}
+          </div>
+
           <button
             className={`nav-hamburger${menuOpen ? ' open' : ''}`}
             onClick={() => setMenuOpen(o => !o)}
@@ -57,6 +103,12 @@ export default function Nav({ locked = false, theme = 'dark', onToggleTheme }) {
           <NavLink to="/leases"    className={cls}       onClick={closeMenu}>Reports</NavLink>
           <NavLink to="/playbooks" className={cls}       onClick={closeMenu}>Playbooks</NavLink>
           <span className="nav-link disabled" title="Coming soon">Audit Trail</span>
+          {user && (
+            <button className="nav-link nav-mobile-signout" onClick={handleSignOut}>
+              <LogOut size={13} style={{marginRight:6}} />
+              Sign out
+            </button>
+          )}
         </div>
       )}
     </nav>

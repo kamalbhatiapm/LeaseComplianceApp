@@ -5,6 +5,24 @@ const anon = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
 
 export const supabase = url && anon ? createClient(url, anon) : null
 
+// Auth helpers
+export async function getSession() {
+  if (!supabase) return null
+  const { data } = await supabase.auth.getSession()
+  return data?.session ?? null
+}
+
+export async function signOut() {
+  if (!supabase) return
+  await supabase.auth.signOut()
+}
+
+export function onAuthStateChange(callback) {
+  if (!supabase) return () => {}
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(callback)
+  return () => subscription.unsubscribe()
+}
+
 export async function saveAnalysis({ fileName, analysisData, isLiveData, intent }) {
   if (!supabase) return null
   const { data, error } = await supabase.from('lease_analyses').insert({

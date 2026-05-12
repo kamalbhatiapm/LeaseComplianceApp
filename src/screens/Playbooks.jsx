@@ -36,10 +36,10 @@ const PLAYBOOKS = [
   },
 ]
 
-export default function Playbooks({ navLocked, theme, toggleTheme }) {
+export default function Playbooks({ navLocked, theme, toggleTheme, user }) {
   return (
     <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
-      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} user={user} />
       <main id="main-content">
 
       <div className="s3-header">

@@ -545,11 +545,11 @@ const STANDARD_META = {
   asc842_compliance: { label: 'ASC 842', short: 'ASC 842', other: 'IFRS 16', otherValue: 'ifrs16_compliance' },
 }
 
-export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme, analysisIntent, setAnalysisIntent, handleReanalyzeAs, fieldEdits, setFieldEdits, analysisRowId, updateFieldEdits }) {
+export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, navLocked, isAnalyzing, progress, theme, toggleTheme, analysisIntent, setAnalysisIntent, handleReanalyzeAs, fieldEdits, setFieldEdits, analysisRowId, updateFieldEdits, user }) {
   if (isAnalyzing) {
     return (
       <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
-        <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
+        <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} user={user} />
         <AnalysisLoader file={selectedFile} progress={progress} />
       </div>
     )
@@ -594,7 +594,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
 
   return (
     <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
-      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} user={user} />
       <main id="main-content">
 
       {/* Sub-header */}

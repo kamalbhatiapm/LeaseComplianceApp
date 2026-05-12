@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import Landing from './screens/Landing.jsx'
+import Auth from './screens/Auth.jsx'
 import Dashboard from './screens/Dashboard.jsx'
 import LeaseAnalysis from './screens/LeaseAnalysis.jsx'
 import AuditTrail from './screens/AuditTrail.jsx'
@@ -9,7 +10,7 @@ import Toast from './components/Toast.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
 import { MOCK_ANALYSIS } from './utils/constants.js'
 import { track } from './utils/track.js'
-import { saveAnalysis, loadLatestAnalysis, updateFieldEdits } from './utils/supabase.js'
+import { saveAnalysis, loadLatestAnalysis, updateFieldEdits, getSession, onAuthStateChange } from './utils/supabase.js'
 
 const WEBHOOK_URL   = import.meta.env.VITE_WEBHOOK_URL   ?? ''
 const SUPABASE_URL  = import.meta.env.VITE_SUPABASE_URL  ?? ''
@@ -19,7 +20,15 @@ if (WEBHOOK_URL.startsWith('__') || !WEBHOOK_URL) {
   console.error('Build misconfiguration: VITE_WEBHOOK_URL not set. Check .env file.')
 }
 
+function ProtectedRoute({ user, authReady, children }) {
+  if (!authReady) return null // wait for session check before redirecting
+  if (!user) return <Navigate to="/signin" replace />
+  return children
+}
+
 export default function App() {
+  const [user, setUser]                   = useState(null)
+  const [authReady, setAuthReady]         = useState(false)
   const [selectedFile, setSelectedFile]   = useState(null)
   const [consentGiven, setConsentGiven]   = useState(
     () => localStorage.getItem('lg-consent') === 'true'
@@ -47,6 +56,18 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('lg-theme', theme)
   }, [theme])
+
+  // Auth state — resolve session on mount, then subscribe to changes
+  useEffect(() => {
+    getSession().then(session => {
+      setUser(session?.user ?? null)
+      setAuthReady(true)
+    })
+    return onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      setAuthReady(true)
+    })
+  }, [])
 
   // Hydrate from Supabase on mount — overwrites localStorage cache if server has newer data
   useEffect(() => {
@@ -295,6 +316,7 @@ export default function App() {
     analysisIntent, setAnalysisIntent,
     fieldEdits, setFieldEdits, analysisRowId, updateFieldEdits,
     showToast, dismissToast, theme, toggleTheme,
+    user,
   }
 
   return (
@@ -303,11 +325,12 @@ export default function App() {
       {toast && <Toast toast={toast} onDismiss={dismissToast} />}
       {showConsent && <ConsentModal onGrant={grantConsent} onDeny={() => setShowConsent(false)} />}
       <Routes>
-        <Route path="/"          element={<Landing />} />
-        <Route path="/app"       element={<Dashboard      {...sharedProps} />} />
-        <Route path="/leases"    element={<LeaseAnalysis  {...sharedProps} isAnalyzing={isAnalyzing} progress={progress} />} />
-        <Route path="/audit"     element={<AuditTrail     {...sharedProps} />} />
-        <Route path="/playbooks" element={<Playbooks      navLocked={navLocked} theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/"       element={<Landing />} />
+        <Route path="/signin" element={user ? <Navigate to="/app" replace /> : <Auth />} />
+        <Route path="/app"       element={<ProtectedRoute user={user} authReady={authReady}><Dashboard      {...sharedProps} /></ProtectedRoute>} />
+        <Route path="/leases"    element={<ProtectedRoute user={user} authReady={authReady}><LeaseAnalysis  {...sharedProps} isAnalyzing={isAnalyzing} progress={progress} /></ProtectedRoute>} />
+        <Route path="/audit"     element={<ProtectedRoute user={user} authReady={authReady}><AuditTrail     {...sharedProps} /></ProtectedRoute>} />
+        <Route path="/playbooks" element={<ProtectedRoute user={user} authReady={authReady}><Playbooks navLocked={navLocked} theme={theme} toggleTheme={toggleTheme} user={user} /></ProtectedRoute>} />
         <Route path="*"          element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
