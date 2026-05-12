@@ -627,20 +627,6 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
             <RefreshCw size={12} /> Re-analyze
           </button>
-          <span className={exportLocked ? 'btn-tooltip-wrap' : ''} data-tip={exportLocked ? lockTitle : undefined}>
-            <button
-              className="btn btn-outline btn-sm"
-              disabled={exportLocked}
-              onClick={() => {
-                if (exportLocked) return
-                track('report_exported', { format: 'pdf', type: 'extraction' })
-                navigate('/audit')
-                setTimeout(() => window.print(), 150)
-              }}
-            >
-              {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export PDF
-            </button>
-          </span>
           {selectedFile && (
             <button
               className="btn btn-secondary btn-sm"
