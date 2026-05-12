@@ -1,4 +1,8 @@
-import { BookOpen, Scale, FileText, Plus } from 'lucide-react'
+import {
+  BookOpen, FileText, Plus,
+  CalendarDays, CreditCard, Percent, RefreshCw, Building2,
+  GitBranch, DollarSign, TrendingDown, BarChart3, Clock,
+} from 'lucide-react'
 import Nav from '../components/Nav.jsx'
 
 const PLAYBOOKS = [
@@ -9,11 +13,11 @@ const PLAYBOOKS = [
     badgeCls: 'badge-ifrs',
     stats: [{ val: 9, label: 'Required fields' }, { val: 14, label: 'Risk rules' }, { val: 3, label: 'Contract types' }],
     rules: [
-      { label: 'Lease term',        desc: 'Commencement date, expiry date, non-cancellable period' },
-      { label: 'Payment schedule',  desc: 'Annual base rent, escalation rate, payment frequency' },
-      { label: 'Discount rate',     desc: 'IBR or stated rate; flags if absent' },
-      { label: 'Renewal options',   desc: 'Number, duration, reasonably certain assessment' },
-      { label: 'ROU asset scope',   desc: 'Premises description, sq ft, floor reference' },
+      { icon: CalendarDays, label: 'Lease term',       desc: 'Commencement date, expiry date, non-cancellable period' },
+      { icon: CreditCard,   label: 'Payment schedule', desc: 'Annual base rent, escalation rate, payment frequency' },
+      { icon: Percent,      label: 'Discount rate',    desc: 'IBR or stated rate; flags if absent' },
+      { icon: RefreshCw,    label: 'Renewal options',  desc: 'Number, duration, reasonably certain assessment' },
+      { icon: Building2,    label: 'ROU asset scope',  desc: 'Premises description, sq ft, floor reference' },
     ],
   },
   {
@@ -23,15 +27,14 @@ const PLAYBOOKS = [
     badgeCls: 'badge-asc',
     stats: [{ val: 11, label: 'Required fields' }, { val: 12, label: 'Risk rules' }, { val: 4, label: 'Contract types' }],
     rules: [
-      { label: 'Lease classification',  desc: 'Finance vs. operating lease test (5 criteria)' },
-      { label: 'Lease term',            desc: 'Commencement, end date, extension options' },
-      { label: 'Lease payments',        desc: 'Fixed, variable, in-substance fixed payments' },
-      { label: 'Incremental borrow rate', desc: 'Required for operating leases; collateral-adjusted' },
-      { label: 'Variable lease costs',  desc: 'Index-linked escalations, usage-based charges' },
+      { icon: GitBranch,   label: 'Lease classification',    desc: 'Finance vs. operating lease test (5 criteria)' },
+      { icon: CalendarDays,label: 'Lease term',              desc: 'Commencement, end date, extension options' },
+      { icon: DollarSign,  label: 'Lease payments',          desc: 'Fixed, variable, in-substance fixed payments' },
+      { icon: TrendingDown,label: 'Incremental borrow rate', desc: 'Required for operating leases; collateral-adjusted' },
+      { icon: BarChart3,   label: 'Variable lease costs',    desc: 'Index-linked escalations, usage-based charges' },
     ],
   },
 ]
-
 
 export default function Playbooks({ navLocked, theme, toggleTheme }) {
   return (
@@ -51,41 +54,50 @@ export default function Playbooks({ navLocked, theme, toggleTheme }) {
       </div>
 
       <div className="s3-body">
-        <div className="s3-grid">
+        <div className="pb-stack">
           {PLAYBOOKS.map(pb => (
-            <div key={pb.title} className="playbook-card">
-              <div className="playbook-card-header">
-                <div>
-                  <div className="playbook-title">{pb.title}</div>
-                  <div className="playbook-meta">{pb.meta}</div>
+            <div key={pb.title} className="pb-card">
+
+              {/* Header */}
+              <div className="pb-card-header">
+                <div className="pb-card-title-group">
+                  <div className="pb-card-title">{pb.title}</div>
+                  <div className="pb-card-meta">{pb.meta}</div>
                 </div>
-                <span className={`standard-badge ${pb.badgeCls}`}>{pb.badge}</span>
-              </div>
-              <div className="playbook-card-body">
-                <div className="playbook-rules">
-                  {pb.rules.map(r => (
-                    <div key={r.label} className="playbook-rule">
-                      <div className="rule-icon"><Scale size={11} color="var(--brand)" /></div>
-                      <div>
-                        <div className="rule-label">{r.label}</div>
-                        <div className="rule-desc">{r.desc}</div>
+                <div className="pb-card-header-right">
+                  <div className="pb-stats-inline">
+                    {pb.stats.map(s => (
+                      <div key={s.label} className="pb-stat-inline">
+                        <span className="pb-stat-val">{s.val}</span>
+                        <span className="pb-stat-label">{s.label}</span>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <span className={`standard-badge ${pb.badgeCls}`}>{pb.badge}</span>
                 </div>
               </div>
-              <div className="playbook-stats">
-                {pb.stats.map(s => (
-                  <div key={s.label}>
-                    <div className="playbook-stat-val">{s.val}</div>
-                    <div className="playbook-stat-label">{s.label}</div>
+
+              {/* Rules grid */}
+              <div className="pb-rules-grid">
+                {pb.rules.map(r => (
+                  <div key={r.label} className="pb-rule">
+                    <div className="pb-rule-icon">
+                      <r.icon size={15} />
+                    </div>
+                    <div>
+                      <div className="pb-rule-label">{r.label}</div>
+                      <div className="pb-rule-desc">{r.desc}</div>
+                    </div>
                   </div>
                 ))}
               </div>
-              <div className="playbook-card-footer">
+
+              {/* Footer */}
+              <div className="pb-card-footer">
                 <button className="btn btn-secondary btn-sm"><FileText size={12} /> View rules</button>
                 <button className="btn btn-outline btn-sm">Edit</button>
               </div>
+
             </div>
           ))}
         </div>
