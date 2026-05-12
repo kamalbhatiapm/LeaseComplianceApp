@@ -3,7 +3,7 @@
 **Status:** In Review
 **Author:** Senior PM, LegalGraph
 **Date:** 2026-05-08
-**Last Updated:** 2026-05-12 (v2.2 — updated after PRD review: corrected AI model name to OpenAI GPT-5 mini throughout, added standalone value proposition, added per-analysis cost and model upgrade path in §7.3)
+**Last Updated:** 2026-05-12 (v2.3 — corrected PCAOB AS 1105 framing; added agentic AI rationale; added L2 metric targets; fixed L1-4 measurement + sample size note; reframed L1-3 accuracy as hypothesis; added beta Go/No-Go gates)
 **Supersedes:** project-context/PRD.md v1.1 (2026-03-31) — full rewrite incorporating JTBD v1.1, USER-JOURNEY v1.1, market research, and user research (May 2026)
 **Context files read:** company-context/company-overview.md · user-personas.md · product-description.md · competitive-landscape.md · project-context/JTBD.md (v1.1) · USER-JOURNEY.md (v1.1) · PRD.md (v1.1) · outputs/market-research-legal-ai-2026.md · outputs/user-research-legal-ai-2026.md · templates/prd-template.md
 
@@ -33,10 +33,12 @@ Rachel (Compliance Lead) manages 10–50 active leases and is responsible for qu
 
 **The regulatory catalyst — PCAOB AS 1105 (effective December 2025):**
 
-The PCAOB amended Auditing Standard No. 1105 and AS 2301, effective for fiscal years beginning December 15, 2025. The amendment requires full audit trail and explainability for AI-generated financial outputs — including per-field data lineage, documentation of the AI model used, human review sign-off, and the ability for auditors to verify AI outputs against source documents independently. This creates:
-- A new compliance requirement that legacy tools (EZLease, early-vintage FinQuery implementations) cannot satisfy without significant retooling
-- A built-in differentiation wedge for LegalGraph, which can architect PCAOB AS 1105 compliance from day one
-- Increasing auditor scrutiny of any AI-assisted compliance filing in 2026 and beyond
+The PCAOB amended Auditing Standard No. 1105 and AS 2301, effective for fiscal years beginning December 15, 2025. The amendment tightens how external auditors must document their own evaluation of technology-assisted analysis — including evaluating AI-generated outputs for data lineage, model disclosure, and the ability to independently verify figures against source documents. This is an auditor obligation, not a direct compliance mandate on Rachel's company. The practical downstream effect, however, is significant: auditors now face stricter standards when reviewing any IFRS 16 / ASC 842 filing where AI was used, which means they will increasingly request clause-level evidence and human sign-off documentation before accepting figures. For Rachel, this creates direct demand for audit-defensible outputs — not just accurate ones. This creates:
+- Increasing auditor scrutiny of any AI-assisted compliance filing in 2026 and beyond, creating real demand for clause-level source evidence
+- A built-in differentiation wedge for LegalGraph, which architects its report format around auditor verification needs from day one
+- A first-mover window over legacy tools (EZLease, early-vintage FinQuery implementations) that were not designed with auditor traceability requirements in mind
+
+*Legal review note: This framing has been aligned with PCAOB AS 1105 primary source. Verify with Head of Legal before using in external sales materials.*
 
 **The competitive opportunity:**
 
@@ -47,6 +49,22 @@ Two market shifts create an open window heading into 2026:
 Both moves leave the 10–50 lease mid-market segment with no clear preferred vendor. The only AI-native competitor in this tier is Trullion (~$3K/year, founded 2020) — differentiated on abstraction but not on full audit-defense workflow quality (source: Trullion G2 reviews, market-research-legal-ai-2026.md).
 
 **Why not generic AI tools?** Generic LLMs (ChatGPT, Copilot, Claude.ai) extract text but produce no audit trail, no clause citation, no per-field confidence scoring, and no PCAOB AS 1105 compliance documentation. They cannot enforce the report gate, persist corrected field values, or generate the cover-page AI model disclosure auditors require. Jennifer's "what happens if it's wrong?" question has no answer from a generic tool.
+
+**Why agentic AI over a rules-based extraction engine?**
+
+A deterministic rules engine — regex patterns, template matching, keyword extraction — works well when lease contracts follow a predictable structure. For structured fields that are consistently present and consistently phrased (commencement date, fixed base rent, governing law), a rules engine achieves high precision at low cost and near-zero hallucination risk. LegalGraph's JSON schema constraint and null-return guardrail deliberately inherit this property: the extraction pipeline is instructed to return structured output or nothing, not to infer.
+
+The rules-engine approach breaks down on four categories of lease clause that represent the majority of real-world extraction failures and audit risk:
+
+1. **Variable and CPI-linked rent:** Escalation clauses reference external indices, percentage triggers, and compound calculation methodologies that appear in hundreds of syntactic forms. A rule written for "3% per annum" will miss "CPI + 1.5%, compounded annually, capped at 5%." LegalGraph's few-shot chain-of-thought prompting with jurisdiction-specific examples extracts the underlying economic structure rather than matching surface patterns.
+
+2. **Renewal options with conditional intent language:** IFRS 16 §19 requires assessment of whether renewal options are "reasonably certain" to be exercised. The relevant clause text is often a paragraph of qualified language. Rules cannot determine which phrase establishes the option vs. which conditions it — the boundary requires reading the full clause in context.
+
+3. **Sublease and multi-party structures:** When a lease identifies a sub-lessor, the right-of-use asset scope changes materially. Subleases are identified by reading for party relationships across multiple sections — not by keyword matching in a single clause.
+
+4. **Missing fields requiring context inference:** Discount rates are almost never stated in lease contracts. An LLM can identify that §7.2 references "market rate borrowing terms" and flag that IBR must be supplied externally — a rules engine returns null without context. The difference matters for the auditor: a null with no explanation vs. a null with a clause-level reason.
+
+*Engineering note: For high-confidence structured fields (commencement date, fixed rent, expiry date), the Claude extraction pipeline functions as a probabilistic rules engine — schema constraints and few-shot examples enforce format. The LLM is used for robustness to syntactic variation, not creative generation. Hallucination risk is mitigated at the schema level.*
 
 **Structural MOAT:** LegalGraph's timing advantage (PCAOB AS 1105 first-mover, Visual Lease displacement window) converts to a structural moat through compounding accuracy. Every lease Rachel processes and every field she corrects via edit-in-place becomes ground-truth training data — jurisdiction-specific, field-type-specific, and auditor-validated. After 500 contracted leases, LegalGraph will hold a proprietary accuracy dataset that no competitor can replicate without years of production deployment. Trullion's clause citation feature (their top G2 strength) can be shipped by any vendor; a 94%+ accuracy dataset grounded in auditor-accepted output cannot be bought.
 
@@ -139,31 +157,31 @@ The consent modal, report cover page, and DPA template are Jennifer-facing UX �
 |---|---|---|---|---|---|---|
 | **L1-1** | Activation rate | % of new accounts completing a first extraction within 14 days of signup | 55% (company) | **≥70%** | 30 days post-launch | PM |
 | **L1-2** | Report generation rate | % of active accounts generating ≥1 IFRS 16/ASC 842 report per quarter | 0% | **≥80%** | 90 days post-launch | PM + Engineering |
-| **L1-3** | AI extraction accuracy | % of lease fields correctly extracted vs. ground truth across ≥20 live contracts | 94% AI vs. ~80% manual (Gartner: 59% of accountants make errors monthly) | **≥94% sustained** | At launch | ML Engineering |
-| **L1-4** | Auditor acceptance rate | % of reports submitted to auditors accepted without revision requests | Unknown | **≥95%** | 6 months post-launch | PM (collected via post-export in-app prompt: "Did your auditor accept this report?") |
+| **L1-3** | AI extraction accuracy | % of lease fields correctly extracted vs. ground truth across ≥20 live contracts | **Unvalidated — benchmark required before GA** (94% on 1 contract; treat as hypothesis until ≥20-contract benchmark is complete) vs. ~80% manual (Gartner) | **≥94% sustained** | At launch — blocked until benchmark runs | ML Engineering |
+| **L1-4** | Auditor acceptance rate | % of reports submitted to auditors accepted without revision requests. *A revision request is defined as any written or verbal feedback from the external auditor requesting changes to extracted values, clause citations, or flag resolution documentation prior to sign-off.* | Unknown (estimated 30–40% revision rate in manual workflows) | **≥95%** (directional at beta; validate at n≥20 accounts post-GA — 3–5 beta accounts is insufficient for statistical confidence) | 6 months post-launch | PM — primary collection: structured 90-day CSM debrief call per account; supplementary: post-export in-app binary prompt. In-app prompt is not the source of record. |
 
 **L2 Diagnostic Metrics — Under L1-1 (Activation):**
-- Time to first extraction: P50 target <10 min from first login (J0)
-- File upload success rate: target >99%
-- Consent modal completion rate
-- IBR flag resolution rate: % of "discount rate missing" flags resolved vs. dismissed (J9 target: >80%)
-- First extraction → first report conversion rate (Journey D → Journey A bridge)
+- Time to first extraction: P50 target **<10 min** from first login (J0)
+- File upload success rate: target **>99%**
+- Consent modal completion rate: target **>95%**
+- IBR flag resolution rate: % of "discount rate missing" flags resolved vs. dismissed — target **>80%** resolved (J9)
+- First extraction → first report conversion rate (Journey D → Journey A bridge) — target **>60%**
 
 **L2 Diagnostic Metrics — Under L1-2 (Report Generation):**
-- % of leases with all High-severity flags resolved before export gate
-- Time from first extraction to report export: P50 target <45 minutes
+- % of leases with all High-severity flags resolved before export gate — target **>90%**
+- Time from first extraction to report export: P50 target **<45 minutes**; P50 days between sessions target **<2 days**
 - Average leases processed per session for accounts with 8+ leases (J8 batch efficiency)
-- Session drop-off rate by phase (Phase 4 — flag resolution — is highest-risk drop-off point)
+- Session drop-off rate at Phase 4 (flag resolution) — target **<20%** drop-off at this phase
 
 **L2 Diagnostic Metrics — Under L1-3 (Extraction Quality):**
 - Per-field accuracy by field type (discount rate is known weak field)
-- Edit-mode session rate per field per account (declining = trust building; target: declining over successive quarters)
-- False-positive flag rate (flags raised that users manually dismiss without resolution)
+- Edit-mode session rate per field per account — target: **month-over-month decline** across successive quarters (declining = trust building)
+- False-positive flag rate (flags raised that users manually dismiss without resolution) — target **<15%**
 
 **L2 Diagnostic Metrics — Under L1-4 (Auditor Acceptance):**
-- Clause citation accuracy (auditor source-clause lookups that resolve correctly)
-- False-negative flag rate (risks surfaced by auditors that LegalGraph missed)
-- Beta DPA signed within 14 days of Rachel's first analysis session (J6/J10 metric)
+- Clause citation accuracy (auditor source-clause lookups that resolve correctly) — target **>95%**
+- False-negative flag rate (risks surfaced by auditors that LegalGraph missed) — target **<5%**; collection mechanism: CSM debrief call post-auditor review
+- Beta DPA signed within 14 days of Rachel's first analysis session (J6/J10 metric) — target **>80%** of beta accounts
 
 ---
 
@@ -517,6 +535,7 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 | BUG-006: Clause PDF viewer | Engineering (Frontend + Backend) | P0 — GA blocker |
 | J9: IBR guidance copy on discount rate flag | PM (copy change only) | P0 — no eng required |
 | Event tracking instrumentation for L1/L2 metrics | Engineering | P0 — all metrics blocked without this |
+| **≥20-contract accuracy benchmark** (field-level, ≥15 IFRS 16 fields per contract — min. 10 fixed-rent, 5 variable/CPI, 3 subleases) | ML Engineering | **P0 — L1-3 reporting blocked until complete; 94% baseline is unvalidated until this runs** |
 
 **Phase 1 — Core Compliance Workflow (Weeks 4–7):**
 | Deliverable | Owner | Priority |
@@ -540,6 +559,11 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 - Rachel persona accounts with 10–50 leases
 - Focus: full compliance cycle from upload → report → auditor Q&A
 - Success criteria: ≥3 of 5 pilots generate a report accepted by their auditor without revision requests
+
+**Beta Go/No-Go Gates:**
+- **Green (proceed to GA):** ≥3 of 5 beta accounts generate an auditor-accepted report AND pre-launch extraction accuracy ≥94% across ≥20-contract benchmark AND IBR flag resolution rate ≥70%
+- **Amber (delay GA, targeted fixes):** 2 of 5 auditor acceptances OR accuracy 92–93% OR IBR resolution rate 60–70% — root-cause sprint required before GA date is reset
+- **Red (stop and redesign):** Fewer than 2 of 5 auditor acceptances OR extraction accuracy below 92% on the 20-contract benchmark — extraction architecture review required before beta resumes
 
 **GA (Week 12):**
 - All P0 and P1 items complete
