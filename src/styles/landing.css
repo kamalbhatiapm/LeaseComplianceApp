@@ -1,12 +1,19 @@
 /* Landing page styles — scoped under .landing-page to avoid conflicts with app globals */
 
 .landing-page {
-  /* Align with app dark-theme tokens */
+  /* Always dark — independent of app theme toggle */
   --brand:     #0071e3;
   --brand-dim: rgba(0,113,227,.18);
+  --page-bg:   #0d1117;
   --surface:   rgba(255,255,255,.06);
   --border:    rgba(255,255,255,.08);
-  background: var(--page-bg);
+  --t1:        #ffffff;
+  --t2:        rgba(255,255,255,.65);
+  --t3:        rgba(255,255,255,.4);
+  --green:     #30d158;
+  --amber:     #ff9f0a;
+  --red:       #ff453a;
+  background: #0d1117;
   color: var(--t1);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
