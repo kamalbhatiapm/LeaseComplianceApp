@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../styles/landing.css'
 
 export default function Landing() {
   const navRef = useNavigate()
   const lpNavRef = useRef(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const nav = lpNavRef.current
@@ -15,6 +16,16 @@ export default function Landing() {
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!menuOpen) return
+    const close = (e) => { if (!lpNavRef.current?.contains(e.target)) setMenuOpen(false) }
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [menuOpen])
+
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <div className="landing-page">
@@ -31,7 +42,27 @@ export default function Landing() {
             <button className="lp-btn lp-btn-ghost" onClick={() => navRef('/app')}>Sign in</button>
             <a href="#demo" className="lp-btn lp-btn-primary">Request demo</a>
           </div>
+          <button
+            className={`lp-hamburger${menuOpen ? ' open' : ''}`}
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Toggle menu"
+          >
+            <span /><span /><span />
+          </button>
         </div>
+
+        {/* Mobile drawer */}
+        {menuOpen && (
+          <div className="lp-mobile-menu">
+            <a href="#how-it-works" onClick={closeMenu}>How it works</a>
+            <a href="#who-its-for"  onClick={closeMenu}>Who it's for</a>
+            <a href="#pricing"      onClick={closeMenu}>Pricing</a>
+            <div className="lp-mobile-menu-ctas">
+              <button className="lp-btn lp-btn-ghost" style={{width:'100%',justifyContent:'center'}} onClick={() => { closeMenu(); navRef('/app') }}>Sign in</button>
+              <a href="#demo" className="lp-btn lp-btn-primary" style={{width:'100%',justifyContent:'center'}} onClick={closeMenu}>Request demo</a>
+            </div>
+          </div>
+        )}
       </div>
 
       <main>

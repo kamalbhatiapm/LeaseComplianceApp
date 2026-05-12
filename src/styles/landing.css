@@ -1,6 +1,8 @@
 /* Landing page styles — scoped under .landing-page to avoid conflicts with app globals */
 
 .landing-page {
+  --brand: #0064D0;
+  --brand-dim: rgba(0,100,208,.18);
   background: var(--page-bg);
   color: var(--t1);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -65,6 +67,41 @@
 .lp-nav-links a:hover { color: var(--t1); }
 .lp-nav-right { display: flex; align-items: center; gap: 10px; }
 .lp-nav-right .lp-btn { font-size: 14px; padding: 9px 20px; }
+
+/* Hamburger */
+.lp-hamburger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px; width: 36px; height: 36px;
+  background: none; border: none; cursor: pointer; padding: 4px;
+}
+.lp-hamburger span {
+  display: block; width: 20px; height: 2px;
+  background: var(--t2); border-radius: 2px;
+  transition: transform .25s, opacity .25s, width .25s;
+  transform-origin: center;
+}
+.lp-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.lp-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+.lp-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile drawer */
+.lp-mobile-menu {
+  display: flex; flex-direction: column;
+  padding: 12px 24px 20px;
+  border-top: 1px solid var(--border);
+  background: rgba(13,17,23,.97);
+  gap: 4px;
+}
+.lp-mobile-menu a {
+  font-size: 15px; font-weight: 500; color: var(--t2);
+  padding: 10px 4px; border-bottom: 1px solid rgba(255,255,255,.05);
+  transition: color .15s;
+}
+.lp-mobile-menu a:hover { color: var(--t1); }
+.lp-mobile-menu-ctas {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 16px;
+}
 
 /* ── Hero ── */
 .lp-hero {
@@ -364,6 +401,8 @@
   .lp-roi-divider { width: 48px; height: 1px; margin: 0; }
   .lp-mock-body { grid-template-columns: 1fr; }
   .lp-nav-links { display: none; }
+  .lp-nav-right { display: none; }
+  .lp-hamburger { display: flex; }
 }
 @media (max-width: 600px) {
   .lp-section { padding: 64px 16px; }
