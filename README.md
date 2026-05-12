@@ -34,7 +34,7 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 | `src/screens/Landing.jsx` | Marketing landing page — hero, feature sections, social proof, CTA → `/signin` |
 | `src/screens/Auth.jsx` | Sign-in / sign-up / forgot-password screen (Supabase email+password auth) |
 | `src/screens/Dashboard.jsx` | Upload hero, lease portfolio table, drag-and-drop file picker |
-| `src/screens/LeaseAnalysis.jsx` | Full extraction results: risk score ring, terms grid, risk flags with guidance, sidebar export actions |
+| `src/screens/LeaseAnalysis.jsx` | Full extraction results: risk score ring, terms grid with per-field thumbs feedback, risk flags with per-flag feedback and guidance, sidebar export actions |
 | `src/screens/AuditTrail.jsx` | Per-session audit log: extraction timestamp, model version, field edits, flag resolutions |
 | `src/screens/Playbooks.jsx` | Playbook management — IFRS 16 / ASC 842 rule sets applied to incoming contracts |
 | `src/components/ConsentModal.jsx` | Pre-analysis consent gate: OpenAI API disclosure, data handling, "not legal advice" |
@@ -42,7 +42,7 @@ The result: Rachel's quarterly compliance cycle drops from 4–6 hours to **unde
 | `src/components/AppNav.jsx` | Top navigation bar with avatar dropdown (sign-out) and mobile hamburger drawer |
 | `src/components/Toast.jsx` | Non-blocking toast notifications (replaces all `alert()` calls) |
 | `src/utils/constants.js` | `FIELD_LABELS`, `MOCK_ANALYSIS`, `FIELD_HINTS`, `getExtractionQuality()` |
-| `src/utils/supabase.js` | Supabase client — `saveAnalysis`, `loadLatestAnalysis`, `getSession`, `signOut`, `onAuthStateChange` |
+| `src/utils/supabase.js` | Supabase client — `saveAnalysis`, `loadLatestAnalysis`, `saveFeedback`, `loadFeedback`, `getSession`, `signOut`, `onAuthStateChange` |
 | `src/utils/track.js` | Analytics event stub — wires to PostHog (`VITE_POSTHOG_KEY`) |
 | `src/utils/fileToBase64.js` | File encoding utility for webhook payload |
 | `src/styles/globals.css` | App CSS — design tokens, components, responsive layout |
@@ -222,6 +222,7 @@ The LeaseAnalysis screen shows the full extraction output:
 - 3 risk flags: one **High** (discount rate missing), one **Medium** (renewal option intent), one **Low** (security deposit classification)
 - Each High flag includes a **"What do I do?"** guidance block with IFRS 16 methodology and an input field for manual entry
 - Export and Send buttons are **gated** until all High flags are resolved
+- Each extracted field and risk flag shows thumbs up/down feedback buttons — votes persist to Supabase and survive page refresh
 
 ---
 
@@ -235,7 +236,7 @@ The UX is built around five trust dimensions for AI-assisted compliance tooling:
 | **R**educe Cognitive Load | Confidence legend (green/amber/red dots) in terms grid header; contextual missing-field hints per field type |
 | **U**ncertainty as a UX Feature | Inline "AI uncertain — verify against §X.X" chips on fields with confidence < 0.85 |
 | **S**ignal Quality Continuously | Extraction quality indicator (Strong/Fair/Weak) separate from risk score; demo fallback badge with Retry CTA |
-| **T**ight Feedback Loops | Field edit tracking via `track('field_edited', …)` — corrections feed back as eval signals; "Correction saved — helps improve future extractions" confirmation |
+| **T**ight Feedback Loops | Per-field and per-flag thumbs up/down voting — votes persisted to Supabase `feedback` table and rehydrated on refresh; field edit tracking via `track('field_edited', …)` feeds corrections back as eval signals |
 
 ---
 
@@ -410,6 +411,13 @@ Netlify runs `npm run build` (Vite), publishes `dist/`, and applies the security
 1. Change `VITE_WEBHOOK_URL` from `/webhook-test/…` to `/webhook/…` — the always-on endpoint
 2. Wire `VITE_POSTHOG_KEY` to your PostHog project for L1/L2 metric instrumentation
 3. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the Netlify dashboard and trigger **Deploy without cache** (Supabase persistence is implemented — env vars enable it)
+
+### Supabase tables
+
+| Table | Description |
+|---|---|
+| `lease_analyses` | One row per analysis — stores all extracted fields, risk flags, field edits, intent, risk score, and file name. RLS scoped to `auth.uid()`. |
+| `feedback` | One row per thumbs vote — `type` (field / flag), `key`, `verdict` (up / down / relevant / not_relevant), `analysis_id` FK, `confidence`, `source_clause`. Used as eval signal for prompt improvement. RLS scoped to `auth.uid()`. |
 
 ---
 
