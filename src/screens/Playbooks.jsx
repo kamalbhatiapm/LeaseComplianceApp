@@ -30,21 +30,8 @@ const PLAYBOOKS = [
       { label: 'Variable lease costs',  desc: 'Index-linked escalations, usage-based charges' },
     ],
   },
-  {
-    title: 'NDA / Confidentiality Agreement',
-    meta: 'Version 1.1 · Updated Jan 2026',
-    badge: 'Contract',
-    badgeCls: 'badge-ifrs',
-    stats: [{ val: 6, label: 'Required fields' }, { val: 8, label: 'Risk rules' }, { val: 2, label: 'Subtypes' }],
-    rules: [
-      { label: 'Parties',              desc: 'Disclosing and receiving party identification' },
-      { label: 'Confidential info',    desc: 'Definition scope, carve-outs, exclusions' },
-      { label: 'Term',                 desc: 'Duration, survival clauses post-expiry' },
-      { label: 'Governing law',        desc: 'Jurisdiction, dispute resolution mechanism' },
-      { label: 'Permitted disclosure', desc: 'Affiliates, legal advisors, required disclosures' },
-    ],
-  },
 ]
+
 
 export default function Playbooks({ navLocked, theme, toggleTheme }) {
   return (
