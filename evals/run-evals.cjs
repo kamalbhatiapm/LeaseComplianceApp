@@ -87,13 +87,27 @@ function evalWebhookPayload(payload, expected) {
     `got "${payload.analyzed_at}"`
   ));
 
-  // No unexpected keys
-  const allowedKeys = new Set(['contract_type','terms_found','terms_missing','risk_score','analyzed_at']);
-  const extra = Object.keys(payload).filter(k => !allowedKeys.has(k));
+  // Required keys all present
+  const REQUIRED_KEYS = ['contract_type', 'terms_found', 'terms_missing', 'risk_score', 'analyzed_at'];
+  const missingRequired = REQUIRED_KEYS.filter(k => !(k in payload));
   results.push(scoreResult(
-    'no unexpected payload keys',
-    extra.length === 0,
-    extra.length ? `unexpected keys: ${extra.join(', ')}` : 'clean'
+    'all required payload keys present',
+    missingRequired.length === 0,
+    missingRequired.length ? `missing: ${missingRequired.join(', ')}` : 'ok'
+  ));
+
+  // No truly unknown keys (fields, risk_flags, key_terms, complexity_flags,
+  // score_breakdown, extraction_metadata are legitimate n8n additions)
+  const KNOWN_KEYS = new Set([
+    'contract_type', 'terms_found', 'terms_missing', 'risk_score', 'analyzed_at',
+    'fields', 'risk_flags', 'key_terms', 'complexity_flags',
+    'score_breakdown', 'extraction_metadata',
+  ]);
+  const unknown = Object.keys(payload).filter(k => !KNOWN_KEYS.has(k));
+  results.push(scoreResult(
+    'no unknown payload keys',
+    unknown.length === 0,
+    unknown.length ? `unknown keys: ${unknown.join(', ')}` : 'clean'
   ));
 
   return results;
@@ -231,6 +245,82 @@ function evalCoverage(payload, spec) {
   ];
 }
 
+/* ── Suite: clause_text presence ───────────────────────────────── */
+function evalClauseText(fields, expectedFields) {
+  const results = [];
+  for (const [key, spec] of Object.entries(expectedFields)) {
+    if (spec.intentionally_absent) continue;
+    if (!spec.clause_text_required) continue;
+    const actual = (fields || {})[key];
+    results.push(scoreResult(
+      `${key} — clause_text present`,
+      actual && typeof actual.clause_text === 'string' && actual.clause_text.length > 10,
+      actual ? `got "${String(actual.clause_text).slice(0, 60)}"` : 'field missing from payload'
+    ));
+  }
+  return results;
+}
+
+/* ── Suite: security invariants (source-file structural checks) ─── */
+function evalSecurityInvariants() {
+  const results = [];
+  const appSrc       = fs.readFileSync(path.join(__dirname, '../src/App.jsx'), 'utf8');
+  const laSrc        = fs.readFileSync(path.join(__dirname, '../src/screens/LeaseAnalysis.jsx'), 'utf8');
+  const netlifyToml  = fs.readFileSync(path.join(__dirname, '../netlify.toml'), 'utf8');
+
+  // Consent key is per-user (lg-consent-${user.id}), not shared
+  results.push(scoreResult(
+    'consent localStorage key is per-user (lg-consent-${...})',
+    appSrc.includes('lg-consent-${') || appSrc.includes('`lg-consent-${'),
+    'App.jsx must key consent by user.id — found shared lg-consent key or missing pattern'
+  ));
+
+  // DOMPurify.sanitize wraps dangerouslySetInnerHTML
+  results.push(scoreResult(
+    'dangerouslySetInnerHTML uses DOMPurify.sanitize()',
+    laSrc.includes('DOMPurify.sanitize('),
+    'AI summary must be sanitized before rendering (XSS protection)'
+  ));
+
+  // HSTS header present
+  results.push(scoreResult(
+    'netlify.toml has Strict-Transport-Security header',
+    netlifyToml.includes('Strict-Transport-Security'),
+    'HSTS required to prevent downgrade attacks'
+  ));
+
+  // CSP header present
+  results.push(scoreResult(
+    'netlify.toml has Content-Security-Policy header',
+    netlifyToml.includes('Content-Security-Policy'),
+    'CSP required to limit script/connect sources'
+  ));
+
+  // Permissions-Policy present
+  results.push(scoreResult(
+    'netlify.toml has Permissions-Policy header',
+    netlifyToml.includes('Permissions-Policy'),
+    'Permissions-Policy required to disable unused browser APIs'
+  ));
+
+  // Sign-out clears localStorage analysis data
+  results.push(scoreResult(
+    'sign-out removes lg-analysis from localStorage',
+    appSrc.includes("localStorage.removeItem('lg-analysis')"),
+    'App.jsx must clear cached analysis on sign-out to prevent cross-user data exposure'
+  ));
+
+  // Password minimum raised
+  const authSrc = fs.readFileSync(path.join(__dirname, '../src/screens/Auth.jsx'), 'utf8');
+  results.push(scoreResult(
+    'signup password minLength >= 12',
+    authSrc.includes('minLength={mode') && authSrc.includes('12'),
+    'Password minimum must be 12 chars for new signups'
+  ));
+
+  return results;
+}
+
 /* ── Report renderer ────────────────────────────────────────────── */
 function renderSuite(name, results) {
   const passed = results.filter(r => r.pass).length;
@@ -292,6 +382,18 @@ function runCase(testCase, payload) {
     console.log(DIM('    Add a "risk_flags" array to the webhook payload to enable flag evals.'));
   }
 
+  // 6. clause_text presence (only if fields present and test case requires it)
+  if (payload.fields && testCase.expected_fields) {
+    const hasClauseTextSpecs = Object.values(testCase.expected_fields).some(s => s.clause_text_required);
+    if (hasClauseTextSpecs) {
+      const ctResults = evalClauseText(payload.fields, testCase.expected_fields);
+      if (ctResults.length > 0) {
+        const ct = renderSuite('Clause text presence', ctResults);
+        totalPassed += ct.passed; totalTests += ct.total;
+      }
+    }
+  }
+
   // Summary
   const pct    = Math.round((totalPassed / totalTests) * 100);
   const status = totalPassed === totalTests ? PASS : FAIL;
@@ -328,6 +430,14 @@ function runCase(testCase, payload) {
     grandPassed += passed;
     grandTotal  += total;
   }
+
+  // Security invariants — run once, not per-case
+  console.log(`\n${'─'.repeat(60)}`);
+  console.log(BOLD('Security invariants (source-file structural checks)'));
+  const secResults = evalSecurityInvariants();
+  const sec = renderSuite('Security / GDPR / consent', secResults);
+  grandPassed += sec.passed;
+  grandTotal  += sec.total;
 
   console.log(`\n${'═'.repeat(60)}`);
   const allPass = grandPassed === grandTotal;

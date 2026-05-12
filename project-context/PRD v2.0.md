@@ -567,7 +567,7 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 
 **Acceptance Criteria:**
 - [ ] Report PDF contains inline clause excerpt text per field: section number + page + first 2 sentences of clause (not just section reference)
-- [ ] Cover page includes: AI model name (Anthropic Claude API), extraction date, LegalGraph version, human review sign-off (Rachel's name and date), PCAOB AS 1105 compliance statement
+- [ ] Cover page includes: AI model name (OpenAI GPT-5 mini via n8n), extraction date, LegalGraph version, human review sign-off (Rachel's name and date), PCAOB AS 1105 compliance statement
 - [ ] Audit trail log distinguishes AI-extracted fields from manually-verified fields with timestamps
 - [ ] Auditor can verify inline clause excerpts against the original contract PDF without accessing LegalGraph
 - [ ] Auditor portal (GA+1): shareable read-only link with active clause citations; no LegalGraph account required for auditor

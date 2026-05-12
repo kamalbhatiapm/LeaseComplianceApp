@@ -25,7 +25,10 @@ export function onAuthStateChange(callback) {
 
 export async function saveAnalysis({ fileName, analysisData, isLiveData, intent }) {
   if (!supabase) return null
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
   const { data, error } = await supabase.from('lease_analyses').insert({
+    user_id:       user.id,
     file_name:     fileName ?? null,
     contract_type: analysisData.contract_type ?? null,
     intent:        intent ?? null,

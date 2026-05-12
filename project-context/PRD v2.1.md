@@ -3,9 +3,13 @@
 **Status:** In Review
 **Author:** Senior PM, LegalGraph
 **Date:** 2026-05-08
-**Last Updated:** 2026-05-09 (v2.1 — updated after PRD review: AI eval strategy, pricing, structural MOAT, ChatGPT differentiation, metric ownership, false-negative guardrail)
+**Last Updated:** 2026-05-12 (v2.2 — updated after PRD review: corrected AI model name to OpenAI GPT-5 mini throughout, added standalone value proposition, added per-analysis cost and model upgrade path in §7.3)
 **Supersedes:** project-context/PRD.md v1.1 (2026-03-31) — full rewrite incorporating JTBD v1.1, USER-JOURNEY v1.1, market research, and user research (May 2026)
 **Context files read:** company-context/company-overview.md · user-personas.md · product-description.md · competitive-landscape.md · project-context/JTBD.md (v1.1) · USER-JOURNEY.md (v1.1) · PRD.md (v1.1) · outputs/market-research-legal-ai-2026.md · outputs/user-research-legal-ai-2026.md · templates/prd-template.md
+
+---
+
+**Value Proposition:** LegalGraph reduces a finance team's quarterly lease compliance cycle from 40–60 hours of manual extraction to under 45 minutes — with clause-level audit evidence that external auditors accept without revision requests.
 
 ---
 
@@ -172,7 +176,7 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 | "Not legal advice" disclaimer always visible on analysis screen | 100% of results views | Legal liability |
 | Consent modal fires before every new session (once-per-session after J8 fix) | 100% — no bypass | GDPR / data-processing compliance |
 | Report gate enforced — High flags block export | 100% | Auditor receiving unreviewed material risks |
-| Anthropic Claude API named in consent modal | 100% of consents | Jennifer's data governance evaluation (J6) |
+| OpenAI GPT-5 mini (via n8n) named in consent modal | 100% of consents | Jennifer's data governance evaluation (J6) |
 | AI extraction accuracy floor | ≥90% | Trust erosion and churn — Rachel fires us at >3 wrong fields per contract |
 | Human spot-check required on top 3 fields | 100% during beta — rent schedule, ROU asset value, termination provisions must be manually verified regardless of AI confidence score | False-negative risk: Claude can extract a materially wrong value with high confidence (e.g., $348K vs $3.48M annual rent). Confidence scoring does not protect against this failure mode. |
 | Webhook success rate | ≥99.5% | Mid-session abandonment (a leading churn signal) |
@@ -398,7 +402,7 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 
 **Acceptance Criteria:**
 - [ ] Report export blocked until all High-severity flags are resolved (live — guardrail)
-- [ ] PDF contains cover page: lease name, analysis date, standard (IFRS 16 / ASC 842), LegalGraph version, Anthropic Claude API disclosure, "AI-assisted, human-reviewed" statement with Rachel's name and date
+- [ ] PDF contains cover page: lease name, analysis date, standard (IFRS 16 / ASC 842), LegalGraph version, OpenAI GPT-5 mini (via n8n) disclosure, "AI-assisted, human-reviewed" statement with Rachel's name and date
 - [ ] Per-field table: extracted value, clause section reference + page, confidence indicator, AI-extracted vs. manually-verified badge
 - [ ] Risk flag summary: every flag raised, resolution action taken, who resolved it, timestamp
 - [ ] Audit trail log: extraction timestamp, model version, all manual edits with timestamps and editor names
@@ -435,7 +439,7 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 *As the General Counsel approving a new AI compliance tool, I want to get answers to my four evaluation questions — where data goes, whether auditors accept it, what it costs, and what happens if it's wrong — in under 30 minutes, so I can approve the DPA and budget without creating new legal or regulatory exposure.*
 
 **Acceptance Criteria:**
-- [ ] Consent modal names "Anthropic Claude API" explicitly and provides a data deletion contact (live)
+- [ ] Consent modal names "OpenAI GPT-5 mini (via n8n)" explicitly and provides a data deletion contact (live)
 - [ ] Consent modal specifies data retention policy (e.g., "your contracts are stored for X days; delete at [contact]")
 - [ ] Report gate prevents export with unresolved High flags (live — guardrail)
 - [ ] "Manually verified" badge visible on any field Rachel has overridden (live)
@@ -493,7 +497,7 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 
 **Acceptance Criteria:**
 - [ ] Report PDF contains inline clause excerpt text per field: section number + page + first 2 sentences of clause (not just section reference)
-- [ ] Cover page includes: AI model name (Anthropic Claude API), extraction date, LegalGraph version, human review sign-off (Rachel's name and date), PCAOB AS 1105 compliance statement
+- [ ] Cover page includes: AI model name (OpenAI GPT-5 mini via n8n), extraction date, LegalGraph version, human review sign-off (Rachel's name and date), PCAOB AS 1105 compliance statement
 - [ ] Audit trail log distinguishes AI-extracted fields from manually-verified fields with timestamps
 - [ ] Auditor can verify inline clause excerpts against the original contract PDF without accessing LegalGraph
 - [ ] Auditor portal (GA+1): shareable read-only link with active clause citations; no LegalGraph account required for auditor
@@ -629,6 +633,11 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 - Total build estimate: **~$200K fully-loaded** for 12-week GA program
 - Break-even: 25 accounts at $8K/year = $200K ARR — achievable within 6 months of GA given existing 45-account base
 
+**Per-analysis cost (GPT-5 mini via n8n):**
+- Estimated cost per contract analysis: ~$0.05–$0.10 (GPT-5 mini input/output at current OpenAI pricing for a ~15K-token lease extraction prompt)
+- At 10 leases × 4 quarters = 40 analyses/year per account: ~$2–$4/year per account — negligible vs. $8K entry price (<0.05% of revenue)
+- Model upgrade path: switching to GPT-5 (full) would increase cost ~5–10× per analysis (~$0.50–$1.00) with estimated +3–5pp accuracy improvement on complex variable-rent and CPI-escalation clauses. Recommended only if L1-3 accuracy falls below 92% guardrail on complex lease types.
+
 ---
 
 ## Open Questions
@@ -643,7 +652,7 @@ These cap what is permitted while optimising for the North Star. A guardrail bre
 
 ---
 
-*PRD Owner: Senior PM · Status: In Review · Version: 2.1*
+*PRD Owner: Senior PM · Status: In Review · Version: 2.2*
 *Context grounded in: JTBD v1.1 · USER-JOURNEY v1.1 · market-research-legal-ai-2026.md · user-research-legal-ai-2026.md · PRD v1.1 (project-context)*
 *Personas: Rachel (Compliance Lead), Jennifer (GC/CFO), David (Senior Associate), External Auditor (v1.1)*
 *v2.1 changes: structural MOAT argument · ChatGPT differentiation · AI Evaluation Strategy section · Pricing & Business Case · metric DRI assignments + PostHog named · human accuracy baseline added to L1-3 · false-negative guardrail (human spot-check on top 3 fields)*

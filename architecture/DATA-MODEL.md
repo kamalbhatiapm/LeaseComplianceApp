@@ -168,7 +168,7 @@ CREATE POLICY "analyses: own rows only"
     // ... one entry per IFRS 16 field
   },
   "analyzed_at": "2026-05-09T10:00:00.000Z",
-  "model": "gpt-4o-mini",               // pipeline model name for PCAOB AS 1105
+  "model": "gpt-5-mini",                // pipeline model name for PCAOB AS 1105
   "pipeline_version": "1.0"
 }
 ```

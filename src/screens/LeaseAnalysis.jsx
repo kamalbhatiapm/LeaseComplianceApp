@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import DOMPurify from 'dompurify'
 import {
   Sparkles, Pencil, Check, FileDown, Send, RefreshCw,
-  Paperclip, AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
+  AlertTriangle, CircleAlert, FlaskConical, CircleCheck,
   FileText, Loader, ScanText, Brain, ShieldCheck, Lock, X, ExternalLink,
 } from 'lucide-react'
 import Nav from '../components/AppNav.jsx'
@@ -161,8 +162,8 @@ function ClauseDrawer({ clause, onClose }) {
 
   if (!clause) return null
 
-  const confLabel = clause.conf >= 0.85 ? 'High confidence' : clause.conf > 0 ? 'Verify recommended' : 'Not found'
-  const confCls   = clause.conf >= 0.85 ? 'conf-high' : clause.conf > 0 ? 'conf-med' : 'conf-low'
+  const confLabel = clause.conf >= 0.85 && !clause.missing ? 'Verified' : 'Needs Review'
+  const confCls   = clause.conf >= 0.85 && !clause.missing ? 'conf-high' : 'conf-med'
 
   return (
     <>
@@ -170,7 +171,7 @@ function ClauseDrawer({ clause, onClose }) {
       <div className="clause-drawer" role="dialog" aria-label={`Clause detail: ${clause.ref}`}>
         <div className="clause-drawer-header">
           <div className="clause-drawer-title">
-            <Paperclip size={14} />
+            <span className="clause-word-label">Clause</span>
             {clause.ref}
           </div>
           <button className="clause-drawer-close" onClick={onClose} aria-label="Close"><X size={16} /></button>
@@ -190,13 +191,10 @@ function ClauseDrawer({ clause, onClose }) {
           </div>
 
           <div className="clause-drawer-section">
-            <div className="clause-drawer-label">AI Confidence</div>
+            <div className="clause-drawer-label">Status</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
               <span className={`confidence-dot ${confCls}`} />
               <span className="clause-drawer-value">{confLabel}</span>
-              {clause.conf > 0 && (
-                <span style={{ fontSize: '11px', color: 'var(--t3)' }}>({Math.round(clause.conf * 100)}%)</span>
-              )}
             </div>
           </div>
 
@@ -235,7 +233,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
     const f       = typeof raw === 'object' && raw !== null ? raw : { value: raw }
     const missing = f.value === null || f.value === undefined || f.value === ''
     const conf    = f.confidence ?? (missing ? 0 : 1)
-    const confCls = missing ? 'conf-low' : conf >= 0.85 ? 'conf-high' : 'conf-med'
+    const confCls = !missing && conf >= 0.85 ? 'conf-high' : 'conf-med'
     const uncertain = !missing && conf > 0 && conf < 0.85
     const label   = FIELD_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     const clause      = f.source_clause ?? ''
@@ -244,6 +242,11 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
 
     return { key, missing, confCls, uncertain, label, clause, clauseText, value: f.value, edited, conf, rawField: f }
   })
+
+  const sortedRows = [
+    ...rows.filter(r => !r.missing && r.conf >= 0.85),
+    ...rows.filter(r =>  r.missing || r.conf <  0.85),
+  ]
 
   const handleSave = () => {
     Object.entries(edits).forEach(([key, corrected_value]) => {
@@ -282,9 +285,8 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
       <div style={{ padding: '8px 18px 6px', borderBottom: '1px solid var(--divider, rgba(255,255,255,.06))', display: 'flex', gap: '16px', alignItems: 'center' }}>
         <span style={{ fontSize: '11px', color: 'var(--t3)' }}>Confidence:</span>
         {[
-          { cls: 'conf-high', label: 'High confidence' },
-          { cls: 'conf-med',  label: 'Verify recommended' },
-          { cls: 'conf-low',  label: 'Not found' },
+          { cls: 'conf-high', label: 'Verified' },
+          { cls: 'conf-med',  label: 'Needs Review' },
         ].map(({ cls, label }) => (
           <span key={cls} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--t3)' }}>
             <span className={`confidence-dot ${cls}`} style={{ flexShrink: 0 }} />{label}
@@ -296,7 +298,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
         <span>Extracted Value</span>
         <span>Source Clause</span>
       </div>
-      {rows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited }) => (
+      {sortedRows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
             <span className={`confidence-dot ${confCls}`} />
@@ -328,7 +330,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
               style={missing ? { color: 'var(--amber)' } : {}}
               onClick={() => setActiveClause({ ref: clause, clauseText, fieldLabel: label, value: edited ?? value, conf, missing })}
             >
-              {missing ? <AlertTriangle size={12} /> : <Paperclip size={12} />}
+              <span className="clause-word-label">Clause</span>
               {clause}
             </button>
           ) : <div />}
@@ -475,7 +477,7 @@ function FlagGuidance({ flagId, isHigh }) {
               onChange={e => setVal(e.target.value)}
             />
             {val && (
-              <span className="flag-guidance-saved">✓ Saved — will appear in audit log</span>
+              <span className="flag-guidance-saved">Note will appear in your export</span>
             )}
           </div>
         </div>
@@ -627,20 +629,6 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
             <RefreshCw size={12} /> Re-analyze
           </button>
-          <span className={exportLocked ? 'btn-tooltip-wrap' : ''} data-tip={exportLocked ? lockTitle : undefined}>
-            <button
-              className="btn btn-outline btn-sm"
-              disabled={exportLocked}
-              onClick={() => {
-                if (exportLocked) return
-                track('report_exported', { format: 'pdf', type: 'extraction' })
-                navigate('/audit')
-                setTimeout(() => window.print(), 150)
-              }}
-            >
-              {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export PDF
-            </button>
-          </span>
           {selectedFile && (
             <button
               className="btn btn-secondary btn-sm"
@@ -701,7 +689,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           {summary && (
             <div className="card" style={{ marginBottom: '20px' }}>
               <div className="card-title"><Sparkles size={14} /> AI Summary</div>
-              <div className="summary-text" dangerouslySetInnerHTML={{ __html: summary }} />
+              <div className="summary-text" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(summary) }} />
             </div>
           )}
 

@@ -7,7 +7,7 @@ export default function ConsentModal({ onGrant, onDeny }) {
           <p>By proceeding, you confirm that:</p>
           <ul style={{ paddingLeft: '18px', marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <li>You have the right to share this document for analysis.</li>
-            <li>The document will be processed by <strong>n8n</strong> and the <strong>OpenAI GPT-4o API</strong> to extract lease terms.</li>
+            <li>The document will be processed by <strong>n8n</strong> and the <strong>OpenAI GPT-5 mini API</strong> to extract lease terms.</li>
             <li>Extracted data is stored solely to generate your compliance report and is not used to train AI models.</li>
             <li>Do not upload documents containing highly sensitive personal data beyond what is necessary for lease compliance review.</li>
             <li>This tool is AI-assisted and requires human review. Output is not legal or financial advice.</li>
