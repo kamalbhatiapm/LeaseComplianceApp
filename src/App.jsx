@@ -163,7 +163,7 @@ export default function App() {
     localStorage.setItem('lg-consent', 'true')
     setShowConsent(false)
     runAnalysis()
-  }, [])
+  }, [selectedFile, analysisIntent])
 
   async function runAnalysis(intentOverride) {
     if (!selectedFile) return

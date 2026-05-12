@@ -1,5 +1,30 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { getExtractionQuality, FIELD_HINTS, MOCK_ANALYSIS } from '../utils/constants.js'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
+
+// ---------------------------------------------------------------------------
+// 0. App.jsx — grantConsent stale closure bug
+//    grantConsent useCallback must include selectedFile + analysisIntent in
+//    its dep array, otherwise it captures a stale runAnalysis from first
+//    render where selectedFile === null and analysis never fires after consent.
+// ---------------------------------------------------------------------------
+describe('App.jsx grantConsent closure', () => {
+  const src = readFileSync(resolve('/tmp/LeaseComplianceApp-fresh/src/App.jsx'), 'utf8')
+
+  it('grantConsent useCallback includes selectedFile in deps', () => {
+    // Match across lines: find the closing dep array of grantConsent's useCallback
+    const match = src.match(/grantConsent\s*=\s*useCallback\([\s\S]*?\},\s*\[([^\]]*)\]/)
+    expect(match, 'grantConsent useCallback not found').toBeTruthy()
+    expect(match[1]).toContain('selectedFile')
+  })
+
+  it('grantConsent useCallback includes analysisIntent in deps', () => {
+    const match = src.match(/grantConsent\s*=\s*useCallback\([\s\S]*?\},\s*\[([^\]]*)\]/)
+    expect(match, 'grantConsent useCallback not found').toBeTruthy()
+    expect(match[1]).toContain('analysisIntent')
+  })
+})
 
 // ---------------------------------------------------------------------------
 // 1. getExtractionQuality — used in the AuditTrail cover page
@@ -98,9 +123,6 @@ describe('MOCK_ANALYSIS clause_text', () => {
 // 4. Print CSS classes — verify the expected class names exist in the source
 //    (structural smoke test — catches regressions if classes are renamed)
 // ---------------------------------------------------------------------------
-import { readFileSync } from 'fs'
-import { resolve } from 'path'
-
 describe('print CSS classes in globals.css', () => {
   const css = readFileSync(
     resolve('/tmp/LeaseComplianceApp-fresh/src/styles/globals.css'), 'utf8'
