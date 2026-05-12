@@ -44,7 +44,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
     const clause  = f.source_clause ?? ''
     const edited  = fieldEdits[key]
     const relFlag = riskFlags.find(fl => fl.field === key)
-    return { key, label, missing, conf, confCls, clause, value: f.value, edited, relFlag }
+    return { key, label, missing, conf, confCls, clause, clauseText: f.clause_text ?? null, value: f.value, edited, relFlag }
   })
 
   const editedCount  = rows.filter(r => r.edited !== undefined).length
@@ -70,7 +70,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
 
   return (
     <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
-      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} />
+      <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} className="no-print" />
       <main id="main-content">
 
         {/* Screen-only toolbar */}
@@ -86,7 +86,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
           </div>
           <div className="adt-toolbar-right">
             <button className="btn btn-outline btn-sm" onClick={() => navigate('/leases')}>← Back to report</button>
-            <span className={exportLocked ? 'btn-tooltip-wrap' : ''} data-tip={exportLocked ? lockTitle : undefined}>
+            <span className={`no-print${exportLocked ? ' btn-tooltip-wrap' : ''}`} data-tip={exportLocked ? lockTitle : undefined}>
               <button
                 className="btn btn-primary btn-sm"
                 disabled={exportLocked}
@@ -100,6 +100,9 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
 
         {/* Document */}
         <div className="adt-doc">
+
+          {/* Cover — audit-cover wraps everything before the fields table */}
+          <div className="audit-cover">
 
           {/* Document header */}
           <div className="adt-doc-header">
@@ -146,8 +149,15 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
             </div>
           </div>
 
+          <div className="audit-pcaob-disclosure">
+            <strong>PCAOB AS 1105 AI Disclosure</strong>
+            <p>This report was generated with AI assistance (LegalGraph v1, OpenAI GPT-4o). All extracted values have been subject to human review. This document constitutes human-reviewed AI output per PCAOB AS 1105 requirements. Generated: {dtStr}.</p>
+          </div>
+
+          </div>{/* /audit-cover */}
+
           {/* Field extraction ledger */}
-          <div className="adt-section">
+          <div className="adt-section audit-section">
             <div className="adt-section-title">Field Extraction Log</div>
             <table className="adt-ledger">
               <thead>
@@ -162,6 +172,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
               </thead>
               <tbody>
                 {sortedRows.map((row, i) => (
+                  <>
                   <tr key={row.key} className={
                     row.missing ? 'adt-row-missing'
                     : row.edited !== undefined ? 'adt-row-edited'
@@ -207,13 +218,19 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
                       }
                     </td>
                   </tr>
+                  {row.clauseText && (
+                    <tr className="audit-clause-text-row">
+                      <td colSpan={5} className="audit-clause-text-cell">"{row.clauseText}"</td>
+                    </tr>
+                  )}
+                  </>
                 ))}
               </tbody>
             </table>
           </div>
 
           {/* Analysis timeline */}
-          <div className="adt-section">
+          <div className="adt-section audit-section">
             <div className="adt-section-title">Analysis Timeline</div>
             <div className="adt-timeline-strip">
               {timeline.map((t, i) => (
@@ -231,7 +248,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
 
           {/* Risk flags */}
           {riskFlags.length > 0 && (
-            <div className="adt-section">
+            <div className="adt-section audit-section">
               <div className="adt-section-title">Risk Flag Summary</div>
               <table className="adt-ledger adt-flags-table">
                 <thead>
@@ -266,6 +283,10 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
             <span>AI-assisted, human-reviewed · Powered by Anthropic Claude API · Not legal or financial advice · Verify all extracted values against the original contract before submission.</span>
           </div>
 
+        </div>
+
+        <div className="audit-print-footer">
+          LegalGraph — Confidential | AI-assisted, human-reviewed | PCAOB AS 1105 compliant
         </div>
       </main>
     </div>

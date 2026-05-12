@@ -630,7 +630,12 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
             <button
               className="btn btn-outline btn-sm"
               disabled={exportLocked}
-              onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'extraction' })}
+              onClick={() => {
+                if (exportLocked) return
+                track('report_exported', { format: 'pdf', type: 'extraction' })
+                navigate('/audit')
+                setTimeout(() => window.print(), 150)
+              }}
             >
               {exportLocked ? <Lock size={12} /> : <FileDown size={12} />} Export PDF
             </button>
@@ -710,7 +715,12 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
             <div className="completion-banner">
               <CircleCheck size={16} />
               <span>All risks acknowledged — report is ready to export.</span>
-              <button className="btn btn-sm btn-primary" onClick={() => track('report_exported', { format: 'pdf', type: 'banner' })}>
+              <button className="btn btn-sm btn-primary" onClick={() => {
+                if (exportLocked) return
+                track('report_exported', { format: 'pdf', type: 'banner' })
+                navigate('/audit')
+                setTimeout(() => window.print(), 150)
+              }}>
                 <FileDown size={12} /> Export PDF
               </button>
               <button className="btn btn-sm btn-outline" onClick={() => track('report_sent', { method: 'email', source: 'banner' })}>
@@ -730,7 +740,12 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
                   className="action-btn"
                   aria-label="Export report to PDF"
                   disabled={exportLocked}
-                  onClick={() => !exportLocked && track('report_exported', { format: 'pdf', type: 'sidebar' })}
+                  onClick={() => {
+                    if (exportLocked) return
+                    track('report_exported', { format: 'pdf', type: 'sidebar' })
+                    navigate('/audit')
+                    setTimeout(() => window.print(), 150)
+                  }}
                 >
                   {exportLocked ? <Lock size={14} aria-hidden="true" /> : <FileDown size={14} aria-hidden="true" />} Export to PDF
                 </button>
