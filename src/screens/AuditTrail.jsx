@@ -9,7 +9,7 @@ function getRiskLevel(score) {
   if (score < 70) return { level: 'Medium', color: '#b45309' }
   return               { level: 'High',   color: '#dc2626' }
 }
-import Nav from '../components/Nav.jsx'
+import Nav from '../components/AppNav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
 import { track } from '../utils/track.js'
 
