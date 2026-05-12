@@ -205,7 +205,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
                     <td>
                       <div className="adt-conf-cell">
                         <span className={`confidence-dot ${row.confCls}`} style={{ width: '7px', height: '7px' }} />
-                        <span className="adt-conf-pct">{row.conf > 0 ? `${Math.round(row.conf * 100)}%` : '—'}</span>
+                        <span className="adt-conf-pct">{row.missing ? '—' : row.conf >= 0.85 ? 'Verified' : 'Needs Review'}</span>
                       </div>
                     </td>
                     <td>
