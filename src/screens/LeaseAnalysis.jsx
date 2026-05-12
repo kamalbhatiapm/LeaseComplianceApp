@@ -144,6 +144,7 @@ function MetricGrid({ fields, data, edits = {} }) {
 
   const annualRentRaw = get('annual_payment') ?? get('annual_payment_usd')
   const discountRaw   = get('discount_rate')
+  const rentPeriod    = /month|\/mo|p\.m\./i.test(annualRentRaw ?? '') ? 'Per month' : 'Per annum'
 
   // Extract just the dollar/numeric amount from verbose rent strings
   const extractAmount = raw => {
@@ -155,9 +156,9 @@ function MetricGrid({ fields, data, edits = {} }) {
   const annualRent = extractAmount(annualRentRaw)
 
   const cards = [
-    { label: 'Lease Duration',  val: duration,    sub: durationSub || 'From commencement to expiry',          flagged: duration === '—' },
-    { label: 'Annual Base Rent',val: annualRent,   sub: annualRent ? 'Base rent per annum' : 'Not extracted',  flagged: !annualRent },
-    { label: 'Remaining Term',  val: remaining,    sub: expirySub || 'Expiry date not found',                  flagged: remaining === '—' },
+    { label: 'Lease Duration',  val: duration,    sub: durationSub || 'Enter expiry date via Edit terms ↓',   flagged: duration === '—' },
+    { label: 'Annual Base Rent',val: annualRent,   sub: annualRent ? rentPeriod : 'Not extracted',             flagged: !annualRent },
+    { label: 'Remaining Term',  val: remaining,    sub: expirySub || 'Enter expiry date via Edit terms ↓',     flagged: remaining === '—' },
     { label: 'Borrowing Rate',  val: discountRaw,  sub: discountRaw ? '' : 'Manual input required', flagged: !discountRaw },
   ]
   return (
@@ -340,10 +341,10 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
       <div style={{ padding: '8px 18px 6px', borderBottom: '1px solid var(--divider, rgba(255,255,255,.06))', display: 'flex', gap: '16px', alignItems: 'center' }}>
         <span style={{ fontSize: '11px', color: 'var(--t3)' }}>Confidence:</span>
         {[
-          { cls: 'conf-high', label: 'Verified' },
-          { cls: 'conf-med',  label: 'Needs Review' },
-        ].map(({ cls, label }) => (
-          <span key={cls} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--t3)' }}>
+          { cls: 'conf-high', label: 'Verified',     tip: 'AI confidence ≥ 85% — value matches a clearly labelled clause' },
+          { cls: 'conf-med',  label: 'Needs Review', tip: 'AI confidence < 85% or field not found — verify against original contract' },
+        ].map(({ cls, label, tip }) => (
+          <span key={cls} title={tip} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--t3)', cursor: 'help' }}>
             <span className={`confidence-dot ${cls}`} style={{ flexShrink: 0 }} />{label}
           </span>
         ))}
@@ -356,7 +357,10 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
       {sortedRows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited, computed }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
-            <span className={`confidence-dot ${confCls}`} />
+            <span
+              className={`confidence-dot ${confCls}`}
+              title={confCls === 'conf-high' ? 'Verified — AI confidence ≥ 85%' : missing ? 'Not found in contract' : 'Needs Review — AI confidence < 85%'}
+            />
             {label}
             {computed && <span style={{ fontSize: '10px', opacity: .45, marginLeft: '5px', fontStyle: 'italic' }}>calculated</span>}
           </div>
@@ -682,7 +686,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           </div>
         </div>
         <div className="s2-subheader-actions">
-          <button className="btn btn-outline btn-sm" onClick={() => track('reanalyze')}>
+          <button className="btn btn-outline btn-sm" onClick={() => { track('reanalyze', { intent: analysisIntent }); handleReanalyzeAs(analysisIntent) }}>
             <RefreshCw size={12} /> Re-analyze
           </button>
           {selectedFile && (
