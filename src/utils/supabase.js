@@ -55,6 +55,23 @@ export async function updateFieldEdits(rowId, fieldEdits) {
   if (error) console.error('[LegalGraph] Supabase field_edits update error:', error.message)
 }
 
+export async function saveFeedback({ analysisId, type, key, verdict, value, confidence, sourceClause }) {
+  if (!supabase) return
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  const { error } = await supabase.from('feedback').insert({
+    user_id:       user.id,
+    analysis_id:   analysisId ?? null,
+    type,
+    key,
+    verdict,
+    value:         value ?? null,
+    confidence:    confidence ?? null,
+    source_clause: sourceClause ?? null,
+  })
+  if (error) console.error('[LegalGraph] Supabase feedback save error:', error.message)
+}
+
 export async function loadLatestAnalysis() {
   if (!supabase) return null
   const { data, error } = await supabase

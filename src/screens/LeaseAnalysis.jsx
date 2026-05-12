@@ -10,6 +10,7 @@ import {
 import Nav from '../components/AppNav.jsx'
 import { MOCK_ANALYSIS, FIELD_LABELS, FIELD_HINTS, getExtractionQuality } from '../utils/constants.js'
 import { track } from '../utils/track.js'
+import { saveFeedback } from '../utils/supabase.js'
 
 const QUIPS = [
   "Translating 'hereinafter referred to as' into English…",
@@ -257,13 +258,15 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits, analysisRowId, 
   const submitFieldFeedback = (key, verdict, row) => {
     if (fieldFeedback[key]) return
     setFieldFeedback(prev => ({ ...prev, [key]: verdict }))
-    track('field_feedback', {
+    const payload = {
       key,
       verdict,
       value: row.edited ?? row.value ?? null,
       confidence: row.conf,
       source_clause: row.clause,
-    })
+    }
+    track('field_feedback', payload)
+    saveFeedback({ analysisId: analysisRowId, type: 'field', key, verdict, value: payload.value, confidence: payload.confidence, sourceClause: payload.source_clause })
     if (verdict === 'down') setEditMode(true)
   }
 
@@ -587,8 +590,8 @@ function FlagGuidance({ flagId, isHigh }) {
   )
 }
 
-function RiskFlags({ flags, onGateChange, stdLabel = 'IFRS 16' }) {
-  const [signoffs, setSignoffs]       = useState({})
+function RiskFlags({ flags, onGateChange, stdLabel = 'IFRS 16', analysisRowId }) {
+  const [signoffs, setSignoffs]         = useState({})
   const [flagFeedback, setFlagFeedback] = useState({}) // { [id]: 'relevant' | 'not_relevant' }
 
   const toggle = id => {
@@ -602,6 +605,7 @@ function RiskFlags({ flags, onGateChange, stdLabel = 'IFRS 16' }) {
     if (flagFeedback[id]) return
     setFlagFeedback(prev => ({ ...prev, [id]: verdict }))
     track('flag_feedback', { flag_id: id, verdict })
+    saveFeedback({ analysisId: analysisRowId, type: 'flag', key: id, verdict })
   }
 
   return (
@@ -820,7 +824,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
           <TermsGrid fields={fields} termsMissing={termsMissing} edits={fieldEdits ?? {}} setEdits={setFieldEdits ?? (() => {})} analysisRowId={analysisRowId} onSaveEdits={updateFieldEdits} />
 
           {/* Risk flags */}
-          <RiskFlags flags={riskFlags} onGateChange={onGateChange} stdLabel={stdMeta.label} />
+          <RiskFlags flags={riskFlags} onGateChange={onGateChange} stdLabel={stdMeta.label} analysisRowId={analysisRowId} />
 
           {/* Completion banner */}
           {gateOpen && highFlags.length > 0 && (
