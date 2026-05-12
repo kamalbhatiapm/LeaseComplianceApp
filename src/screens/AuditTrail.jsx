@@ -151,7 +151,7 @@ export default function AuditTrail({ selectedFile, analysisData, navLocked, them
 
           <div className="audit-pcaob-disclosure">
             <strong>PCAOB AS 1105 AI Disclosure</strong>
-            <p>This report was generated with AI assistance (LegalGraph v1, OpenAI GPT-4o). All extracted values have been subject to human review. This document constitutes human-reviewed AI output per PCAOB AS 1105 requirements. Generated: {dtStr}.</p>
+            <p>This report was generated with AI assistance (LegalGraph v1, OpenAI GPT-5 mini). All extracted values have been subject to human review. This document constitutes human-reviewed AI output per PCAOB AS 1105 requirements. Generated: {dtStr}.</p>
           </div>
 
           </div>{/* /audit-cover */}
