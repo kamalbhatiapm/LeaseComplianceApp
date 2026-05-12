@@ -295,7 +295,7 @@ function TermsGrid({ fields, termsMissing = [], edits, setEdits }) {
         <span>Extracted Value</span>
         <span>Source Clause</span>
       </div>
-      {rows.map(({ key, missing, confCls, uncertain, conf, label, clause, value, edited }) => (
+      {rows.map(({ key, missing, confCls, uncertain, conf, label, clause, clauseText, value, edited }) => (
         <div key={key} className={`term-row${missing ? ' term-missing' : ''}`}>
           <div className="term-label">
             <span className={`confidence-dot ${confCls}`} />
