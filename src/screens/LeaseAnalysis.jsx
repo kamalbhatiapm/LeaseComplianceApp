@@ -184,7 +184,7 @@ function ClauseDrawer({ clause, onClose }) {
 
           <div className="clause-drawer-section">
             <div className="clause-drawer-label">Extracted Value</div>
-            <div className="clause-drawer-value" style={{ color: clause.missing ? 'var(--amber)' : 'inherit' }}>
+            <div className="clause-drawer-value" style={clause.missing ? { color: 'var(--amber)' } : {}}>
               {clause.missing ? 'Not found in contract' : clause.value}
             </div>
           </div>
