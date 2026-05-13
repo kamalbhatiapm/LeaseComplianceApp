@@ -1,0 +1,91 @@
+{
+  "id": "industrial-warehouse-003",
+  "description": "15-year industrial warehouse lease, Dallas TX — IFRS 16, CPI-linked escalation uncertainty, long renewal chain, no security deposit",
+  "source_file": "industrial-warehouse-003.pdf",
+  "standard": "IFRS 16",
+  "model": "OpenAI GPT-5 mini via n8n",
+
+  "expected_webhook_payload": {
+    "contract_type": "Industrial Warehouse Lease",
+    "terms_found": [
+      "commencement_date",
+      "expiry_date",
+      "annual_payment",
+      "escalation_rate",
+      "renewal_options",
+      "termination_rights",
+      "discount_rate",
+      "rou_asset_value"
+    ],
+    "terms_missing": ["security_deposit"],
+    "risk_score": 55
+  },
+
+  "expected_fields": {
+    "commencement_date":           { "value": "2021-01-01",      "source_clause": "§2.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "expiry_date":                 { "value": "2035-12-31",      "source_clause": "§2.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "lease_term_years":            { "value": 15,                "source_clause": "§2.1",  "confidence_min": 0.92, "clause_text_required": true },
+    "annual_payment_usd":          { "value": 1200000,           "source_clause": "§5.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "monthly_payment_usd":         { "value": 100000,            "source_clause": "§5.1",  "confidence_min": 0.92, "clause_text_required": true },
+    "escalation_rate_type":        { "value": "CPI-linked",      "source_clause": "§5.3",  "confidence_min": 0.90, "clause_text_required": true },
+    "escalation_rate_pct":         { "value": null,              "source_clause": "§5.3",  "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false, "note": "Variable CPI-linked — no fixed percentage extractable" },
+    "renewal_option_count":        { "value": 3,                 "source_clause": "§3.1",  "confidence_min": 0.93, "clause_text_required": true },
+    "renewal_term_years":          { "value": 5,                 "source_clause": "§3.1",  "confidence_min": 0.92, "clause_text_required": true },
+    "renewal_total_potential_years": { "value": 15,             "source_clause": "§3.1",  "confidence_min": 0.88, "clause_text_required": true },
+    "security_deposit_usd":        { "value": null,              "source_clause": null,    "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false },
+    "termination_rights":          { "value": "Non-cancellable", "source_clause": "§9.1",  "confidence_min": 0.92, "clause_text_required": true },
+    "termination_party":           { "value": "Neither Party",   "source_clause": "§9.1",  "confidence_min": 0.90, "clause_text_required": true },
+    "discount_rate_pct":           { "value": 5.2,               "source_clause": "§7.1",  "confidence_min": 0.93, "clause_text_required": true },
+    "governing_law":               { "value": "Texas",           "source_clause": "§14.1", "confidence_min": 0.93, "clause_text_required": true },
+    "rou_asset_value":             { "value": null,              "source_clause": "§7.1",  "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false, "note": "Cannot be computed without fixed escalation rate — CPI uncertainty prevents deterministic valuation" }
+  },
+
+  "expected_risk_flags": [
+    {
+      "id": "cpi_escalation_uncertainty",
+      "severity": "medium",
+      "field": "escalation_rate",
+      "description_contains": "CPI"
+    },
+    {
+      "id": "renewal_chain_scope_risk",
+      "severity": "medium",
+      "field": "renewal_options",
+      "description_contains": "reasonably certain"
+    },
+    {
+      "id": "missing_security_deposit",
+      "severity": "low",
+      "field": "security_deposit",
+      "description_contains": "security deposit"
+    },
+    {
+      "id": "long_term_commitment",
+      "severity": "medium",
+      "field": "expiry_date",
+      "description_contains": "long-term"
+    }
+  ],
+
+  "expected_risk_score": {
+    "value": 55,
+    "range_min": 48,
+    "range_max": 63,
+    "label": "Medium"
+  },
+
+  "extraction_coverage": {
+    "total_ifrs16_fields": 9,
+    "expected_found": 7,
+    "expected_missing": 2
+  },
+
+  "notes": [
+    "CPI-linked escalation means no fixed escalation_rate_pct can be extracted — extractor must identify variable escalation type and flag uncertainty for IFRS 16 lease payment computation",
+    "3 x 5-year renewals = up to 30 additional years of potential lease scope under IFRS 16.19 — renewal certainty assessment required",
+    "fully non-cancellable lease (neither party can terminate) — positive signal for IFRS 16 lease term certainty but increases long-term commitment risk",
+    "no security deposit — absence must be flagged; may indicate strong lessee creditworthiness or oversight",
+    "discount_rate present at 5.2% — but rou_asset_value cannot be deterministically computed without fixed escalation schedule",
+    "governing law: Texas — standard commercial industrial lease jurisdiction"
+  ]
+}

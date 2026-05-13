@@ -171,10 +171,10 @@ function MetricGrid({ fields, data, edits = {} }) {
       {cards.map(c => (
         <div key={c.label} className={`metric-card${c.flagged ? ' flagged' : ''}`}>
           <div className="metric-label">{c.label}</div>
-          <div className="metric-val">
+          <div className="metric-val" title={c.val ?? undefined}>
             {c.flagged && !c.val ? <><CircleAlert size={14} /> Missing</> : (c.val ?? 'N/A')}
           </div>
-          <div className="metric-sub">{c.sub}</div>
+          {c.sub && <div className="metric-sub" title={c.sub}>{c.sub}</div>}
         </div>
       ))}
     </div>

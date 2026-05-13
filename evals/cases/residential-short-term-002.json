@@ -1,0 +1,91 @@
+{
+  "id": "residential-short-term-002",
+  "description": "2-year residential apartment lease, Chicago IL — IFRS 16, short-term exemption eligibility flag, lessee termination right",
+  "source_file": "residential-short-term-002.pdf",
+  "standard": "IFRS 16",
+  "model": "OpenAI GPT-5 mini via n8n",
+
+  "expected_webhook_payload": {
+    "contract_type": "Residential Lease",
+    "terms_found": [
+      "commencement_date",
+      "expiry_date",
+      "annual_payment",
+      "termination_rights",
+      "security_deposit",
+      "discount_rate"
+    ],
+    "terms_missing": [
+      "escalation_rate",
+      "renewal_options",
+      "rou_asset_value"
+    ],
+    "risk_score": 50
+  },
+
+  "expected_fields": {
+    "commencement_date":           { "value": "2024-06-01",    "source_clause": "§2.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "expiry_date":                 { "value": "2026-05-31",    "source_clause": "§2.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "lease_term_years":            { "value": 2,               "source_clause": "§2.1",  "confidence_min": 0.92, "clause_text_required": true },
+    "annual_payment_usd":          { "value": 36000,           "source_clause": "§5.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "monthly_payment_usd":         { "value": 3000,            "source_clause": "§5.1",  "confidence_min": 0.93, "clause_text_required": true },
+    "escalation_rate_pct":         { "value": null,            "source_clause": null,    "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false },
+    "renewal_option_count":        { "value": 0,               "source_clause": null,    "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false },
+    "security_deposit_usd":        { "value": 6000,            "source_clause": "§6.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "termination_notice_days":     { "value": 60,              "source_clause": "§9.1",  "confidence_min": 0.90, "clause_text_required": true },
+    "termination_party":           { "value": "Lessee",        "source_clause": "§9.1",  "confidence_min": 0.88, "clause_text_required": true },
+    "discount_rate_pct":           { "value": 4.5,             "source_clause": "§7.1",  "confidence_min": 0.93, "clause_text_required": true },
+    "discount_rate_basis":         { "value": "IBR",           "source_clause": "§7.1",  "confidence_min": 0.88, "clause_text_required": true },
+    "governing_law":               { "value": "Illinois",      "source_clause": "§14.1", "confidence_min": 0.93, "clause_text_required": true },
+    "rou_asset_value":             { "value": null,            "source_clause": null,    "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false }
+  },
+
+  "expected_risk_flags": [
+    {
+      "id": "short_term_exemption_eligible",
+      "severity": "medium",
+      "field": "expiry_date",
+      "description_contains": "short-term"
+    },
+    {
+      "id": "lessee_termination_right",
+      "severity": "medium",
+      "field": "termination_rights",
+      "description_contains": "termination"
+    },
+    {
+      "id": "no_escalation_clause",
+      "severity": "low",
+      "field": "escalation_rate",
+      "description_contains": "escalation"
+    },
+    {
+      "id": "no_renewal_options",
+      "severity": "low",
+      "field": "renewal_options",
+      "description_contains": "renewal"
+    }
+  ],
+
+  "expected_risk_score": {
+    "value": 50,
+    "range_min": 43,
+    "range_max": 58,
+    "label": "Medium"
+  },
+
+  "extraction_coverage": {
+    "total_ifrs16_fields": 9,
+    "expected_found": 6,
+    "expected_missing": 3
+  },
+
+  "notes": [
+    "2-year term exceeds IFRS 16 12-month short-term exemption threshold, but lessee termination right (60-day notice) effectively shortens non-cancellable period — extractor must flag IFRS 16.B34 short-term exemption eligibility assessment",
+    "lessee termination with 60-day notice substantially reduces lease term under IFRS 16 — medium risk flag",
+    "no escalation clause present — zero rent growth increases relative cost certainty but flags absence (+5 pts)",
+    "discount_rate provided as IBR (incremental borrowing rate) at 4.5% — this is a positive signal; rou_asset_value should be computable but is left absent as extractor must derive it",
+    "no renewal options — lease scope is bounded; no IFRS 16.19 renewal chain risk",
+    "governing law: Illinois — residential tenancy law applies alongside IFRS 16"
+  ]
+}
