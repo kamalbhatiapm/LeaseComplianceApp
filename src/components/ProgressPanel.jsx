@@ -1,11 +1,15 @@
-const STEPS = [
-  'Identifying lease type and parties',
-  'Finding commencement date, rent schedule, and renewals',
-  'Scoring risk against IFRS 16 §§ 19, 26, B34',
-  'Generating your audit-ready report',
-]
+const getSteps = (intent) => {
+  const std = intent === 'asc842_compliance' ? 'ASC 842' : 'IFRS 16'
+  return [
+    'Identifying lease type and parties',
+    'Finding commencement date, rent schedule, and renewals',
+    `Checking lease terms against ${std} requirements`,
+    'Generating your audit-ready report',
+  ]
+}
 
-export default function ProgressPanel({ file, progress }) {
+export default function ProgressPanel({ file, progress, analysisIntent }) {
+  const STEPS = getSteps(analysisIntent)
   const { step, label, pct, error } = progress
 
   return (
