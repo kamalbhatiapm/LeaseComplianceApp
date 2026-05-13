@@ -29,14 +29,18 @@ const QUIPS = [
   "Extracting the important bits so you don't have to fake-read 47 pages.",
 ]
 
-const LOADING_STEPS = [
-  { icon: FileText, label: 'Identifying lease type and parties'                   },
-  { icon: ScanText, label: 'Finding commencement date, rent schedule, and renewals' },
-  { icon: Brain,    label: 'Scoring risk against IFRS 16 §§ 19, 26, B34'          },
-  { icon: Sparkles, label: 'Generating your audit-ready report'                   },
-]
+const getLoadingSteps = (intent) => {
+  const std = intent === 'asc842_compliance' ? 'ASC 842' : 'IFRS 16'
+  return [
+    { icon: FileText, label: 'Identifying lease type and parties'                      },
+    { icon: ScanText, label: 'Finding commencement date, rent schedule, and renewals'  },
+    { icon: Brain,    label: `Checking lease terms against ${std} requirements`        },
+    { icon: Sparkles, label: 'Generating your audit-ready report'                      },
+  ]
+}
 
-function AnalysisLoader({ file, progress }) {
+function AnalysisLoader({ file, progress, analysisIntent }) {
+  const LOADING_STEPS = getLoadingSteps(analysisIntent)
   const { step, pct, label, error } = progress
   const [quipIdx, setQuipIdx] = useState(() => Math.floor(Math.random() * QUIPS.length))
   const [fade, setFade]       = useState(true)
@@ -694,7 +698,7 @@ export default function LeaseAnalysis({ selectedFile, analysisData, isLiveData, 
     return (
       <div style={{ background: 'var(--page-bg)', minHeight: '100vh', paddingTop: '53px' }}>
         <Nav locked={navLocked} theme={theme} onToggleTheme={toggleTheme} user={user} />
-        <AnalysisLoader file={selectedFile} progress={progress} />
+        <AnalysisLoader file={selectedFile} progress={progress} analysisIntent={analysisIntent} />
       </div>
     )
   }

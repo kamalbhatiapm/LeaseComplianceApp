@@ -88,7 +88,7 @@ export default function Dashboard({ selectedFile, handleFileSelected, handleFile
           {/* Upload zone */}
           <div className="s1-upload-panel">
             {isAnalyzing ? (
-              <ProgressPanel file={selectedFile} progress={progress} />
+              <ProgressPanel file={selectedFile} progress={progress} analysisIntent={analysisIntent} />
             ) : (
               <div
                 className={`upload-zone${dragging ? ' drag-over' : ''}`}
