@@ -1,0 +1,91 @@
+{
+  "id": "office-asc842-004",
+  "description": "3-year office lease, Austin TX — ASC 842 standard, missing discount rate, landlord-only termination right",
+  "source_file": "office-asc842-004.pdf",
+  "standard": "ASC 842",
+  "model": "OpenAI GPT-5 mini via n8n",
+
+  "expected_webhook_payload": {
+    "contract_type": "Commercial Office Lease",
+    "terms_found": [
+      "commencement_date",
+      "expiry_date",
+      "annual_payment",
+      "escalation_rate",
+      "termination_rights",
+      "security_deposit"
+    ],
+    "terms_missing": [
+      "discount_rate",
+      "renewal_options",
+      "rou_asset_value"
+    ],
+    "risk_score": 70
+  },
+
+  "expected_fields": {
+    "commencement_date":           { "value": "2025-01-01",    "source_clause": "§2.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "expiry_date":                 { "value": "2027-12-31",    "source_clause": "§2.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "lease_term_years":            { "value": 3,               "source_clause": "§2.1",  "confidence_min": 0.92, "clause_text_required": true },
+    "annual_payment_usd":          { "value": 180000,          "source_clause": "§5.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "monthly_payment_usd":         { "value": 15000,           "source_clause": "§5.1",  "confidence_min": 0.93, "clause_text_required": true },
+    "escalation_rate_pct":         { "value": 3.0,             "source_clause": "§5.3",  "confidence_min": 0.93, "clause_text_required": true },
+    "renewal_option_count":        { "value": 0,               "source_clause": null,    "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false },
+    "security_deposit_usd":        { "value": 30000,           "source_clause": "§6.1",  "confidence_min": 0.95, "clause_text_required": true },
+    "termination_notice_months":   { "value": 6,               "source_clause": "§9.1",  "confidence_min": 0.88, "clause_text_required": true },
+    "termination_party":           { "value": "Landlord",      "source_clause": "§9.1",  "confidence_min": 0.87, "clause_text_required": true },
+    "governing_law":               { "value": "Texas",         "source_clause": "§14.1", "confidence_min": 0.93, "clause_text_required": true },
+    "discount_rate":               { "value": null,            "source_clause": null,    "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false },
+    "rou_asset_value":             { "value": null,            "source_clause": null,    "confidence_min": 0.0,  "intentionally_absent": true, "clause_text_required": false }
+  },
+
+  "expected_risk_flags": [
+    {
+      "id": "missing_discount_rate",
+      "severity": "high",
+      "field": "discount_rate",
+      "description_contains": "discount rate"
+    },
+    {
+      "id": "landlord_termination_right",
+      "severity": "high",
+      "field": "termination_rights",
+      "description_contains": "termination"
+    },
+    {
+      "id": "short_term_no_renewal",
+      "severity": "medium",
+      "field": "renewal_options",
+      "description_contains": "renewal"
+    },
+    {
+      "id": "security_deposit_classification",
+      "severity": "low",
+      "field": "security_deposit",
+      "description_contains": "security deposit"
+    }
+  ],
+
+  "expected_risk_score": {
+    "value": 70,
+    "range_min": 63,
+    "range_max": 78,
+    "label": "High"
+  },
+
+  "extraction_coverage": {
+    "total_ifrs16_fields": 9,
+    "expected_found": 6,
+    "expected_missing": 3
+  },
+
+  "notes": [
+    "ASC 842 standard — extractor must apply ASC 842 logic not IFRS 16; incremental borrowing rate (IBR) is the fallback rate under ASC 842-20-30-3",
+    "discount_rate intentionally absent — under ASC 842 this blocks right-of-use asset and lease liability calculation (+25 pts)",
+    "landlord-only termination with 6-month notice creates significant lessee uncertainty — under ASC 842, a termination option exercisable by the lessor shortens the enforceable lease term (+15 pts)",
+    "no renewal options — lease terminates in 3 years with no extension path; combined with landlord termination right, effective non-cancellable period may be as short as 6 months",
+    "rou_asset_value cannot be computed without discount rate",
+    "governing law: Texas — standard commercial office lease jurisdiction",
+    "this case is intentionally a short-term high-risk ASC 842 scenario to contrast with the longer IFRS 16 cases"
+  ]
+}
